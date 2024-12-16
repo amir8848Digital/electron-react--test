@@ -4,6 +4,8 @@ import { getStaticData, pollResources } from './resourceManager.js';
 import { getPreloadPath, getUIPath } from './pathResolver.js';
 import { createTray } from './tray.js';
 import { createMenu } from './menu.js';
+import pkg from 'pg';
+const { Client } = pkg;
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
@@ -43,6 +45,22 @@ app.on('ready', () => {
   handleCloseEvents(mainWindow);
   // createMenu(mainWindow);
 });
+
+export const client = new Client({
+  user: 'root',
+  host: 'postgresql-189014-0.cloudclusters.net',
+  database: 'Test', 
+  password: 'password', 
+  port: 10071,
+});
+
+client.connect()
+  .then(() => {
+      console.log("Database connected successfully!");
+  })
+  .catch((error) => {
+      console.error("Failed to connect to the database:", error.message);
+  });
 
 function handleCloseEvents(mainWindow: BrowserWindow) {
   let willClose = false;

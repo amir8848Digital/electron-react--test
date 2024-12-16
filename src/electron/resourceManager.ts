@@ -3,6 +3,7 @@ import os from 'os';
 import fs from 'fs';
 import { BrowserWindow } from 'electron';
 import { ipcWebContentsSend } from './util.js';
+import { client } from './main.js';
 
 const POLLING_INTERVAL = 500;
 
@@ -19,17 +20,24 @@ export function pollResources(mainWindow: BrowserWindow) {
   }, POLLING_INTERVAL);
 }
 
-export function getStaticData() {
-  const totalStorage = getStorageData().total;
-  const cpuModel = os.cpus()[0].model;
-  const totalMemoryGB = Math.floor(osUtils.totalmem() / 1024);
+export async function getStaticData() {
+  try {
+    const sqlQuery = `
+        SELECT customer_id, customer_name
+        FROM Customers        
+        LIMIT 20;
+    `;
+    console.log("SQL Query:", sqlQuery);
 
-  return {
-    totalStorage,
-    cpuModel,
-    totalMemoryGB,
-  };
+    const result = await client.query(sqlQuery);
+    return result.rows;
+
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    return [];
+  }
 }
+
 
 function getCpuUsage(): Promise<number> {
   return new Promise((resolve) => {

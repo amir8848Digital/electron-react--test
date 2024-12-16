@@ -16,7 +16,7 @@ type FrameWindowAction = 'CLOSE' | 'MAXIMIZE' | 'MINIMIZE';
 
 type EventPayloadMapping = {
   statistics: Statistics;
-  getStaticData: StaticData;
+  getStaticData: any;
   changeView: View;
   sendFrameAction: FrameWindowAction;
 };
@@ -28,7 +28,7 @@ interface Window {
     subscribeStatistics: (
       callback: (statistics: Statistics) => void
     ) => UnsubscribeFunction;
-    getStaticData: () => Promise<StaticData>;
+    getStaticData: any;
     subscribeChangeView: (
       callback: (view: View) => void
     ) => UnsubscribeFunction;
