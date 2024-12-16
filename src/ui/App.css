@@ -70,3 +70,38 @@ header button {
 .selectOptionChart * {
   cursor: pointer;
 }
+
+.custom-dropdown-container {
+  position: relative;
+}
+
+.input-container {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.dropdown-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dropdown-table th,
+.dropdown-table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+}
+
+.dropdown-table tr.highlighted {
+  background-color: #e0e0e0; /* Highlight color */
+}

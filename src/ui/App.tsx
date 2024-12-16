@@ -1,21 +1,20 @@
 
 import './App.css';
-import Layout from './layout/layout';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import FormPage from './componenets/FormPage';
 import { PrimeReactProvider } from 'primereact/api';
-import { LayoutProvider } from './layout/context/layoutcontext';
+import NewFormPage from './componenets/NewFormPage';
 
 function App() {
 
   const router = createBrowserRouter([
     {
-      path: "",
-      Component: Layout,
+      path: "/",
+   
       children: [
         {
           path: "",
-          Component:FormPage ,
+          Component:NewFormPage ,
           
         },
       ],
@@ -28,10 +27,8 @@ function App() {
     <div className="App">
       {/* <Header /> */}
     <div>
-    <PrimeReactProvider>
-          <LayoutProvider>
+    <PrimeReactProvider >
             <RouterProvider router={router} />
-          </LayoutProvider>
         </PrimeReactProvider>
     </div>
     </div>
