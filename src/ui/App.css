@@ -3,7 +3,7 @@ header {
   text-align: left;
   padding: 0.5rem;
   box-sizing: border-box;
-  background-color: #181818;
+  background-color: #ffffff;
   -webkit-app-region: drag;
 }
 
@@ -28,16 +28,6 @@ header button {
   background-color: lime;
 }
 
-.main {
-  display: grid;
-  grid-template-columns: 16rem auto;
-  gap: 1rem;
-  align-items: center;
-  margin: 1rem;
-  max-width: 900px;
-  margin: auto;
-  margin-top: 4rem;
-}
 
 .mainGrid {
   height: 10rem;
