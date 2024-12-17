@@ -1,13 +1,16 @@
 type EventPayloadMapping = {
-  getStaticData: any;
-  insertData:any;
+  getMasterData: any;
+  //insertData:any;
   getSalesOrderData:any;
+  query:any;
+  insertFormData:any
 };
 
 interface Window {
   electron: {
-    getStaticData: any;
-    insertData: any;
-    getSalesOrderData:any
+    getMasterData: any;
+    //insertData: any;
+    getSalesOrderData:any;
+    insertFormData:any
   };
 }
