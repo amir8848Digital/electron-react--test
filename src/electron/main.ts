@@ -1,9 +1,7 @@
 import { app, BrowserWindow, Menu } from 'electron';
-import { ipcMainHandle, ipcMainOn, isDev } from './util.js';
-import { getStaticData ,insertData,getSalesOrderData} from './resourceManager.js';
+import {getMasterData,isDev,insertFormData } from './util.js';
+// import {  insertData,getSalesOrderData,} from './resourceManager.js';
 import { getPreloadPath, getUIPath } from './pathResolver.js';
-import { createTray } from './tray.js';
-import { createMenu } from './menu.js';
 import pkg from 'pg';
 const { Client } = pkg;
 import { ipcMain } from 'electron';
@@ -41,19 +39,20 @@ app.on('ready', () => {
 
  // pollResources(mainWindow);
 
-  ipcMainHandle('getStaticData', () => {
-    return getStaticData();
+ ipcMain.handle('getMasterData', (_,query:any) => {
+    return getMasterData(query);
   });
-  ipcMainHandle('getSalesOrderData', () => {
-    return getSalesOrderData();
-  });
+
   
-  ipcMain.handle('insertData', (formData:any) => {
-   return insertData(formData)
-  });
+  // ipcMain.handle('insertData', (_,formData:any) => {
+  //  return insertData(formData)
+  // });
+  ipcMain.handle('insertFormData', (_,formData:any) => {
+    return insertFormData(formData)
+   });
   
   
-  createTray(mainWindow);
+  
   handleCloseEvents(mainWindow);
   // createMenu(mainWindow);
 });
