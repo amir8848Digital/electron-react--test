@@ -76,17 +76,9 @@ async function getData(queryConfig: any, query: any): Promise<any[]> {
 
 export async function insertFormData(formData: any) {
   console.log(formData);
-  const baseDirectory = path.join(app.getAppPath(), "src", "electron", "forms");
-  console.log("Base Directory:", baseDirectory);
-  const filePath = path.join(
-    baseDirectory,
-    formData.formName,
-    `${formData.formName}.json`
-  );
-  console.log("File Path:", filePath);
-  const fileContent = await fs.readFile(filePath, "utf-8");
-  const data = JSON.parse(fileContent);
-  const tableName = data.table_name;
+  const formName = formData.formName
+  const config = await getFormConfig(formName)
+  const tableName = config.table_name;
   const query = `INSERT INTO ${tableName} (${Object.keys(
     formData["formData"]
   ).join(", ")}) 
