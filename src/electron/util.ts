@@ -79,13 +79,27 @@ export async function insertFormData(formData: any) {
   const formName = formData.formName
   const config = await getFormConfig(formName)
   const tableName = config.tableName;
-  const query = `INSERT INTO ${tableName} (${Object.keys(
-    formData["formData"]
-  ).join(", ")}) 
-    VALUES (${Object.values(formData["formData"])
-      .map((value) => `'${value}'`)
-      .join(", ")})`;
-  console.log(query);
-  await client.query(query);
+  const filteredEntries = Object.entries(formData.formData).filter(
+    ([_, value]) => value !== null && value !== undefined && value !== ""
+  );
+
+  if (filteredEntries.length === 0) {
+    console.log("No valid data to insert.");
+    return;
+  }
+
+  const columns = filteredEntries.map(([key]) => key);
+  const values = filteredEntries.map(([_, value]) => value);
+  const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+
+  // Construct the query
+  const query = `
+      INSERT INTO ${tableName} (${columns.join(", ")})
+      VALUES (${placeholders});
+    `;
+  console.log("Generated Query:", query);
+  console.log("Values:", values);
+  const r = await client.query(query, values);
+  console.log(r)
   console.log("Data inserted successfully!");
 }
