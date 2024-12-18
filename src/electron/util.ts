@@ -78,7 +78,7 @@ export async function insertFormData(formData: any) {
   console.log(formData);
   const formName = formData.formName
   const config = await getFormConfig(formName)
-  const tableName = config.table_name;
+  const tableName = config.tableName;
   const query = `INSERT INTO ${tableName} (${Object.keys(
     formData["formData"]
   ).join(", ")}) 
