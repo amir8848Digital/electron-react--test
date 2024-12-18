@@ -1,5 +1,10 @@
 import { app, BrowserWindow, Menu } from "electron";
-import { getMasterData, isDev, insertFormData } from "./util.js";
+import {
+  getAutoCompleteData,
+  isDev,
+  insertFormData,
+  getFormConfig,
+} from "./util.js";
 // import {  insertData,getSalesOrderData,} from './resourceManager.js';
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import pkg from "pg";
@@ -40,8 +45,12 @@ app.on("ready", () => {
 
   // pollResources(mainWindow);
 
-  ipcMain.handle("getMasterData", (_, query: any) => {
-    return getMasterData(query);
+  ipcMain.handle("getAutoCompleteData", (_, query: any) => {
+    return getAutoCompleteData(query);
+  });
+
+  ipcMain.handle("getFormConfig", (_, formName: any) => {
+    return getFormConfig(formName);
   });
 
   // ipcMain.handle('insertData', (_,formData:any) => {

@@ -3,10 +3,9 @@ const electron = require('electron');
 
 electron.contextBridge.exposeInMainWorld('electron', {
   
-  getMasterData: (query:any) => ipcInvoke('getMasterData',query),
-  getSalesOrderData:()=> ipcInvoke('getSalesOrderData'),
- // insertData: (formData?: any): Promise<any> => ipcInvoke('insertData', formData),
-  insertFormData: (formData?: any): Promise<any> => ipcInvoke('insertFormData', formData),
+  getAutoCompleteData: (query:any) => ipcInvoke('getAutoCompleteData',query),
+  getFormConfig: (formName:any) => ipcInvoke('getFormConfig',formName),
+  insertFormData: (formData: any): Promise<any> => ipcInvoke('insertFormData', formData),
 } );
 
 function ipcInvoke<Key extends string>(

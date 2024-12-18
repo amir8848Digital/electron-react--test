@@ -1,6 +1,7 @@
 import path from 'path';
 import { app } from 'electron';
 import { isDev } from './util.js';
+import { pathToFileURL } from 'url';
 
 export function getPreloadPath() {
   return path.join(
@@ -16,4 +17,13 @@ export function getUIPath() {
 
 export function getAssetPath() {
   return path.join(app.getAppPath(), isDev() ? '.' : '..', '/src/assets');
+}
+export function getFormConfigPath(formName: string): string {
+  const baseDirectory = path.join(app.getAppPath(), "src", "electron", "forms");
+  const filePath = path.join(
+        baseDirectory,
+        formName,
+        `config.json`
+      );
+  return pathToFileURL(filePath).href;  // Converts path to file:// URL
 }

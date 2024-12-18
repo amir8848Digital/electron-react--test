@@ -25,7 +25,7 @@ const AutoCompleteDropDown = ({
     fieldname: string
   ) => {
     setFilter(e.target.value);
-    const res = await window.electron.getMasterData({
+    const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
       fieldname: field.name,
       value: e.target.value,
