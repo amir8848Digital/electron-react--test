@@ -70,7 +70,7 @@ async function getData(queryConfig: any, query: any) {
 }
 
 export async function insertFormData(formData: any) {
-  console.log(formData);
+  console.log(formData['formData']);
   const baseDirectory = path.join(app.getAppPath(), "src", "electron", "forms");
   console.log("Base Directory:", baseDirectory);
   const filePath = path.join(
@@ -78,6 +78,7 @@ export async function insertFormData(formData: any) {
     formData.formName,
     `${formData.formName}.json`
   );
+  console.log("FFFFFFFFF", filePath);
   console.log("File Path:", filePath);
   const fileContent = await fs.readFile(filePath, "utf-8");
   const data = JSON.parse(fileContent);

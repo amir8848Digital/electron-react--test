@@ -1,29 +1,30 @@
-import { app, BrowserWindow, Menu } from 'electron';
-import {getMasterData,isDev,insertFormData } from './util.js';
+import { app, BrowserWindow, Menu } from "electron";
+import { getMasterData, isDev, insertFormData } from "./util.js";
 // import {  insertData,getSalesOrderData,} from './resourceManager.js';
-import { getPreloadPath, getUIPath } from './pathResolver.js';
-import pkg from 'pg';
+import { getPreloadPath, getUIPath } from "./pathResolver.js";
+import pkg from "pg";
 const { Client } = pkg;
-import { ipcMain } from 'electron';
+import { ipcMain } from "electron";
 
 export const client = new Client({
-  user: 'root',
-  host: 'postgresql-189014-0.cloudclusters.net',
-  database: 'Test', 
-  password: 'password', 
-  port: 10071,
+  user: "chintan",
+  host: "3.20.115.50",
+  database: "mydb",
+  password: "Chintan@8848",
+  idle_in_transaction_session_timeout: 1500,
+  //port: 10071,
 });
 
-client.connect()
+client
+  .connect()
   .then(() => {
-      console.log("Database connected successfully!");
+    console.log("Database connected successfully!");
   })
   .catch((error) => {
-      console.error("Failed to connect to the database:", error.message);
+    console.error("Failed to connect to the database:", error.message);
   });
 
-
-app.on('ready', () => {
+app.on("ready", () => {
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
@@ -32,27 +33,24 @@ app.on('ready', () => {
     frame: true,
   });
   if (isDev()) {
-    mainWindow.loadURL('http://localhost:5123');
+    mainWindow.loadURL("http://localhost:5123");
   } else {
     mainWindow.loadFile(getUIPath());
   }
 
- // pollResources(mainWindow);
+  // pollResources(mainWindow);
 
- ipcMain.handle('getMasterData', (_,query:any) => {
+  ipcMain.handle("getMasterData", (_, query: any) => {
     return getMasterData(query);
   });
 
-  
   // ipcMain.handle('insertData', (_,formData:any) => {
   //  return insertData(formData)
   // });
-  ipcMain.handle('insertFormData', (_,formData:any) => {
-    return insertFormData(formData)
-   });
-  
-  
-  
+  ipcMain.handle("insertFormData", (_, formData: any) => {
+    return insertFormData(formData);
+  });
+
   handleCloseEvents(mainWindow);
   // createMenu(mainWindow);
 });
@@ -60,7 +58,7 @@ app.on('ready', () => {
 function handleCloseEvents(mainWindow: BrowserWindow) {
   let willClose = false;
 
-  mainWindow.on('close', (e) => {
+  mainWindow.on("close", (e) => {
     if (willClose) {
       return;
     }
@@ -71,11 +69,11 @@ function handleCloseEvents(mainWindow: BrowserWindow) {
     }
   });
 
-  app.on('before-quit', () => {
+  app.on("before-quit", () => {
     willClose = true;
   });
 
-  mainWindow.on('show', () => {
+  mainWindow.on("show", () => {
     willClose = false;
   });
 }

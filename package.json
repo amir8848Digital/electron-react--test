@@ -18,6 +18,8 @@
     "test:unit": "vitest src"
   },
   "dependencies": {
+    "ag-grid-community": "^33.0.2",
+    "ag-grid-react": "^33.0.2",
     "bootstrap": "^5.3.3",
     "os-utils": "^0.0.14",
     "pg": "^8.13.1",

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import AutoCompleteDropDown from "../commonComponents/AutoCompleteDropDown";
+import TableComponent from "../commonComponents/TableComponent";
 
 const NewFormPage = () => {
   interface FormValues {
@@ -11,7 +12,10 @@ const NewFormPage = () => {
   }
   const fieldName = "orderMaster";
   const fields = [
-    { label: "Voucher", name: "voucher", type: "text" },
+    { label: "Voucher 1", name: " voucher_part1", type: "text" },
+    { label: "Voucher 2", name: " voucher_part2", type: "text" },
+    { label: "Voucher 3 ", name: " voucher_part3", type: "text" },
+    { label: "Voucher 4", name: " voucher_part4", type: "text" },
     { label: "Date", name: "order_date", type: "calendar" },
     { label: "Currency", name: "currency", type: "text" },
     { label: "Customer ID", name: "customer_id", type: "autoComplete" },
@@ -27,7 +31,7 @@ const NewFormPage = () => {
     { label: "PO Date", name: "po_date", type: "calendar" },
     { label: "Priority", name: "priority", type: "text" },
     { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar" },
-    { label: "Product Delivery Date", name: "prod_del", type: "calendar" },
+    { label: "Product Delivery Date", name: "prod_del_date", type: "calendar" },
     { label: "Order Lock", name: "ord_lock", type: "text" },
     { label: "Password", name: "pwd", type: "text" },
     { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
@@ -62,14 +66,14 @@ const NewFormPage = () => {
   };
 
   const handleCalendarChange = (e: any, name: string) => {
-    const inputDate = e.target.value; // yyyy-mm-dd
-    const [year, month, day] = inputDate.split("-"); // Split the date string
-    const formattedDate = `${day}-${month}-${year}`; // Rearrange to dd-mm-yyyy
+    // const inputDate = e.target.value; // yyyy-mm-dd
+    // const [year, month, day] = inputDate.split("-"); // Split the date string
+    // const formattedDate = `${year}-${month}-${year}`; // Rearrange to dd-mm-yyyy
 
-    console.log(formattedDate, name);
+    // console.log(formattedDate, name);
     setFormValues({
       ...formValues,
-      [name]: formattedDate,
+      [name]: e.target.value,
     });
   };
 
@@ -82,17 +86,17 @@ const NewFormPage = () => {
   };
 
   return (
-    <div className="container py-5">
+    <div className="container-fluid py-3">
       <div className="card shadow">
         <div className="card-header bg-primary text-white">
           <h4 className="mb-0">Sales Order Master Form</h4>
         </div>
-        <form className="row p-4 g-3">
+        <form className="row p-4 g-2">
           {fields.map((field, index) => (
-            <div className="col-md-4" key={index}>
+            <div className="col-md-4 col-lg-3" key={index}>
               {/* Text Input */}
               {field.type === "text" && (
-                <div className="mb-3">
+                <div className="mb-2">
                   <label htmlFor={field.name} className="form-label">
                     {field.label}
                   </label>
@@ -107,7 +111,7 @@ const NewFormPage = () => {
                 </div>
               )}
               {field.type === "number" && (
-                <div className="mb-3">
+                <div className="mb-2">
                   <label htmlFor={field.name} className="form-label">
                     {field.label}
                   </label>
@@ -123,7 +127,7 @@ const NewFormPage = () => {
               )}
               {/* Calendar Input */}
               {field.type === "calendar" && (
-                <div className="mb-3">
+                <div className="mb-2">
                   <label htmlFor="dateInput" className="form-label">
                     {field.label || "Select Date"}
                   </label>
@@ -164,6 +168,7 @@ const NewFormPage = () => {
           </button>
         </div>
       </div>
+      <div className="card">{<TableComponent />}</div>
     </div>
   );
 };
