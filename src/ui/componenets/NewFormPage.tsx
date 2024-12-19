@@ -168,7 +168,9 @@ const NewFormPage = () => {
           </button>
         </div>
       </div>
-      <div className="card">{<TableComponent />}</div>
+      <div className="card shadow">
+        <div className="p-4">{<TableComponent />}</div>
+      </div>
     </div>
   );
 };

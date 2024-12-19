@@ -24,6 +24,9 @@ const AutoCompleteDropDown = ({
     e: React.ChangeEvent<HTMLInputElement>,
     fieldname: string
   ) => {
+    if (!isDropdownOpen) {
+      setIsDropdownOpen(true);
+    }
     setFilter(e.target.value);
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
