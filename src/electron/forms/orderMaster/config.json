@@ -1,45 +1,42 @@
 {
-    "tableName":"OrderMaster",
-    "formName": "orderMaster",
-    "autoCompleteFields": {
-        "customer_id": {
-            "table": "Customers",
-            "columns": [
-                "customer_id",
-                "customer_name"
-            ],
-            "searchFields": ["customer_id", "customer_name"],
-            "fieldsMap": {
-                "customer_id": "Customer Id",
-                "customer_name": "Customer Name"
-            },
-            "fetchMap": {
-                "customer_name": "customer_name"
-            },
-            "primaryField": "customer_id"
-        },
-        "order_id": {
-            "table": "OrderMaster",
-            "columns": [
-                "order_id",
-                "TO_CHAR(order_date, 'YYYY-MM-DD') AS order_date",
-                "customer_id",
-                "customer_name",
-                "currency",
-                "TO_CHAR(po_date, 'YYYY-MM-DD') AS po_date",
-                "po_no",
-                "priority"
-            ],
-            "searchField": "order_id",
-            "fieldsMap": {
-                "order_id": "Order ID",
-                "order_date": "Date",
-                "po_date": "PO Date",
-                "customer_name": "Customer Name",
-                "po_no": "PO No",
-                "currency": "Currency",
-                "priority": "Priority"
-            }
-        }
+  "tableName": "OrderMaster",
+  "formName": "orderMaster",
+  "autoCompleteFields": {
+    "customer_id": {
+      "table": "Customers",
+      "columns": ["customer_id", "customer_name"],
+      "searchFields": ["customer_id", "customer_name"],
+      "fieldsMap": {
+        "customer_id": "Customer Id",
+        "customer_name": "Customer Name"
+      },
+      "fetchMap": {
+        "customer_name": "customer_name"
+      },
+      "primaryField": "customer_id"
+    },
+    "voucher_part4": {
+      "table": "OrderMaster",
+      "columns": [
+        "order_id",
+        "TO_CHAR(order_date, 'YYYY-MM-DD') AS order_date",
+        "customer_id",
+        "customer_name",
+        "currency",
+        "TO_CHAR(po_date, 'YYYY-MM-DD') AS po_date",
+        "po_no",
+        "priority"
+      ],
+      "searchField": "order_id",
+      "fieldsMap": {
+        "order_id": "Order ID",
+        "order_date": "Date",
+        "po_date": "PO Date",
+        "customer_name": "Customer Name",
+        "po_no": "PO No",
+        "currency": "Currency",
+        "priority": "Priority"
+      }
     }
+  }
 }

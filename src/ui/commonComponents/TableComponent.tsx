@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import AutoCompleteDropDown from "./AutoCompleteDropDown";
 ModuleRegistry.registerModules([AllCommunityModule]);
-
 type Row = {
   order_id: number;
   design_code: string;
@@ -19,6 +18,7 @@ type Row = {
 };
 
 const TableComponent: React.FC = () => {
+  const fieldName = "orderDesign";
   const [rowData, setRowData] = useState<Row[]>([
     {
       order_id: 1,
@@ -34,9 +34,92 @@ const TableComponent: React.FC = () => {
       fixed_price: 0,
     },
   ]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
 
-  const CustomeCellEditor = () => {
-    return "hello";
+  const handleSelectCustomer = (
+    customer: any,
+    setFilter: any,
+    setIsDropdownOpen: any,
+    field: any
+  ) => {
+    setFilter(customer.customer_name);
+    setIsDropdownOpen(false);
+    const rowIndex = rowData.findIndex(
+      (row: any) => row.design_code === field.name
+    );
+
+    if (rowIndex !== -1) {
+      const updatedRowData = [...rowData];
+      updatedRowData[rowIndex].design_code = customer.customer_id;
+      setRowData(updatedRowData);
+    }
+  };
+
+  const handleBlur = (
+    field: any,
+    filter: any,
+    setFilter: any,
+    setFormValues: any,
+    setIsDropdownOpen: any,
+    setFocusedIndex: any
+  ) => {
+    if (!filter) {
+      setFilter("");
+      const rowIndex = rowData.findIndex(
+        (row: any) => row.design_code === field.name
+      );
+
+      if (rowIndex !== -1) {
+        const updatedRowData = [...rowData];
+        updatedRowData[rowIndex].design_code = "";
+        setRowData(updatedRowData);
+      }
+    }
+    setIsDropdownOpen(false);
+    setFocusedIndex(0);
+  };
+  console.log({ filteredCustomers });
+  const handleFilterChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: any,
+    fieldname: string,
+    isDropdownOpen: any,
+    setIsDropdownOpen: any,
+    setFilter: any,
+    setFilteredCustomers: any
+  ) => {
+    if (!isDropdownOpen) {
+      setIsDropdownOpen(true);
+    }
+    setFilter(e.target.value);
+    const res = await window.electron.getAutoCompleteData({
+      formName: fieldName,
+      fieldname: field.name,
+      value: e.target.value,
+    });
+    setFilteredCustomers(res || []);
+  };
+
+  const CustomeCellEditor = (props: any) => {
+    const { field, headerName } = props.colDef;
+    const val = {
+      name: field,
+      label: headerName,
+    };
+    return (
+      <AutoCompleteDropDown
+        field={val}
+        filteredCustomers={filteredCustomers}
+        setFilteredCustomers={setFilteredCustomers}
+        formValues={rowData}
+        setFormValues={setRowData}
+        fieldName={fieldName}
+        handleSelectRow={handleSelectCustomer}
+        handleBlur={handleBlur}
+        handleFilterChange={handleFilterChange}
+        configName={"orderMaster"}
+      />
+    );
   };
 
   const addRow = () => {
@@ -55,6 +138,13 @@ const TableComponent: React.FC = () => {
     };
     setRowData([...rowData, newRow]);
   };
+
+  useEffect(() => {
+    const fetch = async () => {
+      const res2 = await window.electron.getFormConfig("orderDesign");
+    };
+    fetch(); // Fetch form configuration on component mount
+  }, []);
 
   const columnDefs = [
     { headerName: "Order ID", field: "order_id", editable: false },
@@ -92,6 +182,7 @@ const TableComponent: React.FC = () => {
       </div>
       <AgGridReact
         rowData={rowData}
+        // @ts-ignore
         columnDefs={columnDefs}
         defaultColDef={{
           flex: 1,

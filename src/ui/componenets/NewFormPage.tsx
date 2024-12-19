@@ -11,14 +11,28 @@ const NewFormPage = () => {
     customer_name: string;
   }
   const fieldName = "orderMaster";
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [voucher4, setVoucher4] = useState<any>([]);
   const fields = [
     { label: "Voucher 1", name: " voucher_part1", type: "text" },
     { label: "Voucher 2", name: " voucher_part2", type: "text" },
     { label: "Voucher 3 ", name: " voucher_part3", type: "text" },
-    { label: "Voucher 4", name: " voucher_part4", type: "text" },
+    {
+      label: "Voucher 4",
+      name: "voucher_part4",
+      type: "autoComplete",
+      stateName: voucher4,
+      setStatName: setVoucher4,
+    },
     { label: "Date", name: "order_date", type: "calendar" },
     { label: "Currency", name: "currency", type: "text" },
-    { label: "Customer ID", name: "customer_id", type: "autoComplete" },
+    {
+      label: "Customer ID",
+      name: "customer_id",
+      type: "autoComplete",
+      stateName: filteredCustomers,
+      setStatName: setFilteredCustomers,
+    },
     { label: "Customer Name", name: "customer_name", type: "text" },
     { label: "Conversion Factor", name: "conv_fact", type: "text" },
     { label: "Conversion Date", name: "conv_d", type: "calendar" },
@@ -42,7 +56,6 @@ const NewFormPage = () => {
     acc[field.name] = field.type === "calendar" ? null : "";
     return acc;
   }, {} as FormValues);
-
   const [formValues, setFormValues] = useState<FormValues>(initialState);
 
   const handleChange = (
@@ -78,11 +91,58 @@ const NewFormPage = () => {
   };
 
   const handdleSubmit = () => {
-    console.log("Handling", formValues);
     window.electron.insertFormData({
       formData: formValues,
       formName: fieldName,
     });
+  };
+
+  const handleSelectCustomer = (
+    customer: Customer,
+    setFilter: any,
+    setIsDropdownOpen: any,
+    field: any
+  ) => {
+    setFilter(customer.customer_name);
+    setIsDropdownOpen(false);
+    setFormValues({ ...formValues, [field.name]: customer.customer_id });
+  };
+
+  const handleFilterChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: any,
+    fieldname: string,
+    isDropdownOpen: any,
+    setIsDropdownOpen: any,
+    setFilter: any,
+    setFilteredCustomers: any
+  ) => {
+    if (!isDropdownOpen) {
+      setIsDropdownOpen(true);
+    }
+    setFilter(e.target.value);
+    const res = await window.electron.getAutoCompleteData({
+      formName: fieldname,
+      fieldname: field.name,
+      value: e.target.value,
+    });
+    setFilteredCustomers(res);
+  };
+
+  const handleBlur = (
+    field: any,
+    filter: any,
+    setFilter: any,
+    setFormValues: any,
+    setIsDropdownOpen: any,
+    setFocusedIndex: any
+  ) => {
+    if (!filter) {
+      setFilter("");
+      setFormValues({ ...formValues, [field.name]: "" });
+    }
+    setIsDropdownOpen(false);
+    setFocusedIndex(0);
   };
 
   return (
@@ -152,6 +212,11 @@ const NewFormPage = () => {
                     formValues={formValues}
                     setFormValues={setFormValues}
                     fieldName={fieldName}
+                    handleSelectRow={handleSelectCustomer}
+                    handleBlur={handleBlur}
+                    filteredCustomers={field.stateName}
+                    setFilteredCustomers={field.setStatName}
+                    handleFilterChange={handleFilterChange}
                   />
                 </div>
               )}

@@ -4,9 +4,15 @@ type Props = {};
 
 const AutoCompleteDropDown = ({
   field,
+  filteredCustomers,
+  setFilteredCustomers,
   formValues,
   setFormValues,
   fieldName,
+  handleSelectRow,
+  handleBlur,
+  handleFilterChange,
+  configName,
 }: any) => {
   interface Customer {
     customer_id: number;
@@ -16,31 +22,32 @@ const AutoCompleteDropDown = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [filter, setFilter] = useState("");
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [tableHead, setTableHead] = useState<any>({});
+  // const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleFilterChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldname: string
-  ) => {
-    if (!isDropdownOpen) {
-      setIsDropdownOpen(true);
-    }
-    setFilter(e.target.value);
-    const res = await window.electron.getAutoCompleteData({
-      formName: fieldName,
-      fieldname: field.name,
-      value: e.target.value,
-    });
-    setFilteredCustomers(res);
-  };
+  // const handleFilterChange = async (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   fieldname: string
+  // ) => {
+  //   if (!isDropdownOpen) {
+  //     setIsDropdownOpen(true);
+  //   }
+  //   setFilter(e.target.value);
+  //   const res = await window.electron.getAutoCompleteData({
+  //     formName: fieldName,
+  //     fieldname: field.name,
+  //     value: e.target.value,
+  //   });
+  //   setFilteredCustomers(res);
+  // };
 
-  const handleSelectCustomer = (customer: Customer) => {
-    setFilter(customer.customer_name);
-    setIsDropdownOpen(false);
-    setFormValues({ ...formValues, [field.name]: customer.customer_id });
-  };
+  // const handleSelectCustomer = (customer: Customer) => {
+  //   setFilter(customer.customer_name);
+  //   setIsDropdownOpen(false);
+  //   setFormValues({ ...formValues, [field.name]: customer.customer_id });
+  // };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
@@ -82,7 +89,12 @@ const AutoCompleteDropDown = ({
         });
       }
     } else if (e.key === "Enter" && focusedIndex !== null) {
-      handleSelectCustomer(filteredCustomers[focusedIndex]);
+      handleSelectRow(
+        filteredCustomers[focusedIndex],
+        setFilter,
+        setIsDropdownOpen,
+        field
+      );
     } else if (e.key === "Escape") {
       setIsDropdownOpen(false);
       setFocusedIndex(0);
@@ -107,14 +119,21 @@ const AutoCompleteDropDown = ({
     }
   };
 
-  const handleBlur = () => {
-    if (!filter) {
-      setFilter("");
-      setFormValues({ ...formValues, [field.name]: "" });
-    }
-    setIsDropdownOpen(false);
-    setFocusedIndex(0);
-  };
+  // const handleBlur = (
+  //   field: any,
+  //   filter: any,
+  //   setFilter: any,
+  //   setFormValues: any,
+  //   setIsDropdownOpen: any,
+  //   setFocusedIndex: any
+  // ) => {
+  //   if (!filter) {
+  //     setFilter("");
+  //     setFormValues({ ...formValues, [field.name]: "" });
+  //   }
+  //   setIsDropdownOpen(false);
+  //   setFocusedIndex(0);
+  // };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -124,12 +143,29 @@ const AutoCompleteDropDown = ({
         inputRef.current &&
         !inputRef.current.contains(e.target as Node)
       ) {
-        handleBlur();
+        handleBlur(
+          field,
+          filter,
+          setFilter,
+          setFormValues,
+          setIsDropdownOpen,
+          setFocusedIndex
+        );
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [filteredCustomers, filter]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      console.log({ fieldName });
+      const res2 = await window.electron.getFormConfig(`${fieldName}`);
+      setTableHead(res2.autoCompleteFields[field.name].fieldsMap);
+    };
+    fetch();
+  }, []);
+  console.log(filteredCustomers, "custom");
 
   return (
     <div>
@@ -141,14 +177,39 @@ const AutoCompleteDropDown = ({
           className="form-control"
           value={filter}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleFilterChange(e, field.name)
+            handleFilterChange(
+              e,
+              field,
+              fieldName,
+              isDropdownOpen,
+              setIsDropdownOpen,
+              setFilter,
+              setFilteredCustomers
+            )
           }
           onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
             setIsDropdownOpen(true);
             setFilter("");
-            handleFilterChange(e, field.name);
+            handleFilterChange(
+              e,
+              field,
+              fieldName,
+              isDropdownOpen,
+              setIsDropdownOpen,
+              setFilter,
+              setFilteredCustomers
+            );
           }}
-          onBlur={handleBlur}
+          onBlur={() =>
+            handleBlur(
+              field,
+              filter,
+              setFilter,
+              setFormValues,
+              setIsDropdownOpen,
+              setFocusedIndex
+            )
+          }
           placeholder={`Search ${field.label}`}
           onKeyDown={handleKeyDown}
         />
@@ -159,26 +220,40 @@ const AutoCompleteDropDown = ({
             id="drop"
             style={{ maxHeight: "200px", display: "block" }}
           >
-            <table className="table table-hover mb-0">
+            <table
+              className="table table-hover mb-0"
+              style={{ fontSize: "12px" }}
+            >
               <thead>
                 <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Name</th>
+                  {Object.keys(tableHead).map((key) => (
+                    <th>{tableHead[key]}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredCustomers?.length > 0 &&
-                  filteredCustomers.map((customer: any, idx: number) => (
-                    <tr
-                      key={customer.customer_id}
-                      onClick={() => handleSelectCustomer(customer)}
-                      className={focusedIndex === idx ? "table-primary" : ""}
-                      onMouseEnter={() => setFocusedIndex(idx)}
-                    >
-                      <td>{customer.customer_id}</td>
-                      <td>{customer.customer_name}</td>
-                    </tr>
-                  ))}
+                  filteredCustomers?.map((customer: any, idx: number) => {
+                    return (
+                      <tr
+                        key={idx}
+                        onClick={() =>
+                          handleSelectRow(
+                            customer,
+                            setFilter,
+                            setIsDropdownOpen,
+                            field
+                          )
+                        }
+                        className={focusedIndex === idx ? "table-primary" : ""}
+                        onMouseEnter={() => setFocusedIndex(idx)}
+                      >
+                        {Object.keys(tableHead).map((key) => (
+                          <td key={key}>{customer[key]}</td>
+                        ))}
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
