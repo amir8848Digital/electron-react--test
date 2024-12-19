@@ -1,0 +1,27 @@
+{
+  "table_name":"OrderDesign",
+  "formName": "OrderDesign",
+  "autoCompleteFields": {
+      "design_code": {
+          "table": "Design",
+          "columns": [
+              "design_code",
+              "design_shape",
+              "design_description",
+              "design_size"
+          ],
+          "searchFields": ["design_code"],
+          "fieldsMap": {
+              "design_code": "Code",
+              "design_shape": "Shape",
+              "design_description":"Description",
+              "design_size":"Size"
+          },
+          "fetchMap": {
+              "design_code": "design_code"
+          },
+          "primaryField": "design_code"
+      }
+  }
+
+}
