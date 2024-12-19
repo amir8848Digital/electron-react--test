@@ -14,7 +14,7 @@ const AutoCompleteDropDown = ({
   }
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [filter, setFilter] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -24,6 +24,9 @@ const AutoCompleteDropDown = ({
     e: React.ChangeEvent<HTMLInputElement>,
     fieldname: string
   ) => {
+    if (!isDropdownOpen) {
+      setIsDropdownOpen(true);
+    }
     setFilter(e.target.value);
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
@@ -34,7 +37,6 @@ const AutoCompleteDropDown = ({
   };
 
   const handleSelectCustomer = (customer: Customer) => {
-    console.log(customer);
     setFilter(customer.customer_name);
     setIsDropdownOpen(false);
     setFormValues({ ...formValues, [field.name]: customer.customer_id });
@@ -47,31 +49,71 @@ const AutoCompleteDropDown = ({
           ? 0
           : prevIndex + 1
       );
+      const nextCustomer =
+        filteredCustomers[
+          focusedIndex === null || focusedIndex === filteredCustomers.length - 1
+            ? 0
+            : focusedIndex + 1
+        ];
+      if (nextCustomer) {
+        setFilter(nextCustomer.customer_name);
+        setFormValues({
+          ...formValues,
+          [field.name]: nextCustomer.customer_id,
+        });
+      }
     } else if (e.key === "ArrowUp") {
       setFocusedIndex((prevIndex) =>
         prevIndex === null || prevIndex === 0
           ? filteredCustomers.length - 1
           : prevIndex - 1
       );
+      const prevCustomer =
+        filteredCustomers[
+          focusedIndex === null || focusedIndex === 0
+            ? filteredCustomers.length - 1
+            : focusedIndex - 1
+        ];
+      if (prevCustomer) {
+        setFilter(prevCustomer.customer_name);
+        setFormValues({
+          ...formValues,
+          [field.name]: prevCustomer.customer_id,
+        });
+      }
     } else if (e.key === "Enter" && focusedIndex !== null) {
       handleSelectCustomer(filteredCustomers[focusedIndex]);
     } else if (e.key === "Escape") {
       setIsDropdownOpen(false);
+      setFocusedIndex(0);
+    } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      // Move focus to the next/previous input
+      const inputs = Array.from(
+        document.querySelectorAll<HTMLInputElement>("input")
+      );
+      const currentIndex = inputs.findIndex(
+        (input) => input === inputRef.current
+      );
+      const nextIndex =
+        e.key === "ArrowRight"
+          ? currentIndex + 1
+          : e.key === "ArrowLeft"
+          ? currentIndex - 1
+          : currentIndex;
+
+      if (inputs[nextIndex]) {
+        inputs[nextIndex].focus();
+      }
     }
   };
 
   const handleBlur = () => {
-    const customerMatch = filteredCustomers.find(
-      (customer) => customer.customer_name === filter
-    );
-
-    if (!customerMatch) {
-      // If no match, clear filter and form value
+    if (!filter) {
       setFilter("");
       setFormValues({ ...formValues, [field.name]: "" });
     }
     setIsDropdownOpen(false);
-    setFocusedIndex(null); // Reset focus
+    setFocusedIndex(0);
   };
 
   useEffect(() => {
@@ -114,6 +156,7 @@ const AutoCompleteDropDown = ({
           <div
             ref={dropdownRef}
             className="dropdown-menu w-100 show overflow-auto"
+            id="drop"
             style={{ maxHeight: "200px", display: "block" }}
           >
             <table className="table table-hover mb-0">
@@ -128,10 +171,7 @@ const AutoCompleteDropDown = ({
                   filteredCustomers.map((customer: any, idx: number) => (
                     <tr
                       key={customer.customer_id}
-                      onClick={() => {
-                        console.log("hello");
-                        handleSelectCustomer(customer);
-                      }}
+                      onClick={() => handleSelectCustomer(customer)}
                       className={focusedIndex === idx ? "table-primary" : ""}
                       onMouseEnter={() => setFocusedIndex(idx)}
                     >
