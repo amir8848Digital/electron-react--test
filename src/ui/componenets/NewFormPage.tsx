@@ -126,6 +126,7 @@ const NewFormPage = () => {
       fieldname: field.name,
       value: e.target.value,
     });
+    console.log(res, "REs");
     setFilteredCustomers(res);
   };
 

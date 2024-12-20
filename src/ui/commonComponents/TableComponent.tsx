@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { AgGridReact } from "ag-grid-react";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import AutoCompleteDropDown from "./AutoCompleteDropDown";
-ModuleRegistry.registerModules([AllCommunityModule]);
+
 type Row = {
   order_id: number;
   design_code: string;
@@ -42,84 +40,55 @@ const TableComponent: React.FC = () => {
     setIsDropdownOpen: any,
     field: any
   ) => {
-    setFilter(customer.customer_name);
+    setFilter(customer.design_code);
     setIsDropdownOpen(false);
-    const rowIndex = rowData.findIndex(
-      (row: any) => row.design_code === field.name
-    );
-
-    if (rowIndex !== -1) {
-      const updatedRowData = [...rowData];
-      updatedRowData[rowIndex].design_code = customer.customer_id;
-      setRowData(updatedRowData);
-    }
+    const updatedRowData = rowData.map((row) => {
+      if (row.order_id === field.rowId) {
+        return { ...row, design_code: customer.customer_id };
+      }
+      return row;
+    });
+    setRowData(updatedRowData);
   };
 
   const handleBlur = (
     field: any,
     filter: any,
     setFilter: any,
-    setFormValues: any,
     setIsDropdownOpen: any,
     setFocusedIndex: any
   ) => {
     if (!filter) {
-      setFilter("");
-      const rowIndex = rowData.findIndex(
-        (row: any) => row.design_code === field.name
-      );
-
-      if (rowIndex !== -1) {
-        const updatedRowData = [...rowData];
-        updatedRowData[rowIndex].design_code = "";
-        setRowData(updatedRowData);
-      }
+      const updatedRowData = rowData.map((row) => {
+        if (row.order_id === field.rowId) {
+          return { ...row, design_code: "" };
+        }
+        return row;
+      });
+      setRowData(updatedRowData);
     }
     setIsDropdownOpen(false);
     setFocusedIndex(0);
   };
-  console.log({ filteredCustomers });
+
   const handleFilterChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
     field: any,
-    fieldname: string,
+    fieldName: any,
     isDropdownOpen: any,
     setIsDropdownOpen: any,
     setFilter: any,
     setFilteredCustomers: any
   ) => {
-    if (!isDropdownOpen) {
-      setIsDropdownOpen(true);
-    }
-    setFilter(e.target.value);
+    console.log(setFilteredCustomers, "filter");
+    console.log(e.target.value);
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
       fieldname: field.name,
       value: e.target.value,
     });
-    setFilteredCustomers(res || []);
-  };
-
-  const CustomeCellEditor = (props: any) => {
-    const { field, headerName } = props.colDef;
-    const val = {
-      name: field,
-      label: headerName,
-    };
-    return (
-      <AutoCompleteDropDown
-        field={val}
-        filteredCustomers={filteredCustomers}
-        setFilteredCustomers={setFilteredCustomers}
-        formValues={rowData}
-        setFormValues={setRowData}
-        fieldName={fieldName}
-        handleSelectRow={handleSelectCustomer}
-        handleBlur={handleBlur}
-        handleFilterChange={handleFilterChange}
-        configName={"orderMaster"}
-      />
-    );
+    console.log({ res });
+    setFilteredCustomers(res);
   };
 
   const addRow = () => {
@@ -141,57 +110,87 @@ const TableComponent: React.FC = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const res2 = await window.electron.getFormConfig("orderDesign");
+      await window.electron.getFormConfig("orderDesign");
     };
     fetch(); // Fetch form configuration on component mount
   }, []);
-
-  const columnDefs = [
-    { headerName: "Order ID", field: "order_id", editable: false },
-    {
-      headerName: "Design Code",
-      field: "design_code",
-      editable: true,
-      cellEditor: CustomeCellEditor, // Replace this with a custom cell editor if needed
-    },
-    { headerName: "Suffix", field: "suffix", editable: true },
-    { headerName: "Size", field: "size", editable: true },
-    { headerName: "Quantity", field: "qty", editable: true },
-    { headerName: "Calculated Price", field: "calc_price", editable: true },
-    { headerName: "Sales Price", field: "sales_price", editable: true },
-    {
-      headerName: "Prod Delivery Date",
-      field: "prod_dely_date",
-      editable: true,
-    },
-    {
-      headerName: "Expected Delivery Date",
-      field: "exp_dely_date",
-      editable: true,
-    },
-    { headerName: "Prod Setting", field: "prod_setting", editable: true },
-    { headerName: "Fixed Price", field: "fixed_price", editable: true },
-  ];
+  console.log({ filteredCustomers });
 
   return (
-    <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
+    <div className="container-fluid">
       <div className="text-end mb-3">
         <button onClick={addRow} className="btn btn-success">
           Add Row
         </button>
       </div>
-      <AgGridReact
-        rowData={rowData}
-        // @ts-ignore
-        columnDefs={columnDefs}
-        defaultColDef={{
-          flex: 1,
-          resizable: true,
-          sortable: true,
-          filter: true,
-        }}
-        //   editType="fullRow"
-      />
+      <table className="table table-bordered" style={{ width: "100%" }}>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Design Code</th>
+            <th>Suffix</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Calculated Price</th>
+            <th>Sales Price</th>
+            <th>Prod Delivery Date</th>
+            <th>Expected Delivery Date</th>
+            <th>Prod Setting</th>
+            <th>Fixed Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rowData?.map((row) => (
+            <tr key={row.order_id}>
+              <td>{row.order_id}</td>
+              <td>
+                <AutoCompleteDropDown
+                  field={{
+                    name: "design_code",
+                    rowId: row.order_id,
+                    label: "Design Code",
+                  }}
+                  filteredCustomers={filteredCustomers}
+                  setFilteredCustomers={setFilteredCustomers}
+                  formValues={rowData}
+                  setFormValues={setRowData}
+                  fieldName={fieldName}
+                  handleSelectRow={handleSelectCustomer}
+                  handleBlur={handleBlur}
+                  handleFilterChange={handleFilterChange}
+                />
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.suffix}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.size}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.qty}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.calc_price}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.sales_price}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.prod_dely_date}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.exp_dely_date}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.prod_setting}
+              </td>
+              <td contentEditable suppressContentEditableWarning>
+                {row.fixed_price}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

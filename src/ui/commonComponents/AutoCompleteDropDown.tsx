@@ -18,36 +18,13 @@ const AutoCompleteDropDown = ({
     customer_id: number;
     customer_name: string;
   }
-
+  console.log(setFilteredCustomers, "aannaan");
   const inputRef = useRef<HTMLInputElement>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [filter, setFilter] = useState("");
   const [tableHead, setTableHead] = useState<any>({});
-  // const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // const handleFilterChange = async (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   fieldname: string
-  // ) => {
-  //   if (!isDropdownOpen) {
-  //     setIsDropdownOpen(true);
-  //   }
-  //   setFilter(e.target.value);
-  //   const res = await window.electron.getAutoCompleteData({
-  //     formName: fieldName,
-  //     fieldname: field.name,
-  //     value: e.target.value,
-  //   });
-  //   setFilteredCustomers(res);
-  // };
-
-  // const handleSelectCustomer = (customer: Customer) => {
-  //   setFilter(customer.customer_name);
-  //   setIsDropdownOpen(false);
-  //   setFormValues({ ...formValues, [field.name]: customer.customer_id });
-  // };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
@@ -99,7 +76,6 @@ const AutoCompleteDropDown = ({
       setIsDropdownOpen(false);
       setFocusedIndex(0);
     } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-      // Move focus to the next/previous input
       const inputs = Array.from(
         document.querySelectorAll<HTMLInputElement>("input")
       );
@@ -118,22 +94,6 @@ const AutoCompleteDropDown = ({
       }
     }
   };
-
-  // const handleBlur = (
-  //   field: any,
-  //   filter: any,
-  //   setFilter: any,
-  //   setFormValues: any,
-  //   setIsDropdownOpen: any,
-  //   setFocusedIndex: any
-  // ) => {
-  //   if (!filter) {
-  //     setFilter("");
-  //     setFormValues({ ...formValues, [field.name]: "" });
-  //   }
-  //   setIsDropdownOpen(false);
-  //   setFocusedIndex(0);
-  // };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -165,7 +125,6 @@ const AutoCompleteDropDown = ({
     };
     fetch();
   }, []);
-  console.log(filteredCustomers, "custom");
 
   return (
     <div>
