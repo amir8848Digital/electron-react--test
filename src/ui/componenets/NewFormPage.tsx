@@ -11,18 +11,14 @@ const NewFormPage = () => {
     customer_name: string;
   }
   const fieldName = "orderMaster";
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
-  const [voucher4, setVoucher4] = useState<any>([]);
   const fields = [
     { label: "Voucher 1", name: " voucher_part1", type: "text" },
     { label: "Voucher 2", name: " voucher_part2", type: "text" },
     { label: "Voucher 3 ", name: " voucher_part3", type: "text" },
     {
       label: "Voucher 4",
-      name: "voucher_part4",
+      name: "order_id",
       type: "autoComplete",
-      stateName: voucher4,
-      setStatName: setVoucher4,
     },
     { label: "Date", name: "order_date", type: "calendar" },
     { label: "Currency", name: "currency", type: "text" },
@@ -30,8 +26,6 @@ const NewFormPage = () => {
       label: "Customer ID",
       name: "customer_id",
       type: "autoComplete",
-      stateName: filteredCustomers,
-      setStatName: setFilteredCustomers,
     },
     { label: "Customer Name", name: "customer_name", type: "text" },
     { label: "Conversion Factor", name: "conv_fact", type: "text" },
@@ -79,11 +73,6 @@ const NewFormPage = () => {
   };
 
   const handleCalendarChange = (e: any, name: string) => {
-    // const inputDate = e.target.value; // yyyy-mm-dd
-    // const [year, month, day] = inputDate.split("-"); // Split the date string
-    // const formattedDate = `${year}-${month}-${year}`; // Rearrange to dd-mm-yyyy
-
-    // console.log(formattedDate, name);
     setFormValues({
       ...formValues,
       [name]: e.target.value,
@@ -97,58 +86,61 @@ const NewFormPage = () => {
     });
   };
 
-  const handleSelectCustomer = (
-    customer: Customer,
-    setFilter: any,
-    setIsDropdownOpen: any,
-    field: any
-  ) => {
-    setFilter(customer.customer_name);
-    setIsDropdownOpen(false);
-    setFormValues({ ...formValues, [field.name]: customer.customer_id });
-  };
+  // const handleSelectCustomer = (
+  //   customer: Customer,
+  //   setFilter: any,
+  //   setIsDropdownOpen: any,
+  //   field: any
+  // ) => {
+  //   setFilter(customer.customer_id);
+  //   setIsDropdownOpen(false);
+  //   setFormValues({ ...formValues, [field.name]: customer.customer_id });
+  // };
 
-  const handleFilterChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: any,
-    fieldname: string,
-    isDropdownOpen: any,
-    setIsDropdownOpen: any,
-    setFilter: any,
-    setFilteredCustomers: any
-  ) => {
-    if (!isDropdownOpen) {
-      setIsDropdownOpen(true);
-    }
-    setFilter(e.target.value);
-    const res = await window.electron.getAutoCompleteData({
-      formName: fieldname,
-      fieldname: field.name,
-      value: e.target.value,
-    });
-    console.log(res, "REs");
-    setFilteredCustomers(res);
-  };
+  // const handleFilterChange = async (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   field: any,
+  //   fieldname: string,
+  //   isDropdownOpen: any,
+  //   setIsDropdownOpen: any,
+  //   setFilter: any,
+  //   setFilteredCustomers: any
+  // ) => {
+  //   if (!isDropdownOpen) {
+  //     setIsDropdownOpen(true);
+  //   }
+  //   setFilter(e.target.value);
+  //   const res = await window.electron.getAutoCompleteData({
+  //     formName: fieldname,
+  //     fieldname: field.name,
+  //     value: e.target.value,
+  //   });
 
-  const handleBlur = (
-    field: any,
-    filter: any,
-    setFilter: any,
-    setFormValues: any,
-    setIsDropdownOpen: any,
-    setFocusedIndex: any
-  ) => {
-    if (!filter) {
-      setFilter("");
-      setFormValues({ ...formValues, [field.name]: "" });
-    }
-    setIsDropdownOpen(false);
-    setFocusedIndex(0);
-  };
+  //   setFilteredCustomers(res);
+  // };
+
+  // const handleBlur = (
+  //   field: any,
+  //   filter: any,
+  //   setFilter: any,
+  //   setFormValues: any,
+  //   setIsDropdownOpen: any,
+  //   setFocusedIndex: any
+  // ) => {
+  //   if (!filter) {
+  //     setFilter("");
+  //     setFormValues({ ...formValues, [field.name]: "" });
+  //   }
+  //   setIsDropdownOpen(false);
+  //   setFocusedIndex(0);
+  // };
+ const updateStateFunction=(value:any,field:any)=>{
+  setFormValues({ ...formValues, [field.name]: value });
+ }
 
   return (
     <div className="container-fluid py-3">
-      <div className="card shadow">
+      <div className="card shadow my-4">
         <div className="card-header bg-primary text-white">
           <h4 className="mb-0">Sales Order Master Form</h4>
         </div>
@@ -213,18 +205,14 @@ const NewFormPage = () => {
                     formValues={formValues}
                     setFormValues={setFormValues}
                     fieldName={fieldName}
-                    handleSelectRow={handleSelectCustomer}
-                    handleBlur={handleBlur}
-                    filteredCustomers={field.stateName}
-                    setFilteredCustomers={field.setStatName}
-                    handleFilterChange={handleFilterChange}
+                    updateStateFunction={updateStateFunction}
                   />
                 </div>
               )}
             </div>
           ))}
         </form>
-        <div className="card-footer text-end">
+        <div className="p-4 text-end">
           <button
             type="submit"
             className="btn btn-success px-4"

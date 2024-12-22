@@ -15,7 +15,7 @@
       },
       "primaryField": "customer_id"
     },
-    "voucher_part4": {
+    "order_id": {
       "table": "OrderMaster",
       "columns": [
         "order_id",

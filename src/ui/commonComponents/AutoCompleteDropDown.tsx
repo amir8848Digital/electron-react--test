@@ -1,28 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
+import { First } from "react-bootstrap/esm/PageItem";
 
 type Props = {};
 
 const AutoCompleteDropDown = ({
   field,
-  filteredCustomers,
-  setFilteredCustomers,
   formValues,
   setFormValues,
   fieldName,
-  handleSelectRow,
-  handleBlur,
-  handleFilterChange,
-  configName,
+  updateStateFunction,
 }: any) => {
   interface Customer {
     customer_id: number;
     customer_name: string;
   }
-  console.log(setFilteredCustomers, "aannaan");
   const inputRef = useRef<HTMLInputElement>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [filter, setFilter] = useState("");
   const [tableHead, setTableHead] = useState<any>({});
+  const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -40,11 +36,12 @@ const AutoCompleteDropDown = ({
             : focusedIndex + 1
         ];
       if (nextCustomer) {
-        setFilter(nextCustomer.customer_name);
-        setFormValues({
-          ...formValues,
-          [field.name]: nextCustomer.customer_id,
-        });
+        setFilter(nextCustomer[field.name]);
+        // setFormValues({
+        //   ...formValues,
+        //   [field.name]: nextCustomer.customer_id,
+        // });
+        updateStateFunction(nextCustomer[field.name],field)
       }
     } else if (e.key === "ArrowUp") {
       setFocusedIndex((prevIndex) =>
@@ -59,11 +56,8 @@ const AutoCompleteDropDown = ({
             : focusedIndex - 1
         ];
       if (prevCustomer) {
-        setFilter(prevCustomer.customer_name);
-        setFormValues({
-          ...formValues,
-          [field.name]: prevCustomer.customer_id,
-        });
+        setFilter(prevCustomer[field.name]);
+        updateStateFunction(prevCustomer[field.name],field)
       }
     } else if (e.key === "Enter" && focusedIndex !== null) {
       handleSelectRow(
@@ -103,14 +97,15 @@ const AutoCompleteDropDown = ({
         inputRef.current &&
         !inputRef.current.contains(e.target as Node)
       ) {
-        handleBlur(
-          field,
-          filter,
-          setFilter,
-          setFormValues,
-          setIsDropdownOpen,
-          setFocusedIndex
-        );
+        // handleBlur(
+        //   field,
+        //   filter,
+        //   setFilter,
+        //   setFormValues,
+        //   setIsDropdownOpen,
+        //   setFocusedIndex
+        // );
+        setIsDropdownOpen(false)
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -126,6 +121,55 @@ const AutoCompleteDropDown = ({
     fetch();
   }, []);
 
+
+    const handleFilterChange = async (
+      e: React.ChangeEvent<HTMLInputElement>,
+      field: any,
+      fieldName: any,
+      isDropdownOpen: any,
+      setIsDropdownOpen: any,
+      setFilter: any,
+      setFilteredCustomers: any
+    ) => {
+     setIsDropdownOpen(true)
+     setFilter(e.target.value)
+      const res = await window.electron.getAutoCompleteData({
+        formName: fieldName,
+        fieldname: field.name,
+        value: e.target.value,
+      });
+      updateStateFunction( e.target.value,field)
+      setFilteredCustomers(res);
+    };
+
+    const handleSelectRow = (
+      customer: any,
+      setFilter: any,
+      setIsDropdownOpen: any,
+      field: any
+    ) => {
+      setFilter(customer[field.name]);
+      setIsDropdownOpen(false);
+      updateStateFunction(customer[field.name],field)
+      setIsDropdownOpen(false);
+    };
+
+    const handleBlur = (
+      field: any,
+      filter: any,
+      setFilter: any,
+      setFormValues: any,
+      setIsDropdownOpen: any,
+      setFocusedIndex: any
+    ) => {
+      if (!filter) {
+        setFilter("");
+       updateStateFunction("",field)
+      }
+      setIsDropdownOpen(false);
+      setFocusedIndex(0);
+    };
+    
   return (
     <div>
       <div className="position-relative">
@@ -159,25 +203,15 @@ const AutoCompleteDropDown = ({
               setFilteredCustomers
             );
           }}
-          onBlur={() =>
-            handleBlur(
-              field,
-              filter,
-              setFilter,
-              setFormValues,
-              setIsDropdownOpen,
-              setFocusedIndex
-            )
-          }
           placeholder={`Search ${field.label}`}
           onKeyDown={handleKeyDown}
         />
         {isDropdownOpen && (
           <div
             ref={dropdownRef}
-            className="dropdown-menu w-100 show overflow-auto"
+            className="dropdown-menu show overflow-auto"
             id="drop"
-            style={{ maxHeight: "200px", display: "block" }}
+            style={{ maxHeight: "200px", display: "blck" , overflowY: "auto"}}
           >
             <table
               className="table table-hover mb-0"

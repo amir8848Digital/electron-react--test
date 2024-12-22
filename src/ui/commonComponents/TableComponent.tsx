@@ -32,64 +32,88 @@ const TableComponent: React.FC = () => {
       fixed_price: 0,
     },
   ]);
-  const [filteredCustomers, setFilteredCustomers] = useState([]);
+ 
+  
+  // const handleSelectCustomer = (
+  //   customer: any,
+  //   setFilter: any,
+  //   setIsDropdownOpen: any,
+  //   field: any
+  // ) => {
+  //   setFilter(customer.design_code);
+  //   setIsDropdownOpen(false);
+  //   const updatedRowData = rowData.map((row) => {
+  //     if (row.order_id === field.rowId) {
+  //       return { ...row, design_code: customer.design_code };
+  //     }
+  //     return row;
+  //   });
+  //   setRowData(updatedRowData);
+  //   setIsDropdownOpen(false);
+  // };
 
-  const handleSelectCustomer = (
-    customer: any,
-    setFilter: any,
-    setIsDropdownOpen: any,
-    field: any
-  ) => {
-    setFilter(customer.design_code);
-    setIsDropdownOpen(false);
-    const updatedRowData = rowData.map((row) => {
+  // const handleBlur = (
+  //   field: any,
+  //   filter: any,
+  //   setFilter: any,
+  //   setFormValues: any,
+  //   setIsDropdownOpen: any,
+  //   setFocusedIndex: any
+  // ) => {
+  //   if (!filter) {
+  //     setFilter("");
+  //     const updatedRowData = rowData.map((row) => {
+  //       if (row.order_id === field.rowId) {
+  //         return { ...row, design_code: "" };
+  //       }
+  //       return row;
+  //     });
+
+  //     setRowData(updatedRowData);
+  //   }
+  //   setIsDropdownOpen(false);
+  //   setFocusedIndex(0);
+  // };
+
+  // const handleFilterChange = async (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   field: any,
+  //   fieldName: any,
+  //   isDropdownOpen: any,
+  //   setIsDropdownOpen: any,
+  //   setFilter: any,
+  //   setFilteredCustomers: any
+  // ) => {
+  //  setIsDropdownOpen(true)
+  //  setFilter(e.target.value)
+  //   const res = await window.electron.getAutoCompleteData({
+  //     formName: fieldName,
+  //     fieldname: field.name,
+  //     value: e.target.value,
+  //   });
+  //   const updatedRowData = rowData.map((row) => {
+  //     if (row.order_id === field.rowId) {
+  //       return { ...row, design_code: e.target.value};
+  //     }
+  //     return row;
+  //   });
+  //   setRowData(updatedRowData)
+  //   setFilteredCustomers(res);
+  // };
+
+  const updatRowData = (
+       value:any,
+       field: any,
+  )=>{
+        const updatedRowData = rowData.map((row) => {
       if (row.order_id === field.rowId) {
-        return { ...row, design_code: customer.customer_id };
+        return { ...row, design_code: value};
       }
       return row;
     });
-    setRowData(updatedRowData);
-  };
-
-  const handleBlur = (
-    field: any,
-    filter: any,
-    setFilter: any,
-    setIsDropdownOpen: any,
-    setFocusedIndex: any
-  ) => {
-    if (!filter) {
-      const updatedRowData = rowData.map((row) => {
-        if (row.order_id === field.rowId) {
-          return { ...row, design_code: "" };
-        }
-        return row;
-      });
-      setRowData(updatedRowData);
-    }
-    setIsDropdownOpen(false);
-    setFocusedIndex(0);
-  };
-
-  const handleFilterChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: any,
-    fieldName: any,
-    isDropdownOpen: any,
-    setIsDropdownOpen: any,
-    setFilter: any,
-    setFilteredCustomers: any
-  ) => {
-    console.log(setFilteredCustomers, "filter");
-    console.log(e.target.value);
-    const res = await window.electron.getAutoCompleteData({
-      formName: fieldName,
-      fieldname: field.name,
-      value: e.target.value,
-    });
-    console.log({ res });
-    setFilteredCustomers(res);
-  };
+    setRowData(updatedRowData)
+  }
+  
 
   const addRow = () => {
     const newRow: Row = {
@@ -108,13 +132,13 @@ const TableComponent: React.FC = () => {
     setRowData([...rowData, newRow]);
   };
 
-  useEffect(() => {
-    const fetch = async () => {
-      await window.electron.getFormConfig("orderDesign");
-    };
-    fetch(); // Fetch form configuration on component mount
-  }, []);
-  console.log({ filteredCustomers });
+  // useEffect(() => {
+  //   const fetch = async () => {
+  //     await window.electron.getFormConfig("orderDesign");
+  //   };
+  //   fetch(); 
+  // }, []);
+  // console.log({ filteredCustomers });
 
   return (
     <div className="container-fluid">
@@ -150,14 +174,10 @@ const TableComponent: React.FC = () => {
                     rowId: row.order_id,
                     label: "Design Code",
                   }}
-                  filteredCustomers={filteredCustomers}
-                  setFilteredCustomers={setFilteredCustomers}
                   formValues={rowData}
                   setFormValues={setRowData}
                   fieldName={fieldName}
-                  handleSelectRow={handleSelectCustomer}
-                  handleBlur={handleBlur}
-                  handleFilterChange={handleFilterChange}
+                  updateStateFunction={updatRowData}
                 />
               </td>
               <td contentEditable suppressContentEditableWarning>
