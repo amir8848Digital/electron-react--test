@@ -16,7 +16,7 @@ export const client = new Client({
   host: "3.20.115.50",
   database: "mydb",
   password: "Chintan@8848",
-  // connectionTimeoutMillis: 1500,
+  connectionTimeoutMillis: 150000,
   //port: 10071,
 });
 

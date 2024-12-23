@@ -86,57 +86,9 @@ const NewFormPage = () => {
     });
   };
 
-  // const handleSelectCustomer = (
-  //   customer: Customer,
-  //   setFilter: any,
-  //   setIsDropdownOpen: any,
-  //   field: any
-  // ) => {
-  //   setFilter(customer.customer_id);
-  //   setIsDropdownOpen(false);
-  //   setFormValues({ ...formValues, [field.name]: customer.customer_id });
-  // };
-
-  // const handleFilterChange = async (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   field: any,
-  //   fieldname: string,
-  //   isDropdownOpen: any,
-  //   setIsDropdownOpen: any,
-  //   setFilter: any,
-  //   setFilteredCustomers: any
-  // ) => {
-  //   if (!isDropdownOpen) {
-  //     setIsDropdownOpen(true);
-  //   }
-  //   setFilter(e.target.value);
-  //   const res = await window.electron.getAutoCompleteData({
-  //     formName: fieldname,
-  //     fieldname: field.name,
-  //     value: e.target.value,
-  //   });
-
-  //   setFilteredCustomers(res);
-  // };
-
-  // const handleBlur = (
-  //   field: any,
-  //   filter: any,
-  //   setFilter: any,
-  //   setFormValues: any,
-  //   setIsDropdownOpen: any,
-  //   setFocusedIndex: any
-  // ) => {
-  //   if (!filter) {
-  //     setFilter("");
-  //     setFormValues({ ...formValues, [field.name]: "" });
-  //   }
-  //   setIsDropdownOpen(false);
-  //   setFocusedIndex(0);
-  // };
- const updateStateFunction=(value:any,field:any)=>{
-  setFormValues({ ...formValues, [field.name]: value });
- }
+  const updateStateFunction = (value: any, field: any) => {
+    setFormValues({ ...formValues, [field.name]: value });
+  };
 
   return (
     <div className="container-fluid py-3">
@@ -223,7 +175,9 @@ const NewFormPage = () => {
         </div>
       </div>
       <div className="card shadow">
-        <div className="p-4">{<TableComponent />}</div>
+        <div className="p-4">
+          {<TableComponent orderId={formValues.order_id as string | number} />}
+        </div>
       </div>
     </div>
   );

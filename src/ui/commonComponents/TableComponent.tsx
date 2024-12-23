@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import AutoCompleteDropDown from "./AutoCompleteDropDown";
+import RateChartTable from "./RateChartTable";
+import LabourChartTable from "./labourChartTable";
 
 type Row = {
-  order_id: number;
+  sr_no: number;
+  order_id: number | string | number | null;
   design_code: string;
   suffix: string;
   size: number;
@@ -15,109 +18,108 @@ type Row = {
   fixed_price: number;
 };
 
-const TableComponent: React.FC = () => {
+interface TableComponentProps {
+  orderId: string | number | null;
+}
+
+const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
   const fieldName = "orderDesign";
+  const orderChartField = "orderRateChart";
+  const orderLabourField = "orderLabourChart";
   const [rowData, setRowData] = useState<Row[]>([
-    {
-      order_id: 1,
-      design_code: "",
-      suffix: "",
-      size: 0,
-      qty: 0,
-      calc_price: 0,
-      sales_price: 0,
-      prod_dely_date: "",
-      exp_dely_date: "",
-      prod_setting: "",
-      fixed_price: 0,
-    },
+    // {
+    //   sr_no: 0,
+    //   order_id: 0,
+    //   design_code: "",
+    //   suffix: "",
+    //   size: 0,
+    //   qty: 0,
+    //   calc_price: 0,
+    //   sales_price: 0,
+    //   prod_dely_date: "",
+    //   exp_dely_date: "",
+    //   prod_setting: "",
+    //   fixed_price: 0,
+    // },
   ]);
- 
-  
-  // const handleSelectCustomer = (
-  //   customer: any,
-  //   setFilter: any,
-  //   setIsDropdownOpen: any,
-  //   field: any
-  // ) => {
-  //   setFilter(customer.design_code);
-  //   setIsDropdownOpen(false);
-  //   const updatedRowData = rowData.map((row) => {
-  //     if (row.order_id === field.rowId) {
-  //       return { ...row, design_code: customer.design_code };
-  //     }
-  //     return row;
-  //   });
-  //   setRowData(updatedRowData);
-  //   setIsDropdownOpen(false);
-  // };
 
-  // const handleBlur = (
-  //   field: any,
-  //   filter: any,
-  //   setFilter: any,
-  //   setFormValues: any,
-  //   setIsDropdownOpen: any,
-  //   setFocusedIndex: any
-  // ) => {
-  //   if (!filter) {
-  //     setFilter("");
-  //     const updatedRowData = rowData.map((row) => {
-  //       if (row.order_id === field.rowId) {
-  //         return { ...row, design_code: "" };
-  //       }
-  //       return row;
-  //     });
+  useEffect(() => {
+    if (orderId) {
+      setRowData([
+        {
+          sr_no: 1,
+          order_id: orderId,
+          design_code: "",
+          suffix: "",
+          size: 0,
+          qty: 0,
+          calc_price: 0,
+          sales_price: 0,
+          prod_dely_date: "",
+          exp_dely_date: "",
+          prod_setting: "",
+          fixed_price: 0,
+        },
+      ]);
+    }
+  }, [orderId]);
 
-  //     setRowData(updatedRowData);
-  //   }
-  //   setIsDropdownOpen(false);
-  //   setFocusedIndex(0);
-  // };
+  const initailDataRateChart = {
+    order_design: null,
+    category: "",
+    sub_category: "",
+    sv_ln: "",
+    breadth: 0,
+    depth: 0,
+    quantity: 0,
+    pm_pointer: "",
+    wt: 0,
+    lme_rate: 0,
+    sales_rate: 0,
+    qw: 0,
+    sales_value: 0,
+    production_quantity: 0,
+    production_weight: 0,
+    setting: "",
+    setting_rate: 0,
+    setting_value: 0,
+    alloy: "",
+    alloy_rate: 0,
+    wset: 0,
+    h_set: 0,
+    sshp: 0,
+    m_material: "",
+  };
 
-  // const handleFilterChange = async (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   field: any,
-  //   fieldName: any,
-  //   isDropdownOpen: any,
-  //   setIsDropdownOpen: any,
-  //   setFilter: any,
-  //   setFilteredCustomers: any
-  // ) => {
-  //  setIsDropdownOpen(true)
-  //  setFilter(e.target.value)
-  //   const res = await window.electron.getAutoCompleteData({
-  //     formName: fieldName,
-  //     fieldname: field.name,
-  //     value: e.target.value,
-  //   });
-  //   const updatedRowData = rowData.map((row) => {
-  //     if (row.order_id === field.rowId) {
-  //       return { ...row, design_code: e.target.value};
-  //     }
-  //     return row;
-  //   });
-  //   setRowData(updatedRowData)
-  //   setFilteredCustomers(res);
-  // };
+  const initialDataLabourChart = {
+    order_design: null,
+    order_design_id: 0,
+    maind_cd: "",
+    sub_cd: "",
+    by_qw: 0,
+    quantity: 0,
+    rate: 0,
+    value: 0,
+  };
 
-  const updatRowData = (
-       value:any,
-       field: any,
-  )=>{
-        const updatedRowData = rowData.map((row) => {
-      if (row.order_id === field.rowId) {
-        return { ...row, design_code: value};
-      }
-      return row;
-    });
-    setRowData(updatedRowData)
-  }
-  
+  const [dataRateChart, setDataRateChart] = useState<any[]>([]);
+  const [dataLabourChart, setDataLabourChart] = useState<any[]>([]);
+  console.log({ dataLabourChart });
+  const handleRowChange = (
+    rowId: number | string,
+    field: keyof Row,
+    value: any
+  ) => {
+    const updatedRowData = rowData.map((row) =>
+      row.order_id === rowId ? { ...row, [field]: value } : row
+    );
+    setRowData(updatedRowData);
+  };
 
   const addRow = () => {
     const newRow: Row = {
-      order_id: rowData.length + 1,
+      sr_no: rowData.length + 1,
+      order_id: orderId,
       design_code: "",
       suffix: "",
       size: 0,
@@ -132,86 +134,173 @@ const TableComponent: React.FC = () => {
     setRowData([...rowData, newRow]);
   };
 
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     await window.electron.getFormConfig("orderDesign");
-  //   };
-  //   fetch(); 
-  // }, []);
-  // console.log({ filteredCustomers });
+  const handleAddTable = (row: Row) => {
+    if (row?.design_code) {
+      setDataRateChart([
+        ...dataRateChart,
+        { ...initailDataRateChart, order_design: row.sr_no },
+      ]);
+      setDataLabourChart([
+        ...dataLabourChart,
+        { ...initialDataLabourChart, order_design: row.sr_no },
+      ]);
+    }
+  };
 
-  return (
-    <div className="container-fluid">
-      <div className="text-end mb-3">
-        <button onClick={addRow} className="btn btn-success">
-          Add Row
-        </button>
+  const handleMainSubmit = () => {
+    const combinedData: any[] = [];
+
+    dataRateChart.forEach((item) => {
+      combinedData.push({
+        formData: item,
+        formName: orderChartField,
+      });
+    });
+
+    dataLabourChart.forEach((item) => {
+      combinedData.push({
+        formData: item,
+        formName: orderLabourField,
+      });
+    });
+
+    rowData.forEach((item) => {
+      combinedData.push({
+        formData: item,
+        formName: fieldName,
+      });
+    });
+
+    console.log(combinedData,"aaaaaaaaaaaaaaaaaaaaaa");
+  };
+
+  return rowData.length > 0 ? (
+    <>
+      <div className="container-fluid">
+        <div className="my-4">
+          <div className="text-end mb-3">
+            <button onClick={addRow} className="btn btn-success">
+              Add Row
+            </button>
+          </div>
+          <div>
+            <div>
+              <h6 className="px-4">Design Code</h6>
+            </div>
+            <table className="table table-bordered" style={{ width: "100%" }}>
+              <thead>
+                <tr className="fs-6">
+                  <th>Sr No</th>
+                  <th>Order ID</th>
+                  <th>Design Code</th>
+                  <th>Suffix</th>
+                  <th>Size</th>
+                  <th>Quantity</th>
+                  <th>Calculated Price</th>
+                  <th>Sales Price</th>
+                  <th>Prod Delivery Date</th>
+                  <th>Expected Delivery Date</th>
+                  <th>Prod Setting</th>
+                  <th>Fixed Price</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {rowData?.map((row) => (
+                  <tr key={row.order_id}>
+                    <td>{row.sr_no}</td>
+                    <td>{row.order_id}</td>
+                    <td>
+                      <AutoCompleteDropDown
+                        field={{
+                          name: "design_code",
+                          rowId: row.order_id,
+                          label: "Design Code",
+                        }}
+                        formValues={rowData}
+                        setFormValues={setRowData}
+                        fieldName={fieldName}
+                        updateStateFunction={(value: string) =>
+                          handleRowChange(
+                            row.order_id as number | string,
+                            "design_code",
+                            value
+                          )
+                        }
+                      />
+                    </td>
+                    {[
+                      "suffix",
+                      "size",
+                      "qty",
+                      "calc_price",
+                      "sales_price",
+                      "prod_dely_date",
+                      "exp_dely_date",
+                      "prod_setting",
+                      "fixed_price",
+                    ].map((field) => (
+                      <td key={field}>
+                        <input
+                          type="text"
+                          value={row[field as keyof Row] as string}
+                          onChange={(e) =>
+                            handleRowChange(
+                              row.order_id as number | string,
+                              field as keyof Row,
+                              e.target.value
+                            )
+                          }
+                          className="form-control"
+                        />
+                      </td>
+                    ))}
+                    <td>
+                      <button
+                        onClick={() => handleAddTable(row)}
+                        className="btn btn-primary"
+                      >
+                        Add
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            {dataRateChart.length > 0 ? (
+              <RateChartTable data={dataRateChart} setData={setDataRateChart} />
+            ) : (
+              ""
+            )}
+          </div>
+          <div className="col-md-6">
+            {dataLabourChart.length > 0 ? (
+              <LabourChartTable
+                data={dataLabourChart}
+                setData={setDataLabourChart}
+              />
+            ) : (
+              ""
+            )}
+          </div>
+        </div>
+        <div className="p-4 text-end">
+          <button
+            type="submit"
+            className="btn btn-success px-4"
+            onClick={handleMainSubmit}
+          >
+            Submit
+          </button>
+        </div>
       </div>
-      <table className="table table-bordered" style={{ width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Design Code</th>
-            <th>Suffix</th>
-            <th>Size</th>
-            <th>Quantity</th>
-            <th>Calculated Price</th>
-            <th>Sales Price</th>
-            <th>Prod Delivery Date</th>
-            <th>Expected Delivery Date</th>
-            <th>Prod Setting</th>
-            <th>Fixed Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rowData?.map((row) => (
-            <tr key={row.order_id}>
-              <td>{row.order_id}</td>
-              <td>
-                <AutoCompleteDropDown
-                  field={{
-                    name: "design_code",
-                    rowId: row.order_id,
-                    label: "Design Code",
-                  }}
-                  formValues={rowData}
-                  setFormValues={setRowData}
-                  fieldName={fieldName}
-                  updateStateFunction={updatRowData}
-                />
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.suffix}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.size}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.qty}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.calc_price}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.sales_price}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.prod_dely_date}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.exp_dely_date}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.prod_setting}
-              </td>
-              <td contentEditable suppressContentEditableWarning>
-                {row.fixed_price}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    </>
+  ) : (
+    ""
   );
 };
 
