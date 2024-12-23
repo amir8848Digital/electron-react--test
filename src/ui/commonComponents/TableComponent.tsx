@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import AutoCompleteDropDown from "./AutoCompleteDropDown";
 import RateChartTable from "./RateChartTable";
-import LabourChartTable from "./labourChartTable";
+import LabourChartTable from "./LabourChartTable";
 
 type Row = {
   sr_no: number;
-  order_id: number | string | number | null;
+  order_id: number;
   design_code: string;
   suffix: string;
   size: number;
@@ -19,7 +19,7 @@ type Row = {
 };
 
 interface TableComponentProps {
-  orderId: string | number | null;
+  orderId:  number ;
 }
 
 const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
@@ -65,7 +65,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
   }, [orderId]);
 
   const initailDataRateChart = {
-    order_design: null,
+    order_design_id: null,
     category: "",
     sub_category: "",
     sv_ln: "",
@@ -92,8 +92,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
   };
 
   const initialDataLabourChart = {
-    order_design: null,
-    order_design_id: 0,
+    order_design_id: null,
     maind_cd: "",
     sub_cd: "",
     by_qw: 0,
@@ -138,11 +137,11 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
     if (row?.design_code) {
       setDataRateChart([
         ...dataRateChart,
-        { ...initailDataRateChart, order_design: row.sr_no },
+        { ...initailDataRateChart, order_design_id: row.sr_no },
       ]);
       setDataLabourChart([
         ...dataLabourChart,
-        { ...initialDataLabourChart, order_design: row.sr_no },
+        { ...initialDataLabourChart, order_design_id: row.sr_no },
       ]);
     }
   };
@@ -170,10 +169,8 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
         formName: fieldName,
       });
     });
-
-    console.log(combinedData,"aaaaaaaaaaaaaaaaaaaaaa");
   };
-
+ 
   return rowData.length > 0 ? (
     <>
       <div className="container-fluid">
@@ -206,78 +203,118 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
                 </tr>
               </thead>
               <tbody>
-                {rowData?.map((row) => (
-                  <tr key={row.order_id}>
-                    <td>{row.sr_no}</td>
-                    <td>{row.order_id}</td>
-                    <td>
-                      <AutoCompleteDropDown
-                        field={{
-                          name: "design_code",
-                          rowId: row.order_id,
-                          label: "Design Code",
-                        }}
-                        formValues={rowData}
-                        setFormValues={setRowData}
-                        fieldName={fieldName}
-                        updateStateFunction={(value: string) =>
-                          handleRowChange(
-                            row.order_id as number | string,
-                            "design_code",
-                            value
-                          )
-                        }
-                      />
-                    </td>
-                    {[
-                      "suffix",
-                      "size",
-                      "qty",
-                      "calc_price",
-                      "sales_price",
-                      "prod_dely_date",
-                      "exp_dely_date",
-                      "prod_setting",
-                      "fixed_price",
-                    ].map((field) => (
-                      <td key={field}>
-                        <input
-                          type="text"
-                          value={row[field as keyof Row] as string}
-                          onChange={(e) =>
-                            handleRowChange(
-                              row.order_id as number | string,
-                              field as keyof Row,
-                              e.target.value
-                            )
-                          }
-                          className="form-control"
-                        />
-                      </td>
-                    ))}
-                    <td>
-                      <button
-                        onClick={() => handleAddTable(row)}
-                        className="btn btn-primary"
-                      >
-                        Add
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {rowData?.map((row) => (
+    <tr key={row.sr_no}>
+      {/* sr_no as a number */}
+      <td>{Number(row.sr_no)}</td>
+      
+      {/* order_id as a number */}
+      <td>{Number(row.order_id)}</td>
+      
+      {/* design_code dropdown */}
+      <td>
+        <AutoCompleteDropDown
+          field={{
+            name: "design_code",
+            rowId: row.order_id,
+            label: "Design Code",
+          }}
+          formValues={rowData}
+          setFormValues={setRowData}
+          fieldName={fieldName}
+          updateStateFunction={(value: string) =>
+            handleRowChange(
+              row.order_id as number,
+              "design_code",
+              value
+            )
+          }
+        />
+      </td>
+
+      {/* Other fields */}
+      {[
+        "suffix",
+        "size",
+        "qty",
+        "calc_price", // This is a number field
+        "sales_price", // This is a number field
+        "prod_dely_date", // This is a date field
+        "exp_dely_date", // This is a date field
+        "prod_setting",
+        "fixed_price", // This is a number field
+      ].map((field) => (
+        <td key={field}>
+          {field === "calc_price" || field === "sales_price" || field === "fixed_price" ? (
+            // Render as a number input for price fields
+            <input
+              type="number"
+              value={row[field as keyof Row] as number}
+              onChange={(e) =>
+                handleRowChange(
+                  row.order_id as number | string,
+                  field as keyof Row,
+                  Number(e.target.value)
+                )
+              }
+              className="form-control"
+            />
+          ) : field === "prod_dely_date" || field === "exp_dely_date" ? (
+            // Render as a date input for date fields
+            <input
+              type="date"
+              value={row[field as keyof Row] as string}
+              onChange={(e) =>
+                handleRowChange(
+                  row.order_id as number | string,
+                  field as keyof Row,
+                  e.target.value
+                )
+              }
+              className="form-control"
+            />
+          ) : (
+            // Render as a text input for other fields
+            <input
+              type="text"
+              value={row[field as keyof Row] as string}
+              onChange={(e) =>
+                handleRowChange(
+                  row.order_id as number | string,
+                  field as keyof Row,
+                  e.target.value
+                )
+              }
+              className="form-control"
+            />
+          )}
+        </td>
+      ))}
+
+      {/* Add button */}
+      <td>
+        <button
+          onClick={() => handleAddTable(row)}
+          className="btn btn-primary"
+        >
+          Add
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
             </table>
           </div>
         </div>
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-12 my-3">
             {dataRateChart.length > 0 ? (
               <RateChartTable data={dataRateChart} setData={setDataRateChart} />
             ) : (
               ""
             )}
           </div>
-          <div className="col-md-6">
+          <div className="col-12 my-3">
             {dataLabourChart.length > 0 ? (
               <LabourChartTable
                 data={dataLabourChart}

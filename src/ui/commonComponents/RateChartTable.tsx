@@ -46,7 +46,33 @@ const RateChartTable: React.FC<RateChartTableProps> = ({ data, setData }) => {
     value: string
   ) => {
     const updatedData = [...data];
-    updatedData[rowIndex][fieldName] = value;
+
+    // Convert the field values to numbers for numeric fields
+    if (
+      [
+        "breadth",
+        "depth",
+        "quantity",
+        "wt",
+        "lme_rate",
+        "sales_rate",
+        "qw",
+        "sales_value",
+        "production_quantity",
+        "production_weight",
+        "setting_rate",
+        "setting_value",
+        "alloy_rate",
+        "wset",
+        "h_set",
+        "sshp",
+      ].includes(fieldName)
+    ) {
+      updatedData[rowIndex][fieldName] = parseFloat(value) || 0;
+    } else {
+      updatedData[rowIndex][fieldName] = value;
+    }
+
     setData(updatedData);
   };
 
@@ -69,15 +95,26 @@ const RateChartTable: React.FC<RateChartTableProps> = ({ data, setData }) => {
               {data.map((row, rowIndex) => (
                 <tr key={rowIndex}>
                   {fields.map((field) => (
-                    <td key={field}>
-                      <input
-                        type="text"
-                        value={row[field] || ""}
-                        onChange={(e) =>
-                          handleCellChange(rowIndex, field, e.target.value)
-                        }
-                        className="form-control"
-                      />
+                    <td key={field} >
+                      {field === "order_design_id" ? (
+                        // Order design ID is view-only and displayed as a number
+                        <input
+                          type="number"
+                          value={row[field] || ""}
+                          readOnly
+                          className="form-control"
+                        />
+                      ) : (
+                        <input
+                        style={{minWidth:'60px'}}
+                          type={["breadth", "depth", "quantity", "wt", "lme_rate", "sales_rate", "qw", "sales_value", "production_quantity", "production_weight", "setting_rate", "setting_value", "alloy_rate", "wset", "h_set", "sshp"].includes(field) ? "number" : "text"}
+                          value={row[field] || ""}
+                          onChange={(e) =>
+                            handleCellChange(rowIndex, field, e.target.value)
+                          }
+                          className="form-control"
+                        />
+                      )}
                     </td>
                   ))}
                 </tr>

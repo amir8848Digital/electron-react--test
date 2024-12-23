@@ -32,13 +32,20 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
     value: string
   ) => {
     const updatedData = [...data];
-    updatedData[rowIndex][fieldName] = value;
+
+    // Convert value to number if the field is numeric
+    if (["by_qw","quantity", "rate", "value"].includes(fieldName)) {
+      updatedData[rowIndex][fieldName] = parseFloat(value) || 0;
+    } else {
+      updatedData[rowIndex][fieldName] = value;
+    }
+
     setData(updatedData);
   };
 
   return (
-    <div className="card  shadow">
-      <div className="px-4">
+    <div className="card shadow">
+      <div className="p-4">
         <h6>Labour Chart</h6>
       </div>
       <div className="table-responsive">
@@ -56,14 +63,24 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
                 <tr key={rowIndex}>
                   {fields.map((field) => (
                     <td key={field}>
-                      <input
-                        type="text"
-                        value={row[field] || ""}
-                        onChange={(e) =>
-                          handleCellChange(rowIndex, field, e.target.value)
-                        }
-                        className="form-control"
-                      />
+                      {field === "order_design_id" ? (
+                        // Read-only field for order_design_id
+                        <input
+                          type="number"
+                          value={row[field] || ""}
+                          readOnly
+                          className="form-control"
+                        />
+                      ) : (
+                        <input
+                          type={["quantity", "rate", "value"].includes(field) ? "number" : "text"}
+                          value={row[field] || ""}
+                          onChange={(e) =>
+                            handleCellChange(rowIndex, field, e.target.value)
+                          }
+                          className="form-control"
+                        />
+                      )}
                     </td>
                   ))}
                 </tr>
