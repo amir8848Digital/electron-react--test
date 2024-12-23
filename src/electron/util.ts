@@ -84,10 +84,8 @@ export async function  insertFormData(formDataArray: any) {
     if (!configs[formName]) {
       configs[formName] = config;
     }
-    console.log("fhvbhfvb")
 
     if (config?.dependent !== 1){
-      console.log("Form is not dependent")
       const tableName = config.tableName;
       const filteredEntries = Object.entries(formData.formData).filter(
         ([_, value]) => value !== null && value !== undefined && value !== ""
@@ -96,7 +94,6 @@ export async function  insertFormData(formDataArray: any) {
         console.log("No valid data to insert.");
         return;
       }
-      console.log("Data to insert:", filteredEntries);
       console.log(config, "config")
       const columns = filteredEntries.map(([key]) => key);
       const values = filteredEntries.map(([_, value]) => value);
@@ -111,7 +108,6 @@ export async function  insertFormData(formDataArray: any) {
       if (primaryKey) {
         query += ` RETURNING ${primaryKey};`;
       }
-      console.log("Query:", query);
       const r = await client.query(query, values);
       if (primaryKey && config?.dependent_on === 1) {
         const insertedPrimaryKey = r.rows[0]?.[primaryKey];
@@ -123,17 +119,22 @@ export async function  insertFormData(formDataArray: any) {
       console.log("Data inserted successfully!");
     }
   }
-  console.log(row_record_map)
+  console.log(row_record_map, "row_record_map")
   for (let formData of formDataArray) {
     const formName = formData.formName
+    console.log("Form Name:", formName);
     let config = configs[formName] || await getFormConfig(formName);
     if (!configs[formName]) {
       configs[formName] = config;
     }
+    console.log("inside dependent")
+    console.log(config)
 
     if (config?.dependent === 1){
+      console.log("in loop")
       const tableName = config.tableName;
-      formData.formData[config.foreign_key] = row_record_map[config.dependentTable][formData[config.foreign_row_id]];
+      console.log("Table Name:", config.dependentTable, config.foreign_row_id, formData.formData[config.foreign_row_id]);
+      formData.formData[config.foreign_key] = row_record_map[config.dependentTable][formData.formData[config.foreign_row_id]];
       console.log("Data to insert:", formData.formData);
 
       const filteredEntries = Object.entries(formData.formData).filter(
