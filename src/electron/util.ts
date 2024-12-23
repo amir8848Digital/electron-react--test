@@ -74,32 +74,80 @@ async function getData(queryConfig: any, query: any): Promise<any[]> {
   }
 }
 
-export async function insertFormData(formData: any) {
-  console.log(formData);
-  const formName = formData.formName
-  const config = await getFormConfig(formName)
-  const tableName = config.tableName;
-  const filteredEntries = Object.entries(formData.formData).filter(
-    ([_, value]) => value !== null && value !== undefined && value !== ""
-  );
+export async function  insertFormData(formDataArray: any) {
+  let configs = <any>{}
+  let row_record_map = <any>{}
+  for (let formData of formDataArray) {
+    const formName = formData.formName
+    let config = configs[formName] || await getFormConfig(formName);
+    console.log(config)
+    if (!configs[formName]) {
+      configs[formName] = config;
+    }
+    console.log("fhvbhfvb")
 
-  if (filteredEntries.length === 0) {
-    console.log("No valid data to insert.");
-    return;
+    if (config?.dependent !== 1){
+      console.log("Form is not dependent")
+      const tableName = config.tableName;
+      const filteredEntries = Object.entries(formData.formData).filter(
+        ([_, value]) => value !== null && value !== undefined && value !== ""
+      );
+      if (filteredEntries.length === 0) {
+        console.log("No valid data to insert.");
+        return;
+      }
+      console.log("Data to insert:", filteredEntries);
+      console.log(config, "config")
+      const columns = filteredEntries.map(([key]) => key);
+      const values = filteredEntries.map(([_, value]) => value);
+      const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+
+      const primaryKey = config.primary_key || null; 
+
+      let query = `
+        INSERT INTO ${tableName} (${columns.join(", ")})
+        VALUES (${placeholders})
+      `;
+      if (primaryKey) {
+        query += ` RETURNING ${primaryKey};`;
+      }
+      console.log("Query:", query);
+      const r = await client.query(query, values);
+      if (primaryKey && config?.dependent_on === 1) {
+        const insertedPrimaryKey = r.rows[0]?.[primaryKey];
+        console.log("Inserted Primary Key:", insertedPrimaryKey);
+        console.log(formData.formData[config.row_id], "row_id")
+        row_record_map[tableName] = row_record_map[tableName] || {};
+        row_record_map[tableName][formData.formData[config.row_id]] = insertedPrimaryKey;
+      }
+      console.log("Data inserted successfully!");
+    }
   }
+  console.log(row_record_map)
+  for (let formData of formDataArray) {
+    const formName = formData.formName
+    let config = configs[formName] || await getFormConfig(formName);
+    if (!configs[formName]) {
+      configs[formName] = config;
+    }
 
-  const columns = filteredEntries.map(([key]) => key);
-  const values = filteredEntries.map(([_, value]) => value);
-  const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+    if (config?.dependent === 1){
+      const tableName = config.tableName;
+      formData.formData[config.foreign_key] = row_record_map[config.dependentTable][formData[config.foreign_row_id]];
+      console.log("Data to insert:", formData.formData);
 
-  // Construct the query
-  const query = `
-      INSERT INTO ${tableName} (${columns.join(", ")})
-      VALUES (${placeholders});
-    `;
-  console.log("Generated Query:", query);
-  console.log("Values:", values);
-  const r = await client.query(query, values);
-  console.log(r)
+      const filteredEntries = Object.entries(formData.formData).filter(
+        ([_, value]) => value !== null && value !== undefined && value !== ""
+      );
+      const columns = filteredEntries.map(([key]) => key);
+      const values = filteredEntries.map(([_, value]) => value);
+      const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+      let query = `
+        INSERT INTO ${tableName} (${columns.join(", ")})
+        VALUES (${placeholders})
+      `;
+      const r = await client.query(query, values);
+    }
+  }
   console.log("Data inserted successfully!");
 }

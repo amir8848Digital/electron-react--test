@@ -27,7 +27,7 @@
         "po_no",
         "priority"
       ],
-      "searchField": "order_id",
+      "searchFields": ["order_id"],
       "fieldsMap": {
         "order_id": "Order ID",
         "order_date": "Date",
