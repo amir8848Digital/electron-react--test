@@ -1,6 +1,9 @@
 {
-  "table_name": "OrderDesign",
+  "tableName": "OrderDesign",
   "formName": "orderDesign",
+  "dependent_on": 1,
+  "primary_key": "order_design_id",
+  "row_id": "sr_no",
   "autoCompleteFields": {
     "design_code": {
       "table": "Design",

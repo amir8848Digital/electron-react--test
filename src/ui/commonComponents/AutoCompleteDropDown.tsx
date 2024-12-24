@@ -41,7 +41,7 @@ const AutoCompleteDropDown = ({
         //   ...formValues,
         //   [field.name]: nextCustomer.customer_id,
         // });
-        updateStateFunction(nextCustomer[field.name],field)
+        updateStateFunction(nextCustomer[field.name], field);
       }
     } else if (e.key === "ArrowUp") {
       setFocusedIndex((prevIndex) =>
@@ -57,7 +57,7 @@ const AutoCompleteDropDown = ({
         ];
       if (prevCustomer) {
         setFilter(prevCustomer[field.name]);
-        updateStateFunction(prevCustomer[field.name],field)
+        updateStateFunction(prevCustomer[field.name], field);
       }
     } else if (e.key === "Enter" && focusedIndex !== null) {
       handleSelectRow(
@@ -105,7 +105,7 @@ const AutoCompleteDropDown = ({
         //   setIsDropdownOpen,
         //   setFocusedIndex
         // );
-        setIsDropdownOpen(false)
+        setIsDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -121,55 +121,54 @@ const AutoCompleteDropDown = ({
     fetch();
   }, []);
 
+  const handleFilterChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: any,
+    fieldName: any,
+    isDropdownOpen: any,
+    setIsDropdownOpen: any,
+    setFilter: any,
+    setFilteredCustomers: any
+  ) => {
+    setIsDropdownOpen(true);
+    setFilter(e.target.value);
+    const res = await window.electron.getAutoCompleteData({
+      formName: fieldName,
+      fieldname: field.name,
+      value: e.target.value,
+    });
+    updateStateFunction(e.target.value, field);
+    setFilteredCustomers(res);
+  };
 
-    const handleFilterChange = async (
-      e: React.ChangeEvent<HTMLInputElement>,
-      field: any,
-      fieldName: any,
-      isDropdownOpen: any,
-      setIsDropdownOpen: any,
-      setFilter: any,
-      setFilteredCustomers: any
-    ) => {
-     setIsDropdownOpen(true)
-     setFilter(e.target.value)
-      const res = await window.electron.getAutoCompleteData({
-        formName: fieldName,
-        fieldname: field.name,
-        value: e.target.value,
-      });
-      updateStateFunction( e.target.value,field)
-      setFilteredCustomers(res);
-    };
+  const handleSelectRow = (
+    customer: any,
+    setFilter: any,
+    setIsDropdownOpen: any,
+    field: any
+  ) => {
+    setFilter(customer[field.name]);
+    setIsDropdownOpen(false);
+    updateStateFunction(customer[field.name], field);
+    setIsDropdownOpen(false);
+  };
 
-    const handleSelectRow = (
-      customer: any,
-      setFilter: any,
-      setIsDropdownOpen: any,
-      field: any
-    ) => {
-      setFilter(customer[field.name]);
-      setIsDropdownOpen(false);
-      updateStateFunction(customer[field.name],field)
-      setIsDropdownOpen(false);
-    };
+  const handleBlur = (
+    field: any,
+    filter: any,
+    setFilter: any,
+    setFormValues: any,
+    setIsDropdownOpen: any,
+    setFocusedIndex: any
+  ) => {
+    if (!filter) {
+      setFilter("");
+      updateStateFunction("", field);
+    }
+    setIsDropdownOpen(false);
+    setFocusedIndex(0);
+  };
 
-    const handleBlur = (
-      field: any,
-      filter: any,
-      setFilter: any,
-      setFormValues: any,
-      setIsDropdownOpen: any,
-      setFocusedIndex: any
-    ) => {
-      if (!filter) {
-        setFilter("");
-       updateStateFunction("",field)
-      }
-      setIsDropdownOpen(false);
-      setFocusedIndex(0);
-    };
-    
   return (
     <div>
       <div className="position-relative">
@@ -211,7 +210,7 @@ const AutoCompleteDropDown = ({
             ref={dropdownRef}
             className="dropdown-menu show overflow-auto"
             id="drop"
-            style={{ maxHeight: "200px", display: "blck" , overflowY: "auto"}}
+            style={{ maxHeight: "200px", display: "blck", overflowY: "auto" }}
           >
             <table
               className="table table-hover mb-0"

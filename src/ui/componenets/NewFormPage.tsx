@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import AutoCompleteDropDown from "../commonComponents/AutoCompleteDropDown";
 import TableComponent from "../commonComponents/TableComponent";
+import ModalForm from "../commonComponents/ModalForm";
 
 const NewFormPage = () => {
   interface FormValues {
@@ -51,7 +52,16 @@ const NewFormPage = () => {
     return acc;
   }, {} as FormValues);
   const [formValues, setFormValues] = useState<FormValues>(initialState);
+  const [showModal, setShowModal] = useState(false);
 
+  const handleSubmit = (data: Record<string, any>) => {
+    console.log('Form submitted with data:', data);
+    setShowModal(false); // Close the modal after submission
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
@@ -86,57 +96,9 @@ const NewFormPage = () => {
     });
   };
 
-  // const handleSelectCustomer = (
-  //   customer: Customer,
-  //   setFilter: any,
-  //   setIsDropdownOpen: any,
-  //   field: any
-  // ) => {
-  //   setFilter(customer.customer_id);
-  //   setIsDropdownOpen(false);
-  //   setFormValues({ ...formValues, [field.name]: customer.customer_id });
-  // };
-
-  // const handleFilterChange = async (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   field: any,
-  //   fieldname: string,
-  //   isDropdownOpen: any,
-  //   setIsDropdownOpen: any,
-  //   setFilter: any,
-  //   setFilteredCustomers: any
-  // ) => {
-  //   if (!isDropdownOpen) {
-  //     setIsDropdownOpen(true);
-  //   }
-  //   setFilter(e.target.value);
-  //   const res = await window.electron.getAutoCompleteData({
-  //     formName: fieldname,
-  //     fieldname: field.name,
-  //     value: e.target.value,
-  //   });
-
-  //   setFilteredCustomers(res);
-  // };
-
-  // const handleBlur = (
-  //   field: any,
-  //   filter: any,
-  //   setFilter: any,
-  //   setFormValues: any,
-  //   setIsDropdownOpen: any,
-  //   setFocusedIndex: any
-  // ) => {
-  //   if (!filter) {
-  //     setFilter("");
-  //     setFormValues({ ...formValues, [field.name]: "" });
-  //   }
-  //   setIsDropdownOpen(false);
-  //   setFocusedIndex(0);
-  // };
- const updateStateFunction=(value:any,field:any)=>{
-  setFormValues({ ...formValues, [field.name]: value });
- }
+  const updateStateFunction = (value: any, field: any) => {
+    setFormValues({ ...formValues, [field.name]: value });
+  };
 
   return (
     <div className="container-fluid py-3">
@@ -212,7 +174,15 @@ const NewFormPage = () => {
             </div>
           ))}
         </form>
-        <div className="p-4 text-end">
+        <div>
+
+        <div className="d-flex justify-content-end my-3 ">
+          <div className="me-2">
+      <button onClick={() => setShowModal(true)} className="btn btn-success">
+        Open Modal
+      </button>
+          </div>
+        <div className="mx-4">
           <button
             type="submit"
             className="btn btn-success px-4"
@@ -221,9 +191,18 @@ const NewFormPage = () => {
             Submit
           </button>
         </div>
+       </div>
+        </div>
       </div>
       <div className="card shadow">
-        <div className="p-4">{<TableComponent />}</div>
+        <div className="p-4">
+          {<TableComponent orderId={formValues.order_id as number} />}
+        </div>
+      </div>
+       <div>
+          {showModal && (
+        <ModalForm orderMasterId={formValues?.order_id as number} onSubmit={handleSubmit} onClose={handleClose} />
+      )}
       </div>
     </div>
   );
