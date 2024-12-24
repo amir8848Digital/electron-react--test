@@ -176,7 +176,7 @@ const AutoCompleteDropDown = ({
           ref={inputRef}
           type="text"
           id={field.name}
-          className="form-control"
+          className="form-control fs-10"
           value={filter}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleFilterChange(

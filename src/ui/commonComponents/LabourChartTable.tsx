@@ -34,7 +34,7 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
     const updatedData = [...data];
 
     // Convert value to number if the field is numeric
-    if (["by_qw","quantity", "rate", "value"].includes(fieldName)) {
+    if (["by_qw", "quantity", "rate", "value"].includes(fieldName)) {
       updatedData[rowIndex][fieldName] = parseFloat(value) || 0;
     } else {
       updatedData[rowIndex][fieldName] = value;
@@ -45,7 +45,7 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
 
   return (
     <div className="card shadow">
-      <div className="p-4">
+      <div className="p-2 mb-0">
         <h6>Labour Chart</h6>
       </div>
       <div className="table-responsive">
@@ -54,7 +54,9 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
             <thead>
               <tr>
                 {fields.map((field) => (
-                  <th key={field}>{formatFieldLabel(field)}</th>
+                  <th key={field} className="fs-10">
+                    {formatFieldLabel(field)}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -69,11 +71,15 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
                           type="number"
                           value={row[field] || ""}
                           readOnly
-                          className="form-control"
+                          className="form-control  fs-10 "
                         />
                       ) : (
                         <input
-                          type={["quantity", "rate", "value"].includes(field) ? "number" : "text"}
+                          type={
+                            ["quantity", "rate", "value"].includes(field)
+                              ? "number"
+                              : "text"
+                          }
                           value={row[field] || ""}
                           onChange={(e) =>
                             handleCellChange(rowIndex, field, e.target.value)

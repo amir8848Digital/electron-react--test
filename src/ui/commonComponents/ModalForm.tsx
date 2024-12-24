@@ -7,7 +7,7 @@ interface ModalFormProps {
 }
 
 // Define the type for each field in initialData
-type FieldType = 'number' | 'text' | 'checkbox' | 'date';
+type FieldType = "number" | "text" | "checkbox" | "date";
 
 interface InitialData {
   [key: string]: {
@@ -16,56 +16,60 @@ interface InitialData {
   };
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose }) => {
+const ModalForm: React.FC<ModalFormProps> = ({
+  orderMasterId,
+  onSubmit,
+  onClose,
+}) => {
   const initialData: InitialData = {
-    order_master_id: { value: orderMasterId, type: 'number' },
-    multiply_by: { value: null, type: 'number' },
-    mrp_multiply_by: { value: null, type: 'number' },
-    fixed_price: { value: false, type: 'checkbox' },
-    gold_as: { value: "", type: 'text' },
-    lab_as: { value: "", type: 'text' },
-    val_addn_cap: { value: null, type: 'number' },
-    all_wts_from_ord: { value: false, type: 'checkbox' },
-    wts_from_ord: { value: null, type: 'number' },
-    gld_rz_from_ord: { value: false, type: 'checkbox' },
-    chg_per_on_wst: { value: false, type: 'checkbox' },
-    lab_wt_from_ord: { value: false, type: 'checkbox' },
-    lab_wait_for_all_bags: { value: false, type: 'checkbox' },
-    lmg_cost: { value: null, type: 'number' },
-    lmg_date: { value: null, type: 'date' },
-    lmp_cost: { value: null, type: 'number' },
-    lmp_date: { value: null, type: 'date' },
-    lms_cost: { value: 0.00, type: 'number' },
-    lms_date: { value: null, type: 'date' },
-    lml_cost: { value: 0.00, type: 'number' },
-    lml_date: { value: null, type: 'date' },
-    orig_exp_del_dt: { value: null, type: 'date' },
-    orig_prd_del_dt: { value: null, type: 'date' },
-    person: { value: "", type: 'text' },
-    contractor: { value: "", type: 'text' },
-    del_terms: { value: "", type: 'text' },
-    pay_terms: { value: "", type: 'text' },
-    special_remarks: { value: "", type: 'text' },
-    ret_memo_inp1: { value: "", type: 'text' },
-    ret_memo_inp2: { value: "", type: 'text' },
-    ret_memo_inp3: { value: "", type: 'text' },
-    po_cust_date: { value: null, type: 'date' },
-    cust_req_dt: { value: null, type: 'date' },
-    rev_date1: { value: null, type: 'date' },
-    rev_date2: { value: null, type: 'date' },
-    prod_line: { value: "", type: 'text' },
-    wax_set_dia_dt: { value: null, type: 'date' },
-    hard_set_dia_dt: { value: null, type: 'date' },
-    rm_rate_lookup: { value: 0.00, type: 'number' },
-    lab_rate_lookup: { value: 0.00, type: 'number' },
-    metal_loss: { value: 0.00, type: 'number' },
-    cust_ctg: { value: "", type: 'text' },
-    cust_cd: { value: "", type: 'text' },
-    yyyymm: { value: null, type: 'date' },
+    order_master_id: { value: orderMasterId, type: "number" },
+    multiply_by: { value: null, type: "number" },
+    mrp_multiply_by: { value: null, type: "number" },
+    fixed_price: { value: false, type: "checkbox" },
+    gold_as: { value: "", type: "text" },
+    lab_as: { value: "", type: "text" },
+    val_addn_cap: { value: null, type: "number" },
+    all_wts_from_ord: { value: false, type: "checkbox" },
+    wts_from_ord: { value: null, type: "number" },
+    gld_rz_from_ord: { value: false, type: "checkbox" },
+    chg_per_on_wst: { value: false, type: "checkbox" },
+    lab_wt_from_ord: { value: false, type: "checkbox" },
+    lab_wait_for_all_bags: { value: false, type: "checkbox" },
+    lmg_cost: { value: null, type: "number" },
+    lmg_date: { value: null, type: "date" },
+    lmp_cost: { value: null, type: "number" },
+    lmp_date: { value: null, type: "date" },
+    lms_cost: { value: 0.0, type: "number" },
+    lms_date: { value: null, type: "date" },
+    lml_cost: { value: 0.0, type: "number" },
+    lml_date: { value: null, type: "date" },
+    orig_exp_del_dt: { value: null, type: "date" },
+    orig_prd_del_dt: { value: null, type: "date" },
+    person: { value: "", type: "text" },
+    contractor: { value: "", type: "text" },
+    del_terms: { value: "", type: "text" },
+    pay_terms: { value: "", type: "text" },
+    special_remarks: { value: "", type: "text" },
+    ret_memo_inp1: { value: "", type: "text" },
+    ret_memo_inp2: { value: "", type: "text" },
+    ret_memo_inp3: { value: "", type: "text" },
+    po_cust_date: { value: null, type: "date" },
+    cust_req_dt: { value: null, type: "date" },
+    rev_date1: { value: null, type: "date" },
+    rev_date2: { value: null, type: "date" },
+    prod_line: { value: "", type: "text" },
+    wax_set_dia_dt: { value: null, type: "date" },
+    hard_set_dia_dt: { value: null, type: "date" },
+    rm_rate_lookup: { value: 0.0, type: "number" },
+    lab_rate_lookup: { value: 0.0, type: "number" },
+    metal_loss: { value: 0.0, type: "number" },
+    cust_ctg: { value: "", type: "text" },
+    cust_cd: { value: "", type: "text" },
+    yyyymm: { value: null, type: "date" },
   };
 
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
-  console.log({formData})
+  console.log({ formData });
 
   const formatFieldLabel = (field: string) => {
     return field
@@ -75,9 +79,17 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
       .join(" ");
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: string
+  ) => {
     const { type, value, checked } = e.target;
-    const updatedValue = type === "checkbox" ? checked : type === "number" ? parseFloat(value) : value;
+    const updatedValue =
+      type === "checkbox"
+        ? checked
+        : type === "number"
+        ? parseFloat(value)
+        : value;
     setFormData((prev) => ({
       ...prev,
       [fieldName]: { ...prev[fieldName], value: updatedValue },
@@ -94,20 +106,27 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
   };
 
   return (
-    <div className="modal show" style={{ display: "block" }}>
-      <div className="modal-dialog" style={{ maxWidth: "80%" }}>
+    <div
+      className="modal"
+      aria-hidden="true"
+      data-bs-toggle="modal"
+      data-bs-target="#formModal"
+      style={{ display: "block" }}
+    >
+      <div className="modal-dialog" id="formModal" style={{ maxWidth: "80%" }}>
         <div className="modal-content">
-          <div className="modal-header" style={headerStyle}>
-            <h5 className="modal-title" style={headerTextStyle}>
-              Edit Order Details
-            </h5>
-            <button type="button" className="close" onClick={onClose} style={closeButtonStyle}>
-              <span>&times;</span>
-            </button>
+          <div className="modal-header">
+            <h5 className="modal-title"></h5>
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
-              <div className="row p-4 g-2">
+              <div className="row g-2">
                 {Object.keys(formData).map((field) => {
                   const { value, type } = formData[field];
                   const label = formatFieldLabel(field);
@@ -119,7 +138,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
                         type="number"
                         value={value || ""}
                         onChange={(e) => handleInputChange(e, field)}
-                        className="form-control"
+                        className="form-control fs-10"
                       />
                     );
                   } else if (type === "checkbox") {
@@ -137,7 +156,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
                         type="date"
                         value={value ? value.toString().substring(0, 10) : ""}
                         onChange={(e) => handleInputChange(e, field)}
-                        className="form-control w-100"
+                        className="form-control fs-10 w-100"
                       />
                     );
                   } else {
@@ -146,15 +165,15 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
                         type="text"
                         value={value || ""}
                         onChange={(e) => handleInputChange(e, field)}
-                        className="form-control"
+                        className="form-control fs-10"
                       />
                     );
                   }
 
                   return (
-                    <div className="col-md-4 col-lg-3" key={field}>
-                      <div className="mb-2">
-                        <label htmlFor={field} className="form-label">
+                    <div className="col-md-2" key={field}>
+                      <div className="">
+                        <label htmlFor={field} className="form-label fs-10">
                           {label}
                         </label>
                         {inputElement}
@@ -165,10 +184,18 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn-secondary fs-10"
+                onClick={onClose}
+              >
                 Close
               </button>
-              <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+              <button
+                type="submit"
+                className="btn btn-primary fs-10"
+                onClick={handleSubmit}
+              >
                 Save Changes
               </button>
             </div>
@@ -184,7 +211,7 @@ const headerStyle = {
   backgroundColor: "#007bff",
   color: "white",
   borderBottom: "1px solid #ddd",
-  padding: "15px 20px",
+  // padding: "15px 20px",
 };
 
 const headerTextStyle = {

@@ -55,8 +55,10 @@ const NewFormPage = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = (data: Record<string, any>) => {
-    window.electron.insertFormData([{ formData: data, formName: "orderDetails" }]);
-    console.log('Form submitted with data:', data);
+    window.electron.insertFormData([
+      { formData: data, formName: "orderDetails" },
+    ]);
+    console.log("Form submitted with data:", data);
     setShowModal(false); // Close the modal after submission
   };
 
@@ -91,10 +93,12 @@ const NewFormPage = () => {
   };
 
   const handdleSubmit = () => {
-    window.electron.insertFormData([{
-      formData: formValues,
-      formName: fieldName,
-    }]);
+    window.electron.insertFormData([
+      {
+        formData: formValues,
+        formName: fieldName,
+      },
+    ]);
   };
 
   const updateStateFunction = (value: any, field: any) => {
@@ -102,24 +106,24 @@ const NewFormPage = () => {
   };
 
   return (
-    <div className="container-fluid py-3">
+    <div className="container-fluid">
       <div className="card shadow my-4">
-        <div className="card-header bg-primary text-white">
-          <h4 className="mb-0">Sales Order Master Form</h4>
-        </div>
+        {/* <div className="card-header bg-primary text-white">
+          <p className="mb-0 ">Sales Order Master Form</p>
+        </div> */}
         <form className="row p-4 g-2">
           {fields.map((field, index) => (
-            <div className="col-md-4 col-lg-3" key={index}>
+            <div className="col-md-2" key={index}>
               {/* Text Input */}
               {field.type === "text" && (
-                <div className="mb-2">
-                  <label htmlFor={field.name} className="form-label">
+                <div className="">
+                  <label htmlFor={field.name} className="form-label fs-10">
                     {field.label}
                   </label>
                   <input
                     type="text"
                     id={field.name}
-                    className="form-control"
+                    className="form-control  fs-10"
                     value={formValues[field.name] as string}
                     onChange={(e) => handleChange(e, field.name)}
                     placeholder={`Enter ${field.label}`}
@@ -127,14 +131,14 @@ const NewFormPage = () => {
                 </div>
               )}
               {field.type === "number" && (
-                <div className="mb-2">
-                  <label htmlFor={field.name} className="form-label">
+                <div className="">
+                  <label htmlFor={field.name} className="form-label fs-10">
                     {field.label}
                   </label>
                   <input
                     type="number"
                     id={field.name}
-                    className="form-control"
+                    className="form-control fs-10"
                     value={formValues[field.name] as number}
                     onChange={(e) => handleChangeNumber(e, field.name)}
                     placeholder={`Enter ${field.label}`}
@@ -143,14 +147,14 @@ const NewFormPage = () => {
               )}
               {/* Calendar Input */}
               {field.type === "calendar" && (
-                <div className="mb-2">
-                  <label htmlFor="dateInput" className="form-label">
+                <div className="">
+                  <label htmlFor="dateInput" className="form-label fs-10">
                     {field.label || "Select Date"}
                   </label>
                   <input
                     type="date"
-                    id="dateInput"
-                    className="form-control"
+                    id="dateInput fs-10"
+                    className="form-control fs-10"
                     placeholder="Choose a date"
                     onChange={(e) => handleCalendarChange(e, field.name)}
                   />
@@ -159,8 +163,8 @@ const NewFormPage = () => {
 
               {/* Autocomplete Input */}
               {field.type === "autoComplete" && (
-                <div className="mb-3">
-                  <label htmlFor={field.name} className="form-label">
+                <div className="">
+                  <label htmlFor={field.name} className="form-label fs-10">
                     {field.label}
                   </label>
                   <AutoCompleteDropDown
@@ -169,6 +173,7 @@ const NewFormPage = () => {
                     setFormValues={setFormValues}
                     fieldName={fieldName}
                     updateStateFunction={updateStateFunction}
+                    size={"small"}
                   />
                 </div>
               )}
@@ -176,34 +181,40 @@ const NewFormPage = () => {
           ))}
         </form>
         <div>
-
-        <div className="d-flex justify-content-end my-3 ">
-          <div className="me-2">
-      <button onClick={() => setShowModal(true)} className="btn btn-success">
-        Open Modal
-      </button>
+          <div className="d-flex justify-content-end my-2 ">
+            <div className="me-2">
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn btn-success fs-10"
+              >
+                Open Modal
+              </button>
+            </div>
+            <div className="mx-4">
+              <button
+                type="submit"
+                className="btn btn-success px-4 fs-10"
+                onClick={handdleSubmit}
+              >
+                Submit
+              </button>
+            </div>
           </div>
-        <div className="mx-4">
-          <button
-            type="submit"
-            className="btn btn-success px-4"
-            onClick={handdleSubmit}
-          >
-            Submit
-          </button>
-        </div>
-       </div>
         </div>
       </div>
       <div className="card shadow">
-        <div className="p-4">
+        <div className="">
           {<TableComponent orderId={formValues.order_id as number} />}
         </div>
       </div>
-       <div>
-          {showModal && (
-        <ModalForm orderMasterId={formValues?.order_id as number} onSubmit={handleSubmit} onClose={handleClose} />
-      )}
+      <div>
+        {showModal && (
+          <ModalForm
+            orderMasterId={formValues?.order_id as number}
+            onSubmit={handleSubmit}
+            onClose={handleClose}
+          />
+        )}
       </div>
     </div>
   );
