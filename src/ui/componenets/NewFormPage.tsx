@@ -55,6 +55,7 @@ const NewFormPage = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = (data: Record<string, any>) => {
+    window.electron.insertFormData([{ formData: data, formName: "orderDetails" }]);
     console.log('Form submitted with data:', data);
     setShowModal(false); // Close the modal after submission
   };
@@ -90,10 +91,10 @@ const NewFormPage = () => {
   };
 
   const handdleSubmit = () => {
-    window.electron.insertFormData({
+    window.electron.insertFormData([{
       formData: formValues,
       formName: fieldName,
-    });
+    }]);
   };
 
   const updateStateFunction = (value: any, field: any) => {

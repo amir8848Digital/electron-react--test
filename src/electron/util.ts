@@ -94,7 +94,7 @@ export async function  insertFormData(formDataArray: any) {
         console.log("No valid data to insert.");
         return;
       }
-      console.log(config, "config")
+      
       const columns = filteredEntries.map(([key]) => key);
       const values = filteredEntries.map(([_, value]) => value);
       const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
@@ -108,6 +108,7 @@ export async function  insertFormData(formDataArray: any) {
       if (primaryKey) {
         query += ` RETURNING ${primaryKey};`;
       }
+      console.log(query, values);
       const r = await client.query(query, values);
       if (primaryKey && config?.dependent_on === 1) {
         const insertedPrimaryKey = r.rows[0]?.[primaryKey];

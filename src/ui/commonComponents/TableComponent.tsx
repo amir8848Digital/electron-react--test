@@ -169,6 +169,10 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
         formName: fieldName,
       });
     });
+    console.log({ combinedData });
+    window.electron.insertFormData(
+       combinedData
+    );
   };
  
   return rowData.length > 0 ? (

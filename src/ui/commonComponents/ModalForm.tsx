@@ -168,7 +168,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ orderMasterId, onSubmit, onClose 
               <button type="button" className="btn btn-secondary" onClick={onClose}>
                 Close
               </button>
-              <button type="submit" className="btn btn-primary">
+              <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
                 Save Changes
               </button>
             </div>
