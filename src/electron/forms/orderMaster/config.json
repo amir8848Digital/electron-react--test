@@ -36,7 +36,8 @@
         "po_no": "PO No",
         "currency": "Currency",
         "priority": "Priority"
-      }
+      },
+      "primaryField": "order_id"
     }
   }
 }

@@ -29,19 +29,22 @@ const AutoCompleteDropDown = ({
           ? 0
           : prevIndex + 1
       );
-      const nextCustomer =
-        filteredCustomers[
-          focusedIndex === null || focusedIndex === filteredCustomers.length - 1
-            ? 0
-            : focusedIndex + 1
-        ];
+      const nextIndex =
+        focusedIndex === null || focusedIndex === filteredCustomers.length - 1
+          ? 0
+          : focusedIndex + 1;
+
+      const nextCustomer = filteredCustomers[nextIndex];
       if (nextCustomer) {
         setFilter(nextCustomer[field.name]);
-        // setFormValues({
-        //   ...formValues,
-        //   [field.name]: nextCustomer.customer_id,
-        // });
         updateStateFunction(nextCustomer[field.name], field);
+
+        // Ensure the focused row is visible
+        const row = document.querySelector(`tr:nth-child(${nextIndex + 1})`);
+        row?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
       }
     } else if (e.key === "ArrowUp") {
       setFocusedIndex((prevIndex) =>
@@ -49,15 +52,22 @@ const AutoCompleteDropDown = ({
           ? filteredCustomers.length - 1
           : prevIndex - 1
       );
-      const prevCustomer =
-        filteredCustomers[
-          focusedIndex === null || focusedIndex === 0
-            ? filteredCustomers.length - 1
-            : focusedIndex - 1
-        ];
+      const prevIndex =
+        focusedIndex === null || focusedIndex === 0
+          ? filteredCustomers.length - 1
+          : focusedIndex - 1;
+
+      const prevCustomer = filteredCustomers[prevIndex];
       if (prevCustomer) {
         setFilter(prevCustomer[field.name]);
         updateStateFunction(prevCustomer[field.name], field);
+
+        // Ensure the focused row is visible
+        const row = document.querySelector(`tr:nth-child(${prevIndex + 1})`);
+        row?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
       }
     } else if (e.key === "Enter" && focusedIndex !== null) {
       handleSelectRow(
@@ -116,6 +126,7 @@ const AutoCompleteDropDown = ({
     const fetch = async () => {
       console.log({ fieldName });
       const res2 = await window.electron.getFormConfig(`${fieldName}`);
+      console.log(res2, "Fetching");
       setTableHead(res2.autoCompleteFields[field.name].fieldsMap);
     };
     fetch();
@@ -132,11 +143,14 @@ const AutoCompleteDropDown = ({
   ) => {
     setIsDropdownOpen(true);
     setFilter(e.target.value);
+    console.log(e.target.value, "target value");
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
       fieldname: field.name,
       value: e.target.value,
     });
+    console.log(fieldName, field, res, "response");
+
     updateStateFunction(e.target.value, field);
     setFilteredCustomers(res);
   };
@@ -191,6 +205,7 @@ const AutoCompleteDropDown = ({
           }
           onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
             setIsDropdownOpen(true);
+            console.log("on focus");
             setFilter("");
             handleFilterChange(
               e,
@@ -201,6 +216,31 @@ const AutoCompleteDropDown = ({
               setFilter,
               setFilteredCustomers
             );
+          }}
+          onBlur={() => {
+            console.log("on blur", filteredCustomers);
+            setIsDropdownOpen(false);
+
+            const filteredValue =
+              (filteredCustomers.length > 0 &&
+                filteredCustomers.filter(
+                  (item) => item.order_id === Number(filter)
+                )) ||
+              [];
+            if (filteredValue?.length > 0) {
+              console.log(
+                filteredValue,
+                filter,
+                filteredCustomers.filter(
+                  (item) => item.order_id === Number(filter)
+                ),
+                "filteredCustomers"
+              );
+              setFilter((prev) => prev);
+              updateStateFunction(filteredValue, field);
+            } else {
+              setFilter("");
+            }
           }}
           placeholder={`Search ${field.label}`}
           onKeyDown={handleKeyDown}

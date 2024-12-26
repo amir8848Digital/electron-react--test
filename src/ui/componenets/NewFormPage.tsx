@@ -102,6 +102,12 @@ const NewFormPage = () => {
   };
 
   const updateStateFunction = (value: any, field: any) => {
+    console.log(field, value[0], "updateState");
+    let values = { ...formValues };
+    if (field.name === "order_id") {
+      values = { ...values, customer_name: value[0].customer_name };
+    }
+    console.log(values, "update");
     setFormValues({ ...formValues, [field.name]: value });
   };
 
