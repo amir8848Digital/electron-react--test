@@ -28,7 +28,6 @@ header button {
   background-color: lime;
 }
 
-
 .mainGrid {
   height: 10rem;
   padding: 0.5rem;
@@ -104,4 +103,8 @@ header button {
 
 .dropdown-table tr.highlighted {
   background-color: #e0e0e0; /* Highlight color */
+}
+
+.fs-10 {
+  font-size: 10px;
 }

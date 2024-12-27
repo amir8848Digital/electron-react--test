@@ -19,7 +19,7 @@ type Row = {
 };
 
 interface TableComponentProps {
-  orderId:  number ;
+  orderId: number;
 }
 
 const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
@@ -103,7 +103,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
 
   const [dataRateChart, setDataRateChart] = useState<any[]>([]);
   const [dataLabourChart, setDataLabourChart] = useState<any[]>([]);
-  console.log({ dataLabourChart });
+
   const handleRowChange = (
     rowId: number | string,
     field: keyof Row,
@@ -170,17 +170,15 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
       });
     });
     console.log({ combinedData });
-    window.electron.insertFormData(
-       combinedData
-    );
+    window.electron.insertFormData(combinedData);
   };
- 
+
   return rowData.length > 0 ? (
     <>
       <div className="container-fluid">
         <div className="my-4">
           <div className="text-end mb-3">
-            <button onClick={addRow} className="btn btn-success">
+            <button onClick={addRow} className="btn btn-success fs-10">
               Add Row
             </button>
           </div>
@@ -190,7 +188,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
             </div>
             <table className="table table-bordered" style={{ width: "100%" }}>
               <thead>
-                <tr className="fs-6">
+                <tr className="fs-10">
                   <th>Sr No</th>
                   <th>Order ID</th>
                   <th>Design Code</th>
@@ -207,118 +205,121 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
                 </tr>
               </thead>
               <tbody>
-  {rowData?.map((row) => (
-    <tr key={row.sr_no}>
-      {/* sr_no as a number */}
-      <td>{Number(row.sr_no)}</td>
-      
-      {/* order_id as a number */}
-      <td>{Number(row.order_id)}</td>
-      
-      {/* design_code dropdown */}
-      <td>
-        <AutoCompleteDropDown
-          field={{
-            name: "design_code",
-            rowId: row.order_id,
-            label: "Design Code",
-          }}
-          formValues={rowData}
-          setFormValues={setRowData}
-          fieldName={fieldName}
-          updateStateFunction={(value: string) =>
-            handleRowChange(
-              row.order_id as number,
-              "design_code",
-              value
-            )
-          }
-        />
-      </td>
+                {rowData?.map((row) => (
+                  <tr key={row.sr_no}>
+                    {/* sr_no as a number */}
+                    <td>{Number(row.sr_no)}</td>
 
-      {/* Other fields */}
-      {[
-        "suffix",
-        "size",
-        "qty",
-        "calc_price", // This is a number field
-        "sales_price", // This is a number field
-        "prod_dely_date", // This is a date field
-        "exp_dely_date", // This is a date field
-        "prod_setting",
-        "fixed_price", // This is a number field
-      ].map((field) => (
-        <td key={field}>
-          {field === "calc_price" || field === "sales_price" || field === "fixed_price" ? (
-            // Render as a number input for price fields
-            <input
-              type="number"
-              value={row[field as keyof Row] as number}
-              onChange={(e) =>
-                handleRowChange(
-                  row.order_id as number | string,
-                  field as keyof Row,
-                  Number(e.target.value)
-                )
-              }
-              className="form-control"
-            />
-          ) : field === "prod_dely_date" || field === "exp_dely_date" ? (
-            // Render as a date input for date fields
-            <input
-              type="date"
-              value={row[field as keyof Row] as string}
-              onChange={(e) =>
-                handleRowChange(
-                  row.order_id as number | string,
-                  field as keyof Row,
-                  e.target.value
-                )
-              }
-              className="form-control"
-            />
-          ) : (
-            // Render as a text input for other fields
-            <input
-              type="text"
-              value={row[field as keyof Row] as string}
-              onChange={(e) =>
-                handleRowChange(
-                  row.order_id as number | string,
-                  field as keyof Row,
-                  e.target.value
-                )
-              }
-              className="form-control"
-            />
-          )}
-        </td>
-      ))}
+                    {/* order_id as a number */}
+                    <td>{Number(row.order_id)}</td>
 
-      {/* Add button */}
-      <td>
-        <button
-          onClick={() => handleAddTable(row)}
-          className="btn btn-primary"
-        >
-          Add
-        </button>
-      </td>
-    </tr>
-  ))}
-</tbody>
+                    {/* design_code dropdown */}
+                    <td>
+                      <AutoCompleteDropDown
+                        field={{
+                          name: "design_code",
+                          rowId: row.order_id,
+                          label: "Design Code",
+                        }}
+                        formValues={rowData}
+                        setFormValues={setRowData}
+                        fieldName={fieldName}
+                        updateStateFunction={(value: string) =>
+                          handleRowChange(
+                            row.order_id as number,
+                            "design_code",
+                            value
+                          )
+                        }
+                      />
+                    </td>
+
+                    {/* Other fields */}
+                    {[
+                      "suffix",
+                      "size",
+                      "qty",
+                      "calc_price", // This is a number field
+                      "sales_price", // This is a number field
+                      "prod_dely_date", // This is a date field
+                      "exp_dely_date", // This is a date field
+                      "prod_setting",
+                      "fixed_price", // This is a number field
+                    ].map((field) => (
+                      <td key={field}>
+                        {field === "calc_price" ||
+                        field === "sales_price" ||
+                        field === "fixed_price" ? (
+                          // Render as a number input for price fields
+                          <input
+                            type="number"
+                            value={row[field as keyof Row] as number}
+                            onChange={(e) =>
+                              handleRowChange(
+                                row.order_id as number | string,
+                                field as keyof Row,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="form-control fs-10"
+                          />
+                        ) : field === "prod_dely_date" ||
+                          field === "exp_dely_date" ? (
+                          // Render as a date input for date fields
+                          <input
+                            type="date"
+                            value={row[field as keyof Row] as string}
+                            onChange={(e) =>
+                              handleRowChange(
+                                row.order_id as number | string,
+                                field as keyof Row,
+                                e.target.value
+                              )
+                            }
+                            className="form-control  fs-10"
+                          />
+                        ) : (
+                          // Render as a text input for other fields
+                          <input
+                            type="text"
+                            value={row[field as keyof Row] as string}
+                            onChange={(e) =>
+                              handleRowChange(
+                                row.order_id as number | string,
+                                field as keyof Row,
+                                e.target.value
+                              )
+                            }
+                            className="form-control fs-10"
+                          />
+                        )}
+                      </td>
+                    ))}
+
+                    {/* Add button */}
+                    <td>
+                      <button
+                        onClick={() => handleAddTable(row)}
+                        className="btn btn-success fs-10"
+                      >
+                        Add
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>
         <div className="row">
-          <div className="col-12 my-3">
+          <div className="col-12 my-2">
             {dataRateChart.length > 0 ? (
               <RateChartTable data={dataRateChart} setData={setDataRateChart} />
             ) : (
               ""
             )}
           </div>
-          <div className="col-12 my-3">
+          <div className="col-12 my-2">
             {dataLabourChart.length > 0 ? (
               <LabourChartTable
                 data={dataLabourChart}
@@ -332,7 +333,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ orderId }) => {
         <div className="p-4 text-end">
           <button
             type="submit"
-            className="btn btn-success px-4"
+            className="btn btn-success px-4 fs-10"
             onClick={handleMainSubmit}
           >
             Submit
