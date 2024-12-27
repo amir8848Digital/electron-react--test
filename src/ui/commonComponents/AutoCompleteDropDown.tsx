@@ -6,9 +6,10 @@ type Props = {};
 const AutoCompleteDropDown = ({
   field,
   formValues,
-  setFormValues,
+  // setFormValues,
   fieldName,
   updateStateFunction,
+  defaultValue = "",
 }: any) => {
   interface Customer {
     customer_id: number;
@@ -16,7 +17,7 @@ const AutoCompleteDropDown = ({
   }
   const inputRef = useRef<HTMLInputElement>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState(null);
   const [tableHead, setTableHead] = useState<any>({});
   const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -143,13 +144,12 @@ const AutoCompleteDropDown = ({
   ) => {
     setIsDropdownOpen(true);
     setFilter(e.target.value);
-    console.log(e.target.value, "target value");
+    console.log(formValues, "target value");
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
       fieldname: field.name,
       value: e.target.value,
     });
-    console.log(fieldName, field, res, "response");
 
     updateStateFunction(e.target.value, field);
     setFilteredCustomers(res);
@@ -171,12 +171,11 @@ const AutoCompleteDropDown = ({
     field: any,
     filter: any,
     setFilter: any,
-    setFormValues: any,
     setIsDropdownOpen: any,
     setFocusedIndex: any
   ) => {
     if (!filter) {
-      setFilter("");
+      setFilter(null);
       updateStateFunction("", field);
     }
     setIsDropdownOpen(false);
@@ -191,7 +190,7 @@ const AutoCompleteDropDown = ({
           type="text"
           id={field.name}
           className="form-control fs-10"
-          value={filter}
+          value={filter !== null ? filter : defaultValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleFilterChange(
               e,
@@ -206,7 +205,7 @@ const AutoCompleteDropDown = ({
           onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
             setIsDropdownOpen(true);
             console.log("on focus");
-            setFilter("");
+            setFilter(null);
             handleFilterChange(
               e,
               field,
@@ -236,10 +235,10 @@ const AutoCompleteDropDown = ({
                 ),
                 "filteredCustomers"
               );
-              setFilter((prev) => prev);
+              setFilter((prev: any) => prev);
               updateStateFunction(filteredValue, field);
             } else {
-              setFilter("");
+              setFilter(null);
             }
           }}
           placeholder={`Search ${field.label}`}

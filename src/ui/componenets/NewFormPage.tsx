@@ -102,13 +102,13 @@ const NewFormPage = () => {
   };
 
   const updateStateFunction = (value: any, field: any) => {
-    console.log(field, value[0], "updateState");
     let values = { ...formValues };
-    if (field.name === "order_id") {
-      values = { ...values, customer_name: value[0].customer_name };
+    if (field.type === "autoComplete") {
+      values = { ...values, ...value[0] };
+    } else {
+      values = { ...values, [field.name]: value };
     }
-    console.log(values, "update");
-    setFormValues({ ...formValues, [field.name]: value });
+    setFormValues({ ...values });
   };
 
   return (
@@ -162,6 +162,7 @@ const NewFormPage = () => {
                     id="dateInput fs-10"
                     className="form-control fs-10"
                     placeholder="Choose a date"
+                    value={formValues[field.name] as string}
                     onChange={(e) => handleCalendarChange(e, field.name)}
                   />
                 </div>
@@ -177,6 +178,7 @@ const NewFormPage = () => {
                     field={field}
                     formValues={formValues}
                     setFormValues={setFormValues}
+                    defaultValue={formValues[field.name]}
                     fieldName={fieldName}
                     updateStateFunction={updateStateFunction}
                     size={"small"}
