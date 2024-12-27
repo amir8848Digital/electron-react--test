@@ -4,7 +4,9 @@ import {
   isDev,
   insertFormData,
   getFormConfig,
+  getOrderDesignDetails,
 } from "./util.js";
+import { triggerFunction } from "./triggerHandler.js";
 // import {  insertData,getSalesOrderData,} from './resourceManager.js';
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import pkg from "pg";
@@ -16,7 +18,7 @@ export const client = new Client({
   host: "3.20.115.50",
   database: "mydb",
   password: "Chintan@8848",
-  idle_in_transaction_session_timeout: 1500,
+  connectionTimeoutMillis: 150000,
   //port: 10071,
 });
 
@@ -56,8 +58,14 @@ app.on("ready", () => {
   // ipcMain.handle('insertData', (_,formData:any) => {
   //  return insertData(formData)
   // });
-  ipcMain.handle("insertFormData", (_, formData: any) => {
-    return insertFormData(formData);
+  ipcMain.handle("insertFormData", async (_, formData: any) => {
+    return await insertFormData(formData);
+  });
+  ipcMain.handle("getOrderDesignDetails",async (_, designCode: string) => {
+    return await getOrderDesignDetails(designCode);
+  });
+  ipcMain.handle("triggerFunction",async (_, kwargs: any) => {
+    return await triggerFunction(kwargs);
   });
 
   handleCloseEvents(mainWindow);

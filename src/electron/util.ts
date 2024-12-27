@@ -35,26 +35,22 @@ export async function getFormConfig(formName: string) {
   }
 }
 
-// Example Usage
 async function getData(queryConfig: any, query: any): Promise<any[]> {
   console.log("Query Config:", queryConfig, query);
 
   let queryConditions = "";
   const params: any[] = [];
 
-  // Add dynamic search condition if query.value exists
   if (query && query.value) {
-    const searchValue = query.value.trim().replace(/['"]/g, ''); // Basic sanitization
-    const searchPattern = `%${searchValue}%`; // Add wildcards for ILIKE
+    const searchValue = query.value.trim().replace(/['"]/g, '');
+    const searchPattern = `%${searchValue}%`;
     queryConditions = queryConfig.searchFields.map((field: any, index: number) => {
-      // Add a condition for each search field, dynamically creating placeholders
-      params.push(searchPattern); // Add the sanitized value for each search field
-      return `${field}::TEXT ILIKE $${index + 1}`; // Create the condition for each field
-    }).join(" OR "); // Join conditions with OR
+      params.push(searchPattern);
+      return `${field}::TEXT ILIKE $${index + 1}`;
+    }).join(" OR ");
   }
 
   try {
-    // Construct the SQL Query dynamically using parameterized queries
     const sqlQuery = `
       SELECT 
           ${queryConfig.columns.join(", ")}
@@ -65,7 +61,6 @@ async function getData(queryConfig: any, query: any): Promise<any[]> {
 
     console.log("Generated SQL Query:", sqlQuery);
 
-    // Execute the query with parameters (assuming `client` is a database client object)
     const result: any = await client.query(sqlQuery, params);
     return result.rows;
   } catch (error: any) {
@@ -77,78 +72,65 @@ async function getData(queryConfig: any, query: any): Promise<any[]> {
 export async function  insertFormData(formDataArray: any) {
   let configs = <any>{}
   let row_record_map = <any>{}
+  let dependentFormData = <any>[]
   for (let formData of formDataArray) {
-    const formName = formData.formName
-    let config = configs[formName] || await getFormConfig(formName);
-    console.log(config)
-    if (!configs[formName]) {
-      configs[formName] = config;
-    }
-
-    if (config?.dependent !== 1){
-      const tableName = config.tableName;
-      const filteredEntries = Object.entries(formData.formData).filter(
-        ([_, value]) => value !== null && value !== undefined && value !== ""
-      );
-      if (filteredEntries.length === 0) {
-        console.log("No valid data to insert.");
-        return;
-      }
-      console.log(config, "config")
-      const columns = filteredEntries.map(([key]) => key);
-      const values = filteredEntries.map(([_, value]) => value);
-      const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
-
-      const primaryKey = config.primary_key || null; 
-
-      let query = `
-        INSERT INTO ${tableName} (${columns.join(", ")})
-        VALUES (${placeholders})
-      `;
-      if (primaryKey) {
-        query += ` RETURNING ${primaryKey};`;
-      }
-      const r = await client.query(query, values);
-      if (primaryKey && config?.dependent_on === 1) {
-        const insertedPrimaryKey = r.rows[0]?.[primaryKey];
-        console.log("Inserted Primary Key:", insertedPrimaryKey);
-        console.log(formData.formData[config.row_id], "row_id")
-        row_record_map[tableName] = row_record_map[tableName] || {};
-        row_record_map[tableName][formData.formData[config.row_id]] = insertedPrimaryKey;
-      }
-      console.log("Data inserted successfully!");
-    }
+    await insertData(formData, configs, row_record_map, dependentFormData);
   }
-  console.log(row_record_map, "row_record_map")
-  for (let formData of formDataArray) {
+  for (let formData of dependentFormData) {
+    await insertData(formData, configs, row_record_map, null);
+  }
+}
+
+async function  insertData(formData: any, configs: any, row_record_map: any, dependentFormData: any[] | null) {
     const formName = formData.formName
-    console.log("Form Name:", formName);
     let config = configs[formName] || await getFormConfig(formName);
     if (!configs[formName]) {
       configs[formName] = config;
     }
-    console.log("inside dependent")
-    console.log(config)
+    const tableName = config.tableName;
 
     if (config?.dependent === 1){
-      console.log("in loop")
-      const tableName = config.tableName;
-      console.log("Table Name:", config.dependentTable, config.foreign_row_id, formData.formData[config.foreign_row_id]);
-      formData.formData[config.foreign_key] = row_record_map[config.dependentTable][formData.formData[config.foreign_row_id]];
-      console.log("Data to insert:", formData.formData);
+      if (dependentFormData !== null){
+        dependentFormData.push(formData);
 
-      const filteredEntries = Object.entries(formData.formData).filter(
-        ([_, value]) => value !== null && value !== undefined && value !== ""
-      );
-      const columns = filteredEntries.map(([key]) => key);
-      const values = filteredEntries.map(([_, value]) => value);
-      const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
-      let query = `
-        INSERT INTO ${tableName} (${columns.join(", ")})
-        VALUES (${placeholders})
-      `;
-      const r = await client.query(query, values);
+      }
+      for (let dependentField of config.dependentFields){
+        formData.formData[dependentField.foreign_column] = row_record_map[dependentField.dependentTable][dependentField.foreign_row_id][formData.formData[dependentField.foreign_column]];
+      }
     }
-  }
+    const filteredEntries = Object.entries(formData.formData).filter(
+      ([_, value]) => value !== null && value !== undefined && value !== ""
+    );
+    if (filteredEntries.length === 0) {
+      console.log("No valid data to insert.");
+      return;
+    }
+    
+    const columns = filteredEntries.map(([key]) => key);
+    const values = filteredEntries.map(([_, value]) => value);
+    const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+
+    const primaryKey = config.primary_key || null; 
+
+    let query = `
+      INSERT INTO ${tableName} (${columns.join(", ")})
+      VALUES (${placeholders})
+    `;
+    if (primaryKey) {
+      query += ` RETURNING ${primaryKey};`;
+    }
+    const r = await client.query(query, values);
+    if (primaryKey && config?.dependent_on === 1) {
+        const insertedPrimaryKey = r.rows[0]?.[primaryKey];
+        row_record_map[tableName] ??= {};
+        row_record_map[tableName][config.row_id] ??= {};
+        row_record_map[tableName][config.row_id][formData.formData[config.row_id]] = insertedPrimaryKey;
+      }
   console.log("Data inserted successfully!");
+}
+
+export async function getOrderDesignDetails(designCode: string) {
+    let rateChart = await client.query("SELECT * FROM rate_chart WHERE design_code = $1", [designCode]);
+    let labourChart = await client.query("SELECT * FROM labour_chart WHERE design_code = $1", [designCode]);
+    return { rateChart: rateChart.rows, labourChart: labourChart.rows };
 }

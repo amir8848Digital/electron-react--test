@@ -2,7 +2,9 @@ type EventPayloadMapping = {
   getAutoCompleteData: any;
   getFormConfig:any;
   query:any;
-  insertFormData:any
+  insertFormData:any;
+  getOrderDesignDetails:string;
+
 };
 
 interface Window {
@@ -10,6 +12,8 @@ interface Window {
     getAutoCompleteData: any;
     //insertData: any;
     getFormConfig:any;
-    insertFormData:any
+    insertFormData:any;
+    getOrderDesignDetails:any;
+    triggerFunction:any;
   };
 }

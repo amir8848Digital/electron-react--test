@@ -15,7 +15,7 @@
       },
       "primaryField": "customer_id"
     },
-    "voucher_part4": {
+    "order_id": {
       "table": "OrderMaster",
       "columns": [
         "order_id",
@@ -36,6 +36,10 @@
         "po_no": "PO No",
         "currency": "Currency",
         "priority": "Priority"
+      },
+      "primaryField": "order_id",
+      "onSelect":{
+        "fetchFullForm": "forms.orderMaster.autoCompleteFields.fetchFullForm"
       }
     }
   }

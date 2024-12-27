@@ -1,9 +1,13 @@
 {
   "tableName": "order_rate_chart",
   "formName": "orderRateChart",
-  "dependentTable": "OrderDesign",
   "dependent": 1,
-  "foreign_key": "order_design_id",
-  "foreign_row_id": "order_design_id"
+  "dependentTables": [
+    {
+      "dependentTable": "OrderDesign",
+      "foreign_column": "order_design_id",
+      "foreign_row_id": "sr_no"
+    }
+  ]
 }
 

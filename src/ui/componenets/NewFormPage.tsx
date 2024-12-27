@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import AutoCompleteDropDown from "../commonComponents/AutoCompleteDropDown";
 import TableComponent from "../commonComponents/TableComponent";
+import ModalForm from "../commonComponents/ModalForm";
 
 const NewFormPage = () => {
   interface FormValues {
@@ -11,18 +12,14 @@ const NewFormPage = () => {
     customer_name: string;
   }
   const fieldName = "orderMaster";
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
-  const [voucher4, setVoucher4] = useState<any>([]);
   const fields = [
     { label: "Voucher 1", name: " voucher_part1", type: "text" },
     { label: "Voucher 2", name: " voucher_part2", type: "text" },
     { label: "Voucher 3 ", name: " voucher_part3", type: "text" },
     {
       label: "Voucher 4",
-      name: "voucher_part4",
+      name: "order_id",
       type: "autoComplete",
-      stateName: voucher4,
-      setStatName: setVoucher4,
     },
     { label: "Date", name: "order_date", type: "calendar" },
     { label: "Currency", name: "currency", type: "text" },
@@ -30,8 +27,6 @@ const NewFormPage = () => {
       label: "Customer ID",
       name: "customer_id",
       type: "autoComplete",
-      stateName: filteredCustomers,
-      setStatName: setFilteredCustomers,
     },
     { label: "Customer Name", name: "customer_name", type: "text" },
     { label: "Conversion Factor", name: "conv_fact", type: "text" },
@@ -57,7 +52,19 @@ const NewFormPage = () => {
     return acc;
   }, {} as FormValues);
   const [formValues, setFormValues] = useState<FormValues>(initialState);
+  const [showModal, setShowModal] = useState(false);
 
+  const handleSubmit = (data: Record<string, any>) => {
+    window.electron.insertFormData([
+      { formData: data, formName: "orderDetails" },
+    ]);
+    console.log("Form submitted with data:", data);
+    setShowModal(false); // Close the modal after submission
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
@@ -79,11 +86,6 @@ const NewFormPage = () => {
   };
 
   const handleCalendarChange = (e: any, name: string) => {
-    // const inputDate = e.target.value; // yyyy-mm-dd
-    // const [year, month, day] = inputDate.split("-"); // Split the date string
-    // const formattedDate = `${year}-${month}-${year}`; // Rearrange to dd-mm-yyyy
-
-    // console.log(formattedDate, name);
     setFormValues({
       ...formValues,
       [name]: e.target.value,
@@ -91,79 +93,43 @@ const NewFormPage = () => {
   };
 
   const handdleSubmit = () => {
-    window.electron.insertFormData({
-      formData: formValues,
-      formName: fieldName,
-    });
+    window.electron.insertFormData([
+      {
+        formData: formValues,
+        formName: fieldName,
+      },
+    ]);
   };
 
-  const handleSelectCustomer = (
-    customer: Customer,
-    setFilter: any,
-    setIsDropdownOpen: any,
-    field: any
-  ) => {
-    setFilter(customer.customer_name);
-    setIsDropdownOpen(false);
-    setFormValues({ ...formValues, [field.name]: customer.customer_id });
-  };
-
-  const handleFilterChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: any,
-    fieldname: string,
-    isDropdownOpen: any,
-    setIsDropdownOpen: any,
-    setFilter: any,
-    setFilteredCustomers: any
-  ) => {
-    if (!isDropdownOpen) {
-      setIsDropdownOpen(true);
+  const updateStateFunction = (value: any, field: any) => {
+    console.log(field, value[0], "updateState");
+    let values = { ...formValues };
+    if (field.name === "order_id") {
+      values = { ...values, customer_name: value[0].customer_name };
     }
-    setFilter(e.target.value);
-    const res = await window.electron.getAutoCompleteData({
-      formName: fieldname,
-      fieldname: field.name,
-      value: e.target.value,
-    });
-    setFilteredCustomers(res);
-  };
-
-  const handleBlur = (
-    field: any,
-    filter: any,
-    setFilter: any,
-    setFormValues: any,
-    setIsDropdownOpen: any,
-    setFocusedIndex: any
-  ) => {
-    if (!filter) {
-      setFilter("");
-      setFormValues({ ...formValues, [field.name]: "" });
-    }
-    setIsDropdownOpen(false);
-    setFocusedIndex(0);
+    console.log(values, "update");
+    setFormValues({ ...formValues, [field.name]: value });
   };
 
   return (
-    <div className="container-fluid py-3">
-      <div className="card shadow">
-        <div className="card-header bg-primary text-white">
-          <h4 className="mb-0">Sales Order Master Form</h4>
-        </div>
+    <div className="container-fluid">
+      <div className="card shadow my-4">
+        {/* <div className="card-header bg-primary text-white">
+          <p className="mb-0 ">Sales Order Master Form</p>
+        </div> */}
         <form className="row p-4 g-2">
           {fields.map((field, index) => (
-            <div className="col-md-4 col-lg-3" key={index}>
+            <div className="col-md-2" key={index}>
               {/* Text Input */}
               {field.type === "text" && (
-                <div className="mb-2">
-                  <label htmlFor={field.name} className="form-label">
+                <div className="">
+                  <label htmlFor={field.name} className="form-label fs-10">
                     {field.label}
                   </label>
                   <input
                     type="text"
                     id={field.name}
-                    className="form-control"
+                    className="form-control  fs-10"
                     value={formValues[field.name] as string}
                     onChange={(e) => handleChange(e, field.name)}
                     placeholder={`Enter ${field.label}`}
@@ -171,14 +137,14 @@ const NewFormPage = () => {
                 </div>
               )}
               {field.type === "number" && (
-                <div className="mb-2">
-                  <label htmlFor={field.name} className="form-label">
+                <div className="">
+                  <label htmlFor={field.name} className="form-label fs-10">
                     {field.label}
                   </label>
                   <input
                     type="number"
                     id={field.name}
-                    className="form-control"
+                    className="form-control fs-10"
                     value={formValues[field.name] as number}
                     onChange={(e) => handleChangeNumber(e, field.name)}
                     placeholder={`Enter ${field.label}`}
@@ -187,14 +153,14 @@ const NewFormPage = () => {
               )}
               {/* Calendar Input */}
               {field.type === "calendar" && (
-                <div className="mb-2">
-                  <label htmlFor="dateInput" className="form-label">
+                <div className="">
+                  <label htmlFor="dateInput" className="form-label fs-10">
                     {field.label || "Select Date"}
                   </label>
                   <input
                     type="date"
-                    id="dateInput"
-                    className="form-control"
+                    id="dateInput fs-10"
+                    className="form-control fs-10"
                     placeholder="Choose a date"
                     onChange={(e) => handleCalendarChange(e, field.name)}
                   />
@@ -203,8 +169,8 @@ const NewFormPage = () => {
 
               {/* Autocomplete Input */}
               {field.type === "autoComplete" && (
-                <div className="mb-3">
-                  <label htmlFor={field.name} className="form-label">
+                <div className="">
+                  <label htmlFor={field.name} className="form-label fs-10">
                     {field.label}
                   </label>
                   <AutoCompleteDropDown
@@ -212,29 +178,49 @@ const NewFormPage = () => {
                     formValues={formValues}
                     setFormValues={setFormValues}
                     fieldName={fieldName}
-                    handleSelectRow={handleSelectCustomer}
-                    handleBlur={handleBlur}
-                    filteredCustomers={field.stateName}
-                    setFilteredCustomers={field.setStatName}
-                    handleFilterChange={handleFilterChange}
+                    updateStateFunction={updateStateFunction}
+                    size={"small"}
                   />
                 </div>
               )}
             </div>
           ))}
         </form>
-        <div className="card-footer text-end">
-          <button
-            type="submit"
-            className="btn btn-success px-4"
-            onClick={handdleSubmit}
-          >
-            Submit
-          </button>
+        <div>
+          <div className="d-flex justify-content-end my-2 ">
+            <div className="me-2">
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn btn-success fs-10"
+              >
+                Open Modal
+              </button>
+            </div>
+            <div className="mx-4">
+              <button
+                type="submit"
+                className="btn btn-success px-4 fs-10"
+                onClick={handdleSubmit}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div className="card shadow">
-        <div className="p-4">{<TableComponent />}</div>
+        <div className="">
+          {<TableComponent orderId={formValues.order_id as number} />}
+        </div>
+      </div>
+      <div>
+        {showModal && (
+          <ModalForm
+            orderMasterId={formValues?.order_id as number}
+            onSubmit={handleSubmit}
+            onClose={handleClose}
+          />
+        )}
       </div>
     </div>
   );
