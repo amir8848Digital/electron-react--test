@@ -36,6 +36,9 @@
         "po_no": "PO No",
         "currency": "Currency",
         "priority": "Priority"
+      },
+      "onSelect":{
+        "fetchFullForm": "forms.orderMaster.autoCompleteFields.fetchFullForm"
       }
     }
   }
