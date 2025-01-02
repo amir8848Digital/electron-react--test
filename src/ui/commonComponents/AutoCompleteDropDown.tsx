@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { First } from "react-bootstrap/esm/PageItem";
+import DropdownList from "./DropdownList";
 
 type Props = {};
 
@@ -165,6 +166,7 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen(false);
     updateStateFunction(customer[field.name], field);
     setIsDropdownOpen(false);
+    console.log("updateStateFunction called");
   };
 
   const handleBlur = (
@@ -216,16 +218,22 @@ const AutoCompleteDropDown = ({
               setFilteredCustomers
             );
           }}
-          onBlur={() => {
+          onBlur={(e) => {
             console.log("on blur", filteredCustomers);
             setIsDropdownOpen(false);
 
             const filteredValue =
               (filteredCustomers.length > 0 &&
                 filteredCustomers.filter(
-                  (item) => item.order_id === Number(filter)
+                  (item) => item[field.name] === Number(filter)
                 )) ||
               [];
+            console.log(
+              filteredCustomers,
+              filter,
+              filteredValue,
+              "updateStateFunction"
+            );
             if (filteredValue?.length > 0) {
               console.log(
                 filteredValue,
@@ -245,6 +253,17 @@ const AutoCompleteDropDown = ({
           onKeyDown={handleKeyDown}
         />
         {isDropdownOpen && (
+          <DropdownList
+            items={filteredCustomers}
+            focusedIndex={focusedIndex}
+            onSelect={(e, customer) => {
+              e.stopPropagation();
+              handleSelectRow(customer, setFilter, setIsDropdownOpen, field);
+            }}
+            tableHead={tableHead}
+          />
+        )}
+        {/* {isDropdownOpen && (
           <div
             ref={dropdownRef}
             className="dropdown-menu show overflow-auto"
@@ -268,16 +287,20 @@ const AutoCompleteDropDown = ({
                     return (
                       <tr
                         key={idx}
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleSelectRow(
                             customer,
                             setFilter,
                             setIsDropdownOpen,
                             field
-                          )
-                        }
+                          );
+                        }}
                         className={focusedIndex === idx ? "table-primary" : ""}
-                        onMouseEnter={() => setFocusedIndex(idx)}
+                        onMouseEnter={() => {
+                          setFocusedIndex(idx);
+                          console.log("updateStateFunction called again");
+                        }}
                       >
                         {Object.keys(tableHead).map((key) => (
                           <td key={key}>{customer[key]}</td>
@@ -288,7 +311,7 @@ const AutoCompleteDropDown = ({
               </tbody>
             </table>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
