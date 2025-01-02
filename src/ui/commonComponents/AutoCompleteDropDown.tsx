@@ -20,6 +20,7 @@ const AutoCompleteDropDown = ({
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [filter, setFilter] = useState(null);
   const [tableHead, setTableHead] = useState<any>({});
+  const [tableData, setTableData] = useState<any>({});
   const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -128,7 +129,13 @@ const AutoCompleteDropDown = ({
     const fetch = async () => {
       console.log({ fieldName });
       const res2 = await window.electron.getFormConfig(`${fieldName}`);
+      const res3 = await window.electron.triggerFunction({
+        path: res2.autoCompleteFields.order_id.onSelect.fetchFullForm,
+        inputs: {},
+      });
       console.log(res2, "Fetching");
+      console.log(res3, "Fetching new");
+      setTableData(res2.autoCompleteFields[field.name]);
       setTableHead(res2.autoCompleteFields[field.name].fieldsMap);
     };
     fetch();
@@ -166,7 +173,7 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen(false);
     updateStateFunction(customer[field.name], field);
     setIsDropdownOpen(false);
-    console.log("updateStateFunction called");
+    console.log("updateStateFunction called", customer, field);
   };
 
   const handleBlur = (
