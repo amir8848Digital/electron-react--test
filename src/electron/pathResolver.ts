@@ -19,11 +19,11 @@ export function getAssetPath() {
   return path.join(app.getAppPath(), isDev() ? '.' : '..', '/src/assets');
 }
 export function getFormConfigPath(formName: string): string {
-  const baseDirectory = path.join(app.getAppPath(), "src", "electron", "forms");
-  const filePath = path.join(
-        baseDirectory,
+  const filePath = path.join(app.getAppPath(),  
+        isDev() ? '.' : '..', 
+        "src/electron/forms",
         formName,
         `config.json`
       );
-  return pathToFileURL(filePath).href;  // Converts path to file:// URL
+  return pathToFileURL(filePath).href;
 }

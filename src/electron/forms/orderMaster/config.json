@@ -37,7 +37,10 @@
         "currency": "Currency",
         "priority": "Priority"
       },
-      "primaryField": "order_id"
+      "primaryField": "order_id",
+      "onSelect":{
+        "fetchFullForm": "forms.orderMaster.autoCompleteFields.fetchFullForm"
+      }
     }
   }
 }
