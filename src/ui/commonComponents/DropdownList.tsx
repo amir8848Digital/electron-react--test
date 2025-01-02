@@ -28,7 +28,7 @@ const DropdownList = ({
           <tr
             key={idx}
             className={focusedIndex === idx ? "table-primary" : ""}
-            onClick={(e) => onSelect(e, item)}
+            // onClick={(e) => onSelect(e, item)}
             onMouseDown={(e) => onSelect(e, item)}
           >
             {Object.keys(tableHead).map((key) => (
