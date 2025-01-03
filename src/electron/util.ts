@@ -7,30 +7,18 @@ export function isDev(): boolean {
   return process.env.NODE_ENV === 'development';
 }
 export async function getAutoCompleteData(client: any, query: any) {
-  try {
     const formName = query.formName;
     const config = await getFormConfig(formName)
     console.log(config.autoCompleteFields)
     console.log(config.autoCompleteFields[query.fieldname])
     return getData(client, config.autoCompleteFields[query.fieldname], query);
-
-    } catch (error) {
-      console.error("Error reading file:", error);
-      return [];
-    }
 }
 
 
 export async function getFormConfig(formName: string) {
-  try {
     const configFilePath = getFormConfigPath(formName);
     const configModule = await import(configFilePath, { with: { type: "json" } });
     return configModule.default
-
-  } catch (error) {
-    console.error(`Error loading config for ${formName}:`, error);
-    return {};
-  }
 }
 
 async function getData(client: any, queryConfig: any, query: any): Promise<any[]> {
@@ -47,8 +35,6 @@ async function getData(client: any, queryConfig: any, query: any): Promise<any[]
       return `${field}::TEXT ILIKE $${index + 1}`;
     }).join(" OR ");
   }
-
-  try {
     const sqlQuery = `
       SELECT 
           ${queryConfig.columns.join(", ")}
@@ -60,11 +46,8 @@ async function getData(client: any, queryConfig: any, query: any): Promise<any[]
     console.log("Generated SQL Query:", sqlQuery);
 
     const result: any = await client.query(sqlQuery, params);
+    console.log("Result:", result.rows);
     return result.rows;
-  } catch (error: any) {
-    console.error("Error fetching suggestions:", error);
-    return [];
-  }
 }
 
 export async function  insertFormData(client:any, formDataArray: any) {
