@@ -53,6 +53,7 @@ const NewFormPage = () => {
   }, {} as FormValues);
   const [formValues, setFormValues] = useState<FormValues>(initialState);
   const [showModal, setShowModal] = useState(false);
+  const [designData, setDesignData] = useState<any>([]);
 
   const handleSubmit = (data: Record<string, any>) => {
     window.electron.insertFormData([
@@ -110,6 +111,28 @@ const NewFormPage = () => {
       values = { ...values, [field.name]: value };
     }
     setFormValues({ ...values });
+  };
+
+  const handleOnSelect = async (data: any, value: any) => {
+    console.log(data, value, "handleOnSelect");
+    if (data?.onSelect?.fetchFullForm) {
+      const res = await window.electron.triggerFunction({
+        path: data.onSelect.fetchFullForm,
+        inputs: {},
+      });
+      console.log(res?.data?.orderDesign, "handleOnSelect new");
+      let orderDesignData = res?.data?.orderDesign || [];
+
+      orderDesignData =
+        orderDesignData?.length > 0
+          ? orderDesignData.filter(
+              (item: any) => item.order_id === value[0]?.order_id
+            )
+          : [];
+
+      console.log(orderDesignData, "orderDesignData handleOnSelect");
+      setDesignData(orderDesignData);
+    }
   };
 
   return (
@@ -183,6 +206,7 @@ const NewFormPage = () => {
                     fieldName={fieldName}
                     updateStateFunction={updateStateFunction}
                     size={"small"}
+                    handleOnSelect={handleOnSelect}
                   />
                 </div>
               )}
@@ -213,7 +237,12 @@ const NewFormPage = () => {
       </div>
       <div className="card shadow">
         <div className="">
-          {<TableComponent orderId={formValues.order_id as number} />}
+          {
+            <TableComponent
+              orderId={formValues.order_id as number}
+              designData={designData}
+            />
+          }
         </div>
       </div>
       <div>

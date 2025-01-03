@@ -11,6 +11,7 @@ const AutoCompleteDropDown = ({
   fieldName,
   updateStateFunction,
   defaultValue = "",
+  handleOnSelect,
 }: any) => {
   interface Customer {
     customer_id: number;
@@ -235,23 +236,11 @@ const AutoCompleteDropDown = ({
                   (item) => item[field.name] === Number(filter)
                 )) ||
               [];
-            console.log(
-              filteredCustomers,
-              filter,
-              filteredValue,
-              "updateStateFunction"
-            );
+
             if (filteredValue?.length > 0) {
-              console.log(
-                filteredValue,
-                filter,
-                filteredCustomers.filter(
-                  (item) => item.order_id === Number(filter)
-                ),
-                "filteredCustomers"
-              );
               setFilter((prev: any) => prev);
               updateStateFunction(filteredValue, field);
+              handleOnSelect(tableData, filteredValue);
             } else {
               setFilter(null);
             }
