@@ -109,11 +109,17 @@ const TableComponent: React.FC<TableComponentProps> = ({
   const handleRowChange = (
     rowId: number | string,
     field: keyof Row,
-    value: any
+    value: any,
+    index: number
   ) => {
-    const updatedRowData = rowData.map((row) =>
-      row.order_id === rowId ? { ...row, [field]: value } : row
+    // const updatedRowData = rowData.map((row) =>
+    //   row.order_id === rowId ? { ...row, [field]: value } : row
+    // );
+    let updatedRowData = [...rowData];
+    updatedRowData = updatedRowData.map((row, i) =>
+      i === index ? { ...row, [field]: value } : row
     );
+    console.log(updatedRowData, "updatedRowData");
     setRowData(updatedRowData);
   };
 
@@ -232,7 +238,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
                             handleRowChange(
                               row.order_id as number,
                               "design_code",
-                              value
+                              value,
+                              index
                             )
                           }
                         />
@@ -262,7 +269,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
                                 handleRowChange(
                                   row.order_id as number | string,
                                   field as keyof Row,
-                                  Number(e.target.value)
+                                  Number(e.target.value),
+                                  index
                                 )
                               }
                               className="form-control fs-10"
@@ -277,7 +285,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
                                 handleRowChange(
                                   row.order_id as number | string,
                                   field as keyof Row,
-                                  e.target.value
+                                  e.target.value,
+                                  index
                                 )
                               }
                               className="form-control  fs-10"
@@ -291,7 +300,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
                                 handleRowChange(
                                   row.order_id as number | string,
                                   field as keyof Row,
-                                  e.target.value
+                                  e.target.value,
+                                  index
                                 )
                               }
                               className="form-control fs-10"
