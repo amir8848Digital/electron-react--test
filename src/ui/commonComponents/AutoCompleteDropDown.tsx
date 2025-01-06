@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { First } from "react-bootstrap/esm/PageItem";
+import DropdownList from "./DropdownList";
 
 type Props = {};
 
 const AutoCompleteDropDown = ({
   field,
   formValues,
-  setFormValues,
+  // setFormValues,
   fieldName,
   updateStateFunction,
+  defaultValue = "",
+  handleOnSelect,
 }: any) => {
   interface Customer {
     customer_id: number;
@@ -16,8 +19,9 @@ const AutoCompleteDropDown = ({
   }
   const inputRef = useRef<HTMLInputElement>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState(null);
   const [tableHead, setTableHead] = useState<any>({});
+  const [tableData, setTableData] = useState<any>({});
   const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -126,7 +130,13 @@ const AutoCompleteDropDown = ({
     const fetch = async () => {
       console.log({ fieldName });
       const res2 = await window.electron.getFormConfig(`${fieldName}`);
+      const res3 = await window.electron.triggerFunction({
+        path: res2.autoCompleteFields.order_id.onSelect.fetchFullForm,
+        inputs: {},
+      });
       console.log(res2, "Fetching");
+      console.log(res3, "Fetching new");
+      setTableData(res2.autoCompleteFields[field.name]);
       setTableHead(res2.autoCompleteFields[field.name].fieldsMap);
     };
     fetch();
@@ -143,13 +153,12 @@ const AutoCompleteDropDown = ({
   ) => {
     setIsDropdownOpen(true);
     setFilter(e.target.value);
-    console.log(e.target.value, "target value");
+    console.log(formValues, "target value");
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
       fieldname: field.name,
       value: e.target.value,
     });
-    console.log(fieldName, field, res, "response");
 
     updateStateFunction(e.target.value, field);
     setFilteredCustomers(res);
@@ -165,18 +174,18 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen(false);
     updateStateFunction(customer[field.name], field);
     setIsDropdownOpen(false);
+    console.log("updateStateFunction called", customer, field);
   };
 
   const handleBlur = (
     field: any,
     filter: any,
     setFilter: any,
-    setFormValues: any,
     setIsDropdownOpen: any,
     setFocusedIndex: any
   ) => {
     if (!filter) {
-      setFilter("");
+      setFilter(null);
       updateStateFunction("", field);
     }
     setIsDropdownOpen(false);
@@ -191,7 +200,7 @@ const AutoCompleteDropDown = ({
           type="text"
           id={field.name}
           className="form-control fs-10"
-          value={filter}
+          value={filter !== null ? filter : defaultValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleFilterChange(
               e,
@@ -206,7 +215,7 @@ const AutoCompleteDropDown = ({
           onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
             setIsDropdownOpen(true);
             console.log("on focus");
-            setFilter("");
+            setFilter(null);
             handleFilterChange(
               e,
               field,
@@ -217,35 +226,40 @@ const AutoCompleteDropDown = ({
               setFilteredCustomers
             );
           }}
-          onBlur={() => {
+          onBlur={(e) => {
             console.log("on blur", filteredCustomers);
             setIsDropdownOpen(false);
 
             const filteredValue =
               (filteredCustomers.length > 0 &&
                 filteredCustomers.filter(
-                  (item) => item.order_id === Number(filter)
+                  (item) => item[field.name] === Number(filter)
                 )) ||
               [];
+
             if (filteredValue?.length > 0) {
-              console.log(
-                filteredValue,
-                filter,
-                filteredCustomers.filter(
-                  (item) => item.order_id === Number(filter)
-                ),
-                "filteredCustomers"
-              );
-              setFilter((prev) => prev);
+              setFilter((prev: any) => prev);
               updateStateFunction(filteredValue, field);
+              handleOnSelect(tableData, filteredValue);
             } else {
-              setFilter("");
+              setFilter(null);
             }
           }}
           placeholder={`Search ${field.label}`}
           onKeyDown={handleKeyDown}
         />
         {isDropdownOpen && (
+          <DropdownList
+            items={filteredCustomers}
+            focusedIndex={focusedIndex}
+            onSelect={(e, customer) => {
+              e.stopPropagation();
+              handleSelectRow(customer, setFilter, setIsDropdownOpen, field);
+            }}
+            tableHead={tableHead}
+          />
+        )}
+        {/* {isDropdownOpen && (
           <div
             ref={dropdownRef}
             className="dropdown-menu show overflow-auto"
@@ -269,16 +283,20 @@ const AutoCompleteDropDown = ({
                     return (
                       <tr
                         key={idx}
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleSelectRow(
                             customer,
                             setFilter,
                             setIsDropdownOpen,
                             field
-                          )
-                        }
+                          );
+                        }}
                         className={focusedIndex === idx ? "table-primary" : ""}
-                        onMouseEnter={() => setFocusedIndex(idx)}
+                        onMouseEnter={() => {
+                          setFocusedIndex(idx);
+                          console.log("updateStateFunction called again");
+                        }}
                       >
                         {Object.keys(tableHead).map((key) => (
                           <td key={key}>{customer[key]}</td>
@@ -289,7 +307,7 @@ const AutoCompleteDropDown = ({
               </tbody>
             </table>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

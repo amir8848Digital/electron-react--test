@@ -49,7 +49,10 @@ app.on("ready", () => {
     });
   });
   ipcMain.handle("triggerFunction",async (_, kwargs: any) => {
-    return await triggerFunction(kwargs);
+    return await performTransaction("readOnly", async (client) => {
+      return await triggerFunction(client,kwargs);
+    });
+   
   });
 
   handleCloseEvents(mainWindow);

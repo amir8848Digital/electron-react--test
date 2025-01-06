@@ -37,12 +37,12 @@ export async function performTransaction(
       console.log("Write transaction committed successfully.");
     }
 
-    return {result: result};
+    return result;
   } catch (error: any) {
     if (type === "write") {
       await client.query("ROLLBACK");
       console.error("Transaction rolled back due to an error:", error);
-      return {error: error}
+      return {"error":error};
     }
     throw error;
   } finally {
