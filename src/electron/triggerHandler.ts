@@ -3,7 +3,7 @@ import path from "path";
 import { pathToFileURL } from 'url';
 
 
-export async function triggerFunction(kwargs: any): Promise<any> {
+export async function triggerFunction(client:any,kwargs: any): Promise<any> {
   try {
     const { path: funcPath, inputs } = kwargs;
 
@@ -16,7 +16,7 @@ export async function triggerFunction(kwargs: any): Promise<any> {
       throw new Error(`No callable function found at path: ${funcPath}`);
     }
 
-    const result = await func(inputs);
+    const result = await func(client,inputs);
 
     return {
       success: true,

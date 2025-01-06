@@ -9,27 +9,9 @@ import {
 import { triggerFunction } from "./triggerHandler.js";
 // import {  insertData,getSalesOrderData,} from './resourceManager.js';
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
-import pkg from "pg";
-const { Client } = pkg;
 import { ipcMain } from "electron";
+import { performTransaction } from "./db.js";
 
-export const client = new Client({
-  user: "chintan",
-  host: "3.20.115.50",
-  database: "mydb",
-  password: "Chintan@8848",
-  connectionTimeoutMillis: 150000,
-  //port: 10071,
-});
-
-client
-  .connect()
-  .then(() => {
-    console.log("Database connected successfully!");
-  })
-  .catch((error) => {
-    console.error("Failed to connect to the database:", error.message);
-  });
 
 app.on("ready", () => {
   const mainWindow = new BrowserWindow({
@@ -47,25 +29,30 @@ app.on("ready", () => {
 
   // pollResources(mainWindow);
 
-  ipcMain.handle("getAutoCompleteData", (_, query: any) => {
-    return getAutoCompleteData(query);
+  ipcMain.handle("getAutoCompleteData", async (_, query: any) => {
+    return await performTransaction("readOnly", async (client) => {
+      return await getAutoCompleteData(client, query);
+    });
   });
 
   ipcMain.handle("getFormConfig", (_, formName: any) => {
     return getFormConfig(formName);
   });
-
-  // ipcMain.handle('insertData', (_,formData:any) => {
-  //  return insertData(formData)
-  // });
   ipcMain.handle("insertFormData", async (_, formData: any) => {
-    return await insertFormData(formData);
+    return await performTransaction("write", async (client) => {
+      return await insertFormData(client, formData);
+    });
   });
   ipcMain.handle("getOrderDesignDetails",async (_, designCode: string) => {
-    return await getOrderDesignDetails(designCode);
+    return await performTransaction("readOnly", async (client) => {
+      return await getOrderDesignDetails(client, designCode);
+    });
   });
   ipcMain.handle("triggerFunction",async (_, kwargs: any) => {
-    return await triggerFunction(kwargs);
+    return await performTransaction("readOnly", async (client) => {
+      return await triggerFunction(client,kwargs);
+    });
+   
   });
 
   handleCloseEvents(mainWindow);
