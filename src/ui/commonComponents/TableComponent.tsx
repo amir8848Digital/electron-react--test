@@ -60,11 +60,11 @@ const TableComponent: React.FC<TableComponentProps> = ({
     }
   }, [designData]);
 
-  useEffect(() => {
-    if (rowData?.length > 0) {
-      console.log(rowData, "row data handleOnSelect");
-    }
-  }, [rowData]);
+  // useEffect(() => {
+  //   if (rowData?.length > 0) {
+  //     console.log(rowData, "row data handleOnSelect");
+  //   }
+  // }, [rowData]);
 
   const initailDataRateChart = {
     order_design_id: null,

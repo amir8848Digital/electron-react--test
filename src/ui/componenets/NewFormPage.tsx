@@ -104,7 +104,6 @@ const NewFormPage = () => {
 
   const updateStateFunction = (value: any, field: any) => {
     let values = { ...formValues };
-    console.log(value, field, fields, "updateStateFunction");
     if (field.type === "autoComplete") {
       values = { ...values, ...value[0] };
     } else {
