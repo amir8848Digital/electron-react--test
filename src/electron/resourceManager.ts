@@ -1,5 +1,5 @@
 
-import { client } from './main.js';
+// import { client } from './main.js';
 
 // export async function insertData(formData: any) {
 //     console.log(formData)

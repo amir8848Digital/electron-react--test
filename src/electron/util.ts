@@ -1,5 +1,3 @@
-import { client } from "./main.js";
-
 import * as path from "path";
 import { promises as fs } from "fs";
 import { app } from "electron";
@@ -8,34 +6,22 @@ import {getFormConfigPath} from "./pathResolver.js"
 export function isDev(): boolean {
   return process.env.NODE_ENV === 'development';
 }
-export async function getAutoCompleteData(query: any) {
-  try {
+export async function getAutoCompleteData(client: any, query: any) {
     const formName = query.formName;
     const config = await getFormConfig(formName)
     console.log(config.autoCompleteFields)
     console.log(config.autoCompleteFields[query.fieldname])
-    return getData(config.autoCompleteFields[query.fieldname], query);
-
-    } catch (error) {
-      console.error("Error reading file:", error);
-      return [];
-    }
+    return getData(client, config.autoCompleteFields[query.fieldname], query);
 }
 
 
 export async function getFormConfig(formName: string) {
-  try {
     const configFilePath = getFormConfigPath(formName);
     const configModule = await import(configFilePath, { with: { type: "json" } });
     return configModule.default
-
-  } catch (error) {
-    console.error(`Error loading config for ${formName}:`, error);
-    return {};
-  }
 }
 
-async function getData(queryConfig: any, query: any): Promise<any[]> {
+async function getData(client: any, queryConfig: any, query: any): Promise<any[]> {
   console.log("Query Config:", queryConfig, query);
 
   let queryConditions = "";
@@ -49,8 +35,6 @@ async function getData(queryConfig: any, query: any): Promise<any[]> {
       return `${field}::TEXT ILIKE $${index + 1}`;
     }).join(" OR ");
   }
-
-  try {
     const sqlQuery = `
       SELECT 
           ${queryConfig.columns.join(", ")}
@@ -62,26 +46,23 @@ async function getData(queryConfig: any, query: any): Promise<any[]> {
     console.log("Generated SQL Query:", sqlQuery);
 
     const result: any = await client.query(sqlQuery, params);
+    console.log("Result:", result.rows);
     return result.rows;
-  } catch (error: any) {
-    console.error("Error fetching suggestions:", error);
-    return [];
-  }
 }
 
-export async function  insertFormData(formDataArray: any) {
+export async function  insertFormData(client:any, formDataArray: any) {
   let configs = <any>{}
   let row_record_map = <any>{}
   let dependentFormData = <any>[]
   for (let formData of formDataArray) {
-    await insertData(formData, configs, row_record_map, dependentFormData);
+    await insertData(client, formData, configs, row_record_map, dependentFormData);
   }
   for (let formData of dependentFormData) {
-    await insertData(formData, configs, row_record_map, null);
+    await insertData(client, formData, configs, row_record_map, null);
   }
 }
 
-async function  insertData(formData: any, configs: any, row_record_map: any, dependentFormData: any[] | null) {
+async function  insertData(client:any, formData: any, configs: any, row_record_map: any, dependentFormData: any[] | null) {
     const formName = formData.formName
     let config = configs[formName] || await getFormConfig(formName);
     if (!configs[formName]) {
@@ -129,7 +110,7 @@ async function  insertData(formData: any, configs: any, row_record_map: any, dep
   console.log("Data inserted successfully!");
 }
 
-export async function getOrderDesignDetails(designCode: string) {
+export async function getOrderDesignDetails(client: any, designCode: string) {
     let rateChart = await client.query("SELECT * FROM rate_chart WHERE design_code = $1", [designCode]);
     let labourChart = await client.query("SELECT * FROM labour_chart WHERE design_code = $1", [designCode]);
     return { rateChart: rateChart.rows, labourChart: labourChart.rows };
