@@ -1,0 +1,11 @@
+{
+    "customer_id": {
+    "table": "Customers",
+    "columns": ["customer_id","customer_name"],
+    "searchField": "customer_id",
+    "fields_map":{
+      "customer_id":"Customer Id",
+      "customer_name":"Customer Name"
+    }
+}
+}

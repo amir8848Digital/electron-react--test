@@ -1,5 +1,5 @@
-import { client } from "../../main.js";
-export async function fetchFullForm(kwargs: any) {
+//import { client } from "../../main.js";
+export async function fetchFullForm(client:any,kwargs: any) {
   const query = `
       SELECT
           om.*,
@@ -12,13 +12,12 @@ export async function fetchFullForm(kwargs: any) {
           om.order_id = oe.order_id
   `;
   try {
-    const r = await client.query(query);
+   const r = await client.query(query);
     if (r.rows.length === 0) {
       return { orderMaster: null, orderDesign: [] };
     }
     const firstRow = r.rows[0];
     const orderMasterFields = Object.keys(firstRow).filter((field) => {
-      console.log("Field:", field); // Log the field name for debugging
       return [
         "order_id",
         "customer_id",
@@ -55,7 +54,7 @@ export async function fetchFullForm(kwargs: any) {
       obj[field] = firstRow[field];
       return obj;
     }, {});
-    const orderDesign = r.rows.map((row) => {
+    const orderDesign = r.rows.map((row:any) => {
       return orderDesignFields.reduce((obj: any, field) => {
         obj[field] = row[field];
         return obj;
