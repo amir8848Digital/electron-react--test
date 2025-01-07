@@ -13,7 +13,12 @@ const NewFormPage = () => {
   }
   const fieldName = "orderMaster";
   const fields = [
-    { label: "Voucher 1", name: " voucher_part1", type: "text" },
+    {
+      label: "Voucher 1",
+      name: " voucher_part1",
+      type: "text",
+      table: "order_master",
+    },
     { label: "Voucher 2", name: " voucher_part2", type: "text" },
     { label: "Voucher 3 ", name: " voucher_part3", type: "text" },
     {
@@ -21,14 +26,24 @@ const NewFormPage = () => {
       name: "order_id",
       type: "autoComplete",
     },
-    { label: "Date", name: "order_date", type: "calendar" },
+    {
+      label: "Date",
+      name: "order_date",
+      type: "calendar",
+      table: "order_master_item",
+    },
     { label: "Currency", name: "currency", type: "text" },
     {
       label: "Customer ID",
       name: "customer_id",
       type: "autoComplete",
     },
-    { label: "Customer Name", name: "customer_name", type: "text" },
+    {
+      label: "Customer Name",
+      name: "customer_name",
+      type: "text",
+      table: "rate_charts",
+    },
     { label: "Conversion Factor", name: "conv_fact", type: "text" },
     { label: "Conversion Date", name: "conv_d", type: "calendar" },
     { label: "LMG Sales", name: "lmg_sales", type: "number" },
@@ -121,14 +136,12 @@ const NewFormPage = () => {
       });
       console.log(res?.data?.orderDesign, "handleOnSelect new");
       let orderDesignData = res?.data?.orderDesign || [];
-
       orderDesignData =
         orderDesignData?.length > 0
           ? orderDesignData.filter(
               (item: any) => item.order_id === value[0]?.order_id
             )
           : [];
-
       console.log(orderDesignData, "orderDesignData handleOnSelect");
       setDesignData(orderDesignData);
     }

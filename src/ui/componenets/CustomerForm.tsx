@@ -7,18 +7,18 @@ const CustomerForm = (props: Props) => {
   interface FormValues {
     [key: string]: string | number | boolean | null;
   }
-  const fieldName = "Customers";
+  const fieldName = "customers";
   const newFields = [
-    { label: "Customer Code", name: "customer_code", type: "dropdown" },
+    { label: "Customer Code", name: "customer_id", type: "dropdown" },
     { label: "Customer Name", name: "customer_name", type: "text" },
-    { label: "Valid", name: "valid", type: "checkbox" },
-    { label: "Address Line 1  ", name: "address1", type: "text" },
-    { label: "Address Line 2  ", name: "address2", type: "text" },
-    { label: "Address Line 3  ", name: "address3", type: "text" },
-    { label: "Address Line 4  ", name: "address4", type: "text" },
-    { label: "Telephone", name: "telephone", type: "number" },
-    { label: "Mail", name: "mail", type: "email" },
-    { label: "Region", name: "region", type: "text" },
+    { label: "Currency", name: "currency", type: "text" },
+    { label: "Address", name: "address", type: "text" },
+    // { label: "Address Line 2  ", name: "address2", type: "text" },
+    // { label: "Address Line 3  ", name: "address3", type: "text" },
+    // { label: "Address Line 4  ", name: "address4", type: "text" },
+    { label: "Phone NO", name: "contact_phone", type: "number" },
+    { label: "Mail", name: "contact_email", type: "email" },
+    { label: "City", name: "city", type: "text" },
   ];
 
   const initialState: FormValues = newFields.reduce((acc, field) => {
@@ -44,8 +44,12 @@ const CustomerForm = (props: Props) => {
   };
 
   const handleSubmit = () => {
-    console.log("Form Submitted:", formValues);
-    // Submit formValues to the server or handle them accordingly
+    window.electron.insertFormData([
+      {
+        formData: formValues,
+        formName: fieldName,
+      },
+    ]);
   };
 
   const updateStateFunction = (value: any, field: any) => {

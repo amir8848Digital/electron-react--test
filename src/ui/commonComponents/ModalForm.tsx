@@ -69,7 +69,6 @@ const ModalForm: React.FC<ModalFormProps> = ({
   };
 
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
-  console.log({ formData });
 
   const formatFieldLabel = (field: string) => {
     return field
