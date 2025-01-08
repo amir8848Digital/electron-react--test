@@ -2,9 +2,9 @@ import { app, BrowserWindow, Menu } from "electron";
 import {
   getAutoCompleteData,
   isDev,
-  insertFormData,
   getFormConfig,
   getOrderDesignDetails,
+  saveForm,
 } from "./util.js";
 import { triggerFunction } from "./triggerHandler.js";
 // import {  insertData,getSalesOrderData,} from './resourceManager.js';
@@ -40,7 +40,7 @@ app.on("ready", () => {
   });
   ipcMain.handle("insertFormData", async (_, formData: any) => {
     return await performTransaction("write", async (client) => {
-      return await insertFormData(client, formData);
+     // return await insertFormData(client, formData);
     });
   });
   ipcMain.handle("getOrderDesignDetails",async (_, designCode: string) => {
@@ -51,6 +51,13 @@ app.on("ready", () => {
   ipcMain.handle("triggerFunction",async (_, kwargs: any) => {
     return await performTransaction("readOnly", async (client) => {
       return await triggerFunction(client,kwargs);
+    });
+   
+  });
+  ipcMain.handle("saveForm",async (_, kwargs: any) => {
+   console.log("saveForm",kwargs);
+    return await performTransaction("write", async (client) => {
+      return await saveForm(client,kwargs);
     });
    
   });
