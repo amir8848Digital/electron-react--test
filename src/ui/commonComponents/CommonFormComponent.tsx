@@ -5,59 +5,50 @@ type Props = {};
 
 const CommonFormComponent = ({
   formMainObj,
-  formValues,
-  setFormValues,
+  orderMaster,
+  setOrderMaster,
   setRowDataForTable1,
 }: any) => {
   interface FormValues {
     [key: string]: string | Date | null | Date | number;
   }
 
-  //   const initialState: FormValues = formMainObj.fields.reduce(
-  //     (acc: any, field: any) => {
-  //       acc[field.name] = field.type === "calendar" ? null : "";
-  //       return acc;
-  //     },
-  //     {} as FormValues
-  //   );
-
-  //   const [formValues, setFormValues] = useState<FormValues>(initialState);
+  const stateUpdater = (name: any, value: any) => {
+    setOrderMaster((prev: any) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
   ) => {
-    setFormValues({
-      ...formValues,
-      [name]: e.target.value,
-    });
+    stateUpdater(name, e.target.value);
   };
 
   const handleChangeNumber = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
   ) => {
-    setFormValues({
-      ...formValues,
-      [name]: Number(e.target.value),
-    });
+    stateUpdater(name, parseFloat(e.target.value));
   };
 
   const handleCalendarChange = (e: any, name: string) => {
-    setFormValues({
-      ...formValues,
-      [name]: e.target.value,
-    });
+    stateUpdater(name, e.target.value);
   };
 
   const updateStateFunction = (value: any, field: any) => {
-    let values = { ...formValues };
+    let values = { ...orderMaster.formValues };
     if (field.type === "autoComplete") {
       values = { ...values, ...value[0] };
     } else {
       values = { ...values, [field.name]: value };
     }
-    setFormValues({ ...values });
+    setOrderMaster((prev: any) => ({
+      ...prev,
+      ...values,
+    }));
   };
 
   const handleOnSelect = async (data: any, value: any) => {
@@ -80,32 +71,32 @@ const CommonFormComponent = ({
     }
   };
 
-  const handdleSubmit = () => {
-    const res = window.electron.insertFormData([
+  const handdleSubmit = async (e: any) => {
+    e.preventDefault();
+    const res = await window.electron.insertFormData([
       {
-        formData: formValues,
+        formData: orderMaster.formValues,
         formName: formMainObj.fieldName,
       },
     ]);
-    console.log(formValues, "formValues");
+    console.log(res, orderMaster, "handdleSubmit");
   };
 
   return (
     <form onSubmit={handdleSubmit}>
       <div className="row p-4 g-2">
-        {formMainObj?.fields.map((field: any, index: number) => (
+        {formMainObj?.fields?.map((field: any, index: number) => (
           <div className="col-md-2" key={index}>
-            {/* Text Input */}
             {field.type === "text" && (
               <div className="">
-                <label htmlFor={field.name} className="form-label fs-10">
+                <label id={field.name} className="form-label fs-10">
                   {field.label}
                 </label>
                 <input
                   type="text"
                   id={field.name}
                   className="form-control  fs-10"
-                  value={formValues[field.name] as string}
+                  value={orderMaster.formValues[field.name] as string}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />
@@ -120,7 +111,7 @@ const CommonFormComponent = ({
                   type="number"
                   id={field.name}
                   className="form-control fs-10"
-                  value={formValues[field.name] as number}
+                  value={orderMaster.formValues[field.name] as number}
                   onChange={(e) => handleChangeNumber(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />
@@ -137,7 +128,7 @@ const CommonFormComponent = ({
                   id="dateInput fs-10"
                   className="form-control fs-10"
                   placeholder="Choose a date"
-                  value={formValues[field.name] as string}
+                  value={orderMaster.formValues[field.name] as string}
                   onChange={(e) => handleCalendarChange(e, field.name)}
                 />
               </div>
@@ -151,9 +142,8 @@ const CommonFormComponent = ({
                 </label>
                 <AutoCompleteDropDown
                   field={field}
-                  formValues={formValues}
-                  setFormValues={setFormValues}
-                  defaultValue={formValues[field.name]}
+                  formValues={orderMaster.formValues}
+                  defaultValue={orderMaster.formValues[field.name]}
                   fieldName={formMainObj.fieldName}
                   updateStateFunction={updateStateFunction}
                   size={"small"}

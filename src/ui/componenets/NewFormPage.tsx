@@ -125,8 +125,13 @@ const NewFormPage = () => {
     return acc;
   }, {} as FormValues);
 
-  const [formValues, setFormValues] = useState<FormValues>(initialState);
+  // const [formValues, setFormValues] = useState<FormValues>(initialState);
   const [rowDataForTable1, setRowDataForTable1] = useState<Row[]>([]);
+
+  const [orderMaster, setOrderMaster] = useState<any>({
+    ...initialState,
+    rowDataForTable1: [],
+  });
 
   const [showModal, setShowModal] = useState(false);
   const [designData, setDesignData] = useState<any>([]);
@@ -136,7 +141,7 @@ const NewFormPage = () => {
       { formData: data, formName: "orderDetails" },
     ]);
     console.log("Form submitted with data:", data);
-    setShowModal(false); // Close the modal after submission
+    setShowModal(false);
   };
 
   const handleClose = () => {
@@ -148,8 +153,8 @@ const NewFormPage = () => {
       <div className="card shadow my-4">
         <CommonFormComponent
           formMainObj={formObj}
-          formValues={formValues}
-          setFormValues={setFormValues}
+          orderMaster={orderMaster}
+          setOrderMaster={setOrderMaster}
           setRowDataForTable1={setRowDataForTable1}
         />
         <div>
@@ -169,10 +174,9 @@ const NewFormPage = () => {
         <div className="">
           {
             <TableComponent
-              orderId={formValues.order_id as number}
-              designData={designData}
-              rowDataForTable1={rowDataForTable1}
-              setRowDataForTable1={setRowDataForTable1}
+              orderId={orderMaster.order_id as number}
+              orderMaster={orderMaster}
+              setOrderMaster={setOrderMaster}
               formObj={formObj}
             />
           }
@@ -181,7 +185,7 @@ const NewFormPage = () => {
       <div>
         {showModal && (
           <ModalForm
-            orderMasterId={formValues?.order_id as number}
+            orderMasterId={orderMaster?.order_id as number}
             onSubmit={handleSubmit}
             onClose={handleClose}
           />

@@ -13,7 +13,7 @@ function App() {
       children: [
         {
           path: "/",
-          Component: FormPage,
+          Component: NewFormPage,
         },
         {
           path: "/customer-form",
