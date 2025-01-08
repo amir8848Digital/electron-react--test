@@ -50,65 +50,6 @@ async function getData(client: any, queryConfig: any, query: any): Promise<any[]
     return result.rows;
 }
 
-// export async function  insertFormData(client:any, formDataArray: any) {
-//   let configs = <any>{}
-//   let row_record_map = <any>{}
-//   let dependentFormData = <any>[]
-//   for (let formData of formDataArray) {
-//     await insertData(client, formData, configs, row_record_map, dependentFormData);
-//   }
-//   for (let formData of dependentFormData) {
-//     await insertData(client, formData, configs, row_record_map, null);
-//   }
-// }
-
-// async function  insertData(client:any, formData: any, configs: any, row_record_map: any, dependentFormData: any[] | null) {
-//     const formName = formData.formName
-//     let config = configs[formName] || await getFormConfig(formName);
-//     if (!configs[formName]) {
-//       configs[formName] = config;
-//     }
-//     const tableName = config.tableName;
-
-//     if (config?.dependent === 1){
-//       if (dependentFormData !== null){
-//         dependentFormData.push(formData);
-
-//       }
-//       for (let dependentField of config.dependentFields){
-//         formData.formData[dependentField.foreign_column] = row_record_map[dependentField.dependentTable][dependentField.foreign_row_id][formData.formData[dependentField.foreign_column]];
-//       }
-//     }
-//     const filteredEntries = Object.entries(formData.formData).filter(
-//       ([_, value]) => value !== null && value !== undefined && value !== ""
-//     );
-//     if (filteredEntries.length === 0) {
-//       console.log("No valid data to insert.");
-//       return;
-//     }
-    
-//     const columns = filteredEntries.map(([key]) => key);
-//     const values = filteredEntries.map(([_, value]) => value);
-//     const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
-
-//     const primaryKey = config.primary_key || null; 
-
-//     let query = `
-//       INSERT INTO ${tableName} (${columns.join(", ")})
-//       VALUES (${placeholders})
-//     `;
-//     if (primaryKey) {
-//       query += ` RETURNING ${primaryKey};`;
-//     }
-//     const r = await client.query(query, values);
-//     if (primaryKey && config?.dependent_on === 1) {
-//         const insertedPrimaryKey = r.rows[0]?.[primaryKey];
-//         row_record_map[tableName] ??= {};
-//         row_record_map[tableName][config.row_id] ??= {};
-//         row_record_map[tableName][config.row_id][formData.formData[config.row_id]] = insertedPrimaryKey;
-//       }
-//   console.log("Data inserted successfully!");
-// }
 
 export async function getOrderDesignDetails(client: any, designCode: string) {
     let rateChart = await client.query("SELECT * FROM rate_chart WHERE design_code = $1", [designCode]);
@@ -119,29 +60,26 @@ export async function getOrderDesignDetails(client: any, designCode: string) {
 export async function saveForm(client:any, formDataArray: any) {
   let configs = {};
   formDataArray = [{
-    "order_id": 1,
-    "order_date": "2023-10-01",
-    "order_status": "pending",
-    "order_type": "custom",
+   
+    "voucher_part1": "voucher1",
+    "order_id":"100",
     "formName": "orderMaster",
     "order_design": [
         {
-            "design_code": 1,
+          "order_id":"100",
+            "design_code": "D001",
             "formName": "orderDesign",
             "rate_chart": [
                 {
-                    "rate_id": 1,
-                    "rate_name": "rate1",
-                    "rate_value": 100,
-                    "formName": "rateChart",
+                    "category": "DDDDDDD",
+                    "formName": "orderRateChart",
                 }
             ],
             "labour_chart": [
                 {
-                    "labour_id": 1,
-                    "labour_name": "labour1",
-                    "labour_value": 100,
-                    "formName": "labourChart",
+                   "main_cd": "DDDDDDD",
+                   "sub_cd":"DDDDDDDF",
+                    "formName": "orderLabourChart",
                 }
             ]
         }
@@ -189,8 +127,18 @@ async function saveFormData(
       if (parent_type && parent_field && parent_id) {
           entries["parent_type"] = parent_type;
           entries["parent_field"] = parent_field;
-          entries["parent_id"] = parent_id;
+          entries[config.parent_id] = parent_id;
       }
+
+
+
+
+
+
+
+
+
+      
       primaryKeyValue = await insertData(client, tableName, primaryKey, entries);
     }
     
@@ -229,6 +177,7 @@ async function insertData(client: any, tableName: string, primaryKey: string, en
     VALUES (${placeholders})
     RETURNING ${primaryKey};
   `;
+  console.log(query)
   const r = await client.query(query, values);
   return r.rows[0]?.[primaryKey];
 }

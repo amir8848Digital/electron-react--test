@@ -1,6 +1,7 @@
 {
   "tableName": "OrderMaster",
   "formName": "orderMaster",
+  "primary_key": "order_id",
   "autoCompleteFields": {
     "customer_id": {
       "table": "Customers",

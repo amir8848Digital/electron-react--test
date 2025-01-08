@@ -130,12 +130,12 @@ const AutoCompleteDropDown = ({
     const fetch = async () => {
       console.log({ fieldName });
       const res2 = await window.electron.getFormConfig(`${fieldName}`);
-      const res3 = await window.electron.triggerFunction({
-        path: res2.autoCompleteFields.order_id.onSelect.fetchFullForm,
-        inputs: {},
-      });
+      // const res3 = await window.electron.triggerFunction({
+      //   path: res2.autoCompleteFields.order_id.onSelect.fetchFullForm,
+      //   inputs: {},
+      // });
+
       console.log(res2, "Fetching");
-      console.log(res3, "Fetching new");
       setTableData(res2.autoCompleteFields[field.name]);
       setTableHead(res2.autoCompleteFields[field.name].fieldsMap);
     };

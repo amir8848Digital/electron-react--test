@@ -1,11 +1,19 @@
 {
+  "tableName": "Customers",
+  "formName": "customers",
+  "autoCompleteFields": {
     "customer_id": {
-    "table": "Customers",
-    "columns": ["customer_id","customer_name"],
-    "searchField": "customer_id",
-    "fields_map":{
-      "customer_id":"Customer Id",
-      "customer_name":"Customer Name"
+      "table": "Customers",
+      "columns": ["customer_id", "customer_name"],
+      "searchFields": ["customer_id", "customer_name"],
+      "fieldsMap": {
+        "customer_id": "Customer Id",
+        "customer_name": "Customer Name"
+      },
+      "fetchMap": {
+        "customer_name": "customer_name"
+      },
+      "primaryField": "customer_id"
     }
-}
+  }
 }
