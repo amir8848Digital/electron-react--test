@@ -21,50 +21,21 @@ type Row = {
 interface TableComponentProps {
   orderId: number;
   designData: any;
+  rowDataForTable1: any;
+  setRowDataForTable1: any;
+  formObj: any;
 }
 
 const TableComponent: React.FC<TableComponentProps> = ({
   orderId,
   designData,
+  rowDataForTable1: rowData,
+  setRowDataForTable1: setRowData,
+  formObj,
 }) => {
   const fieldName = "orderDesign";
   const orderChartField = "orderRateChart";
   const orderLabourField = "orderLabourChart";
-  const [rowData, setRowData] = useState<Row[]>([]);
-
-  // useEffect(() => {
-  //   if (orderId) {
-  //     setRowData([
-  //       {
-  //         sr_no: 1,
-  //         order_id: orderId,
-  //         design_code: "",
-  //         suffix: "",
-  //         size: 0,
-  //         qty: 0,
-  //         calc_price: 0,
-  //         sales_price: 0,
-  //         prod_dely_date: "",
-  //         exp_dely_date: "",
-  //         prod_setting: "",
-  //         fixed_price: 0,
-  //       },
-  //     ]);
-  //   }
-  // }, [orderId]);
-
-  useEffect(() => {
-    if (designData?.length > 0) {
-      console.log(designData, "design data handleOnSelect");
-      setRowData([...designData]);
-    }
-  }, [designData]);
-
-  // useEffect(() => {
-  //   if (rowData?.length > 0) {
-  //     console.log(rowData, "row data handleOnSelect");
-  //   }
-  // }, [rowData]);
 
   const initailDataRateChart = {
     order_design_id: null,
@@ -112,14 +83,10 @@ const TableComponent: React.FC<TableComponentProps> = ({
     value: any,
     index: number
   ) => {
-    // const updatedRowData = rowData.map((row) =>
-    //   row.order_id === rowId ? { ...row, [field]: value } : row
-    // );
     let updatedRowData = [...rowData];
     updatedRowData = updatedRowData.map((row, i) =>
       i === index ? { ...row, [field]: value } : row
     );
-    console.log(updatedRowData, "updatedRowData");
     setRowData(updatedRowData);
   };
 
@@ -171,7 +138,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
       });
     });
 
-    rowData.forEach((item) => {
+    rowData.forEach((item: any) => {
       combinedData.push({
         formData: item,
         formName: fieldName,
@@ -181,7 +148,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
     window.electron.insertFormData(combinedData);
   };
 
-  return rowData.length > 0 ? (
+  return (
     <>
       <div className="container-fluid">
         <div className="my-4">
@@ -196,24 +163,12 @@ const TableComponent: React.FC<TableComponentProps> = ({
             </div>
             <table className="table table-bordered" style={{ width: "100%" }}>
               <thead>
-                <tr className="fs-10">
-                  <th>Sr No</th>
-                  <th>Order ID</th>
-                  <th>Design Code</th>
-                  <th>Suffix</th>
-                  <th>Size</th>
-                  <th>Quantity</th>
-                  <th>Calculated Price</th>
-                  <th>Sales Price</th>
-                  <th>Prod Delivery Date</th>
-                  <th>Expected Delivery Date</th>
-                  <th>Prod Setting</th>
-                  <th>Fixed Price</th>
-                  <th></th>
-                </tr>
+                {formObj?.tableOne?.tableVales?.map((e: any, index: any) => (
+                  <tr key={index}>{e.label}</tr>
+                ))}
               </thead>
               <tbody>
-                {rowData?.map((row, index) => {
+                {rowData?.map((row: any, index: any) => {
                   console.log(row, "row handleOnSelect");
                   return (
                     <tr key={index}>
@@ -356,8 +311,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
         </div>
       </div>
     </>
-  ) : (
-    ""
   );
 };
 

@@ -106,7 +106,7 @@ const FormPage = (props: Props) => {
   };
 
   const handleAddChildRow = (event: any) => {
-    console.log(event);
+    console.log(event.target);
   };
 
   const renderField = (field: any, tableName: string, index: number) => {
@@ -127,7 +127,9 @@ const FormPage = (props: Props) => {
     }
     if (field.type === "button") {
       return (
-        <button onClick={ handleAddChildRow}>{field.label}</button>
+        <button onClick={handleAddChildRow} data-index={index}>
+          {field.label}
+        </button>
       );
     }
   };

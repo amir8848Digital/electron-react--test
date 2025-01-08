@@ -128,7 +128,6 @@ const AutoCompleteDropDown = ({
 
   useEffect(() => {
     const fetch = async () => {
-      console.log({ fieldName });
       const res2 = await window.electron.getFormConfig(`${fieldName}`);
       // const res3 = await window.electron.triggerFunction({
       //   path: res2.autoCompleteFields.order_id.onSelect.fetchFullForm,
