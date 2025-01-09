@@ -97,26 +97,24 @@ const NewFormPage = () => {
       { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
       { label: "Refresh Date", name: "refresh_date", type: "calendar" },
     ],
-    tableone: {
-      tableVales: [
-        { label: "Order ID", name: "order_id", type: "number" },
-        { label: "Design Code", name: "design_code", type: "autoComplete" },
-        { label: "Suffix", name: "suffix", type: "text" },
-        { label: "Size", name: "size", type: "text" },
-        { label: "Quantity", name: "qty", type: "number" },
-        { label: "Calculated Price", name: "calc_price", type: "number" },
-        { label: "Sales Price", name: "sales_price", type: "number" },
-        { label: "Prod Delivery Date", name: "prod_dely_date", type: "date" },
-        {
-          label: "Expected Delivery Date",
-          name: "exp_dely_date",
-          type: "date",
-        },
-        { label: "Prod Setting", name: "prod_setting", type: "text" },
-        { label: "Fixed Price", name: "fixed_price", type: "number" },
-        { label: "Actions", name: "actions", type: "button" },
-      ],
-    },
+    tableone: [
+      { label: "Order ID", name: "order_id", type: "number" },
+      { label: "Design Code", name: "design_code", type: "autoComplete" },
+      { label: "Suffix", name: "suffix", type: "text" },
+      { label: "Size", name: "size", type: "text" },
+      { label: "Quantity", name: "qty", type: "number" },
+      { label: "Calculated Price", name: "calc_price", type: "number" },
+      { label: "Sales Price", name: "sales_price", type: "number" },
+      { label: "Prod Delivery Date", name: "prod_dely_date", type: "date" },
+      {
+        label: "Expected Delivery Date",
+        name: "exp_dely_date",
+        type: "date",
+      },
+      { label: "Prod Setting", name: "prod_setting", type: "text" },
+      { label: "Fixed Price", name: "fixed_price", type: "number" },
+      { label: "Actions", name: "actions", type: "button" },
+    ],
   };
 
   const initialState: FormValues = formObj.fields.reduce((acc, field) => {
@@ -140,6 +138,7 @@ const NewFormPage = () => {
   const handleClose = () => {
     setShowModal(false);
   };
+  console.log();
 
   return (
     <div className="container-fluid">
