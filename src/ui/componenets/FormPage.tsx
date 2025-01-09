@@ -71,7 +71,6 @@ const FormPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", JSON.stringify(formData, null, 2));
   };
 
   return (

@@ -1,5 +1,31 @@
 //import { client } from "../../main.js";
-export async function fetchFullForm(client:any,kwargs: any) {
+export async function fetchFullForm(client: any, kwargs: any) {
+  return [
+    {
+      voucher_part1: "voucher1",
+      order_id: "100",
+      formName: "orderMaster",
+      order_design: [
+        {
+          design_code: "D001",
+          formName: "orderDesign",
+          rate_chart: [
+            {
+              category: "DDDDDDD",
+              formName: "orderRateChart",
+            },
+          ],
+          labour_chart: [
+            {
+              main_cd: "DDDDDDD",
+              sub_cd: "DDDDDDDF",
+              formName: "orderLabourChart",
+            },
+          ],
+        },
+      ],
+    },
+  ];
   const query = `
       SELECT
           om.*,
@@ -9,10 +35,11 @@ export async function fetchFullForm(client:any,kwargs: any) {
       JOIN
           "public"."orderdesign" oe
       ON
-          om.order_id = oe.order_id
+          om.order_id = oe.order_design_id
   `;
   try {
-   const r = await client.query(query);
+    const r = await client.query(query);
+    console.log("############################", r);
     if (r.rows.length === 0) {
       return { orderMaster: null, orderDesign: [] };
     }
@@ -54,16 +81,18 @@ export async function fetchFullForm(client:any,kwargs: any) {
       obj[field] = firstRow[field];
       return obj;
     }, {});
-    const orderDesign = r.rows.map((row:any) => {
+    const orderDesign = r.rows.map((row: any) => {
       return orderDesignFields.reduce((obj: any, field) => {
         obj[field] = row[field];
         return obj;
       }, {});
     });
-    return {
+    let x = {
       orderMaster,
       orderDesign,
     };
+
+    return x;
   } catch (error) {
     console.error("Error fetching data:", error);
     throw error;

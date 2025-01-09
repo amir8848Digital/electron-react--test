@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AutoCompleteDropDown from "./AutoCompleteDropDown";
 
 type Props = {};
@@ -7,13 +7,13 @@ const CommonFormComponent = ({
   formMainObj,
   orderMaster,
   setOrderMaster,
-  setRowDataForTable1,
 }: any) => {
   interface FormValues {
     [key: string]: string | Date | null | Date | number;
   }
 
   const stateUpdater = (name: any, value: any) => {
+    console.log({ name, value });
     setOrderMaster((prev: any) => ({
       ...prev,
       [name]: value,
@@ -58,7 +58,7 @@ const CommonFormComponent = ({
         path: data.onSelect.fetchFullForm,
         inputs: {},
       });
-      console.log(res?.data?.orderDesign, "handleOnSelect new");
+      console.log(res?.data?.orderDesign, "new");
       let orderDesignData = res?.data?.orderDesign || [];
       orderDesignData =
         orderDesignData?.length > 0
@@ -66,20 +66,52 @@ const CommonFormComponent = ({
               (item: any) => item.order_id === value[0]?.order_id
             )
           : [];
-      console.log(orderDesignData, "orderDesignData handleOnSelect");
-      setRowDataForTable1(orderDesignData);
+      console.log(orderDesignData, "orderDesignData");
+      setOrderMaster(orderDesignData);
+      // const orderDesignData = {
+      //   voucher_part1: "voucher1",
+      //   parent_id: "1",
+      //   customer_id: "1",
+      //   formName: "orderMaster",
+      //   order_design: [
+      //     {
+      //       design_code: "D001",
+      //       formName: "orderDesign",
+      //       rate_chart: [
+      //         {
+      //           category: "DDDDDDD",
+      //           formName: "orderRateChart",
+      //         },
+      //       ],
+      //       labour_chart: [
+      //         {
+      //           main_cd: "DDDDDDD",
+      //           sub_cd: "DDDDDDDF",
+      //           formName: "orderLabourChart",
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // };
+      setOrderMaster(orderDesignData);
     }
   };
 
+  useEffect(() => {
+    console.log(orderMaster, "orderMaster");
+  }, [orderMaster]);
+
   const handdleSubmit = async (e: any) => {
+    console.log({ orderMaster });
     e.preventDefault();
-    const res = await window.electron.insertFormData([
+    const res = await window.electron.saveForm([
       {
-        formData: orderMaster.formValues,
+        ...orderMaster,
         formName: formMainObj.fieldName,
       },
     ]);
-    console.log(res, orderMaster, "handdleSubmit");
+    console.log(res, "handdleSubmit");
+    // setOrderMaster(res?.data?.orderMaster);
   };
 
   return (
@@ -95,7 +127,7 @@ const CommonFormComponent = ({
                 <input
                   type="text"
                   className="form-control  fs-10"
-                  value={orderMaster[field.name] as string}
+                  value={orderMaster[field?.name] as string}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />
@@ -110,7 +142,7 @@ const CommonFormComponent = ({
                   type="number"
                   id={field.name}
                   className="form-control fs-10"
-                  value={orderMaster[field.name] as number}
+                  value={Number(orderMaster[field.name] as number)}
                   onChange={(e) => handleChangeNumber(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />

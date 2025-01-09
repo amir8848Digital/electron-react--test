@@ -81,20 +81,20 @@ const TableComponent: React.FC<TableComponentProps> = ({
     value: any,
     index: number
   ) => {
-    let updatedRowData = [...orderMaster.rowDataForTable1];
+    let updatedRowData = [...orderMaster.order_design];
     updatedRowData = updatedRowData.map((row, i) =>
       i === index ? { ...row, [field]: value } : row
     );
     // setRowData(updatedRowData);
     setOrderMaster({
       ...orderMaster,
-      rowDataForTable1: updatedRowData,
+      order_design: updatedRowData,
     });
   };
 
   const addRow = () => {
     const newRow: Row = {
-      sr_no: orderMaster.rowDataForTable1.length + 1,
+      sr_no: orderMaster.order_design.length + 1,
       order_id: orderId,
       design_code: "",
       suffix: "",
@@ -107,14 +107,15 @@ const TableComponent: React.FC<TableComponentProps> = ({
       prod_setting: "",
       fixed_price: 0,
     };
-    // setRowData([...rowData, newRow]);
+
     setOrderMaster({
       ...orderMaster,
-      rowDataForTable1: [...orderMaster.rowDataForTable1, newRow],
+      order_design: [...orderMaster.order_design, newRow],
     });
   };
 
   const handleAddTable = (row: Row) => {
+    console.log({ row });
     if (row?.design_code) {
       setDataRateChart([
         ...dataRateChart,
@@ -150,7 +151,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
         formName: fieldName,
       });
     });
-    console.log({ combinedData });
+
     window.electron.insertFormData(combinedData);
   };
 
@@ -174,115 +175,112 @@ const TableComponent: React.FC<TableComponentProps> = ({
                 ))}
               </thead>
               <tbody>
-                {orderMaster?.rowDataForTable1?.rowData?.map(
-                  (row: any, index: any) => {
-                    console.log(row, "row handleOnSelect");
-                    return (
-                      <tr key={index}>
-                        {/* sr_no as a number */}
-                        <td>{Number(row.sr_no)}</td>
+                {orderMaster?.order_design?.map((row: any, index: any) => {
+                  return (
+                    <tr key={index}>
+                      {/* sr_no as a number */}
+                      {/* <td>{row.sr_no}</td> */}
 
-                        {/* order_id as a number */}
-                        <td>{Number(row.order_id)}</td>
+                      {/* order_id as a number */}
+                      <td>{row.order_id}</td>
 
-                        {/* design_code dropdown */}
-                        <td>
-                          <AutoCompleteDropDown
-                            field={{
-                              name: "design_code",
-                              rowId: row.order_id,
-                              label: "Design Code",
-                            }}
-                            formValues={orderMaster.rowDataForTable1}
-                            fieldName={fieldName}
-                            updateStateFunction={(value: string) =>
-                              handleRowChange(
-                                row.order_id as number,
-                                "design_code",
-                                value,
-                                index
-                              )
-                            }
-                          />
+                      {/* design_code dropdown */}
+                      <td>
+                        <AutoCompleteDropDown
+                          field={{
+                            name: "design_code",
+                            rowId: row.order_id,
+                            label: "Design Code",
+                          }}
+                          formValues={orderMaster.order_design}
+                          fieldName={fieldName}
+                          updateStateFunction={(value: string) =>
+                            handleRowChange(
+                              row.order_id as number,
+                              "design_code",
+                              value,
+                              index
+                            )
+                          }
+                        />
+                      </td>
+
+                      {/* Other fields */}
+                      {[
+                        "suffix",
+                        "size",
+                        "qty",
+                        "calc_price", // This is a number field
+                        "sales_price", // This is a number field
+                        "prod_dely_date", // This is a date field
+                        "exp_dely_date", // This is a date field
+                        "prod_setting",
+                        "fixed_price", // This is a number field
+                      ].map((field) => (
+                        <td key={field}>
+                          {field === "calc_price" ||
+                          field === "sales_price" ||
+                          field === "fixed_price" ? (
+                            // Render as a number input for price fields
+                            <input
+                              type="number"
+                              value={row[field as keyof Row] as number}
+                              onChange={(e) =>
+                                handleRowChange(
+                                  row.order_id as number | string,
+                                  field as keyof Row,
+                                  Number(e.target.value),
+                                  index
+                                )
+                              }
+                              className="form-control fs-10"
+                            />
+                          ) : field === "prod_dely_date" ||
+                            field === "exp_dely_date" ? (
+                            // Render as a date input for date fields
+                            <input
+                              type="date"
+                              value={row[field as keyof Row] as string}
+                              onChange={(e) =>
+                                handleRowChange(
+                                  row.order_id as number | string,
+                                  field as keyof Row,
+                                  e.target.value,
+                                  index
+                                )
+                              }
+                              className="form-control  fs-10"
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              value={row[field as keyof Row] as string}
+                              onChange={(e) =>
+                                handleRowChange(
+                                  row.order_id as number | string,
+                                  field as keyof Row,
+                                  e.target.value,
+                                  index
+                                )
+                              }
+                              className="form-control fs-10"
+                            />
+                          )}
                         </td>
+                      ))}
 
-                        {/* Other fields */}
-                        {[
-                          "suffix",
-                          "size",
-                          "qty",
-                          "calc_price", // This is a number field
-                          "sales_price", // This is a number field
-                          "prod_dely_date", // This is a date field
-                          "exp_dely_date", // This is a date field
-                          "prod_setting",
-                          "fixed_price", // This is a number field
-                        ].map((field) => (
-                          <td key={field}>
-                            {field === "calc_price" ||
-                            field === "sales_price" ||
-                            field === "fixed_price" ? (
-                              // Render as a number input for price fields
-                              <input
-                                type="number"
-                                value={row[field as keyof Row] as number}
-                                onChange={(e) =>
-                                  handleRowChange(
-                                    row.order_id as number | string,
-                                    field as keyof Row,
-                                    Number(e.target.value),
-                                    index
-                                  )
-                                }
-                                className="form-control fs-10"
-                              />
-                            ) : field === "prod_dely_date" ||
-                              field === "exp_dely_date" ? (
-                              // Render as a date input for date fields
-                              <input
-                                type="date"
-                                value={row[field as keyof Row] as string}
-                                onChange={(e) =>
-                                  handleRowChange(
-                                    row.order_id as number | string,
-                                    field as keyof Row,
-                                    e.target.value,
-                                    index
-                                  )
-                                }
-                                className="form-control  fs-10"
-                              />
-                            ) : (
-                              <input
-                                type="text"
-                                value={row[field as keyof Row] as string}
-                                onChange={(e) =>
-                                  handleRowChange(
-                                    row.order_id as number | string,
-                                    field as keyof Row,
-                                    e.target.value,
-                                    index
-                                  )
-                                }
-                                className="form-control fs-10"
-                              />
-                            )}
-                          </td>
-                        ))}
-
-                        {/* Add button */}
-                        <td>
-                          <button
-                            onClick={() => handleAddTable(row)}
-                            className="btn btn-success fs-10"
-                          >
-                            Add
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
+                      {/* Add button */}
+                      <td>
+                        <button
+                          onClick={() => handleAddTable(row)}
+                          className="btn btn-success fs-10"
+                        >
+                          Add
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

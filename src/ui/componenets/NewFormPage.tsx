@@ -33,7 +33,7 @@ const NewFormPage = () => {
     fields: [
       {
         label: "Voucher 1",
-        name: " voucher_part1",
+        name: "voucher_part1",
         type: "text",
         table: "order_master",
         show: true,
@@ -41,22 +41,22 @@ const NewFormPage = () => {
       },
       {
         label: "Voucher 2",
-        name: " voucher_part2",
+        name: "voucher_part2",
         type: "text",
         show: true,
         disabled: false,
       },
       {
         label: "Voucher 3 ",
-        name: " voucher_part3",
+        name: "voucher_part3",
         type: "text",
         show: true,
         disabled: false,
       },
       {
         label: "Voucher 4",
-        name: "order_id",
-        type: "autoComplete",
+        name: "voucher_part4",
+        type: "text",
       },
       {
         label: "Date",
@@ -68,7 +68,7 @@ const NewFormPage = () => {
       {
         label: "Customer ID",
         name: "customer_id",
-        type: "autoComplete",
+        type: "text",
       },
       {
         label: "Customer Name",
@@ -99,7 +99,6 @@ const NewFormPage = () => {
     ],
     tableone: {
       tableVales: [
-        { label: "Sr No", name: "sr_no", type: "number" },
         { label: "Order ID", name: "order_id", type: "number" },
         { label: "Design Code", name: "design_code", type: "autoComplete" },
         { label: "Suffix", name: "suffix", type: "text" },
@@ -124,17 +123,11 @@ const NewFormPage = () => {
     acc[field.name] = field.type === "calendar" ? null : "";
     return acc;
   }, {} as FormValues);
-
-  // const [formValues, setFormValues] = useState<FormValues>(initialState);
-  const [rowDataForTable1, setRowDataForTable1] = useState<Row[]>([]);
-
   const [orderMaster, setOrderMaster] = useState<any>({
     ...initialState,
-    rowDataForTable1: [],
+    order_design: [],
   });
-
   const [showModal, setShowModal] = useState(false);
-  const [designData, setDesignData] = useState<any>([]);
 
   const handleSubmit = (data: Record<string, any>) => {
     window.electron.insertFormData([
@@ -155,7 +148,6 @@ const NewFormPage = () => {
           formMainObj={formObj}
           orderMaster={orderMaster}
           setOrderMaster={setOrderMaster}
-          setRowDataForTable1={setRowDataForTable1}
         />
         <div>
           <div className="d-flex justify-content-end my-2 ">

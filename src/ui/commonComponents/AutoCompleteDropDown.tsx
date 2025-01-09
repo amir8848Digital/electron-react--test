@@ -134,7 +134,6 @@ const AutoCompleteDropDown = ({
       //   inputs: {},
       // });
 
-      console.log(res2, "Fetching");
       setTableData(res2.autoCompleteFields[field.name]);
       setTableHead(res2.autoCompleteFields[field.name].fieldsMap);
     };
@@ -169,11 +168,11 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen: any,
     field: any
   ) => {
+    console.log({ customer, field });
     setFilter(customer[field.name]);
     setIsDropdownOpen(false);
     updateStateFunction(customer[field.name], field);
     setIsDropdownOpen(false);
-    console.log("updateStateFunction called", customer, field);
   };
 
   const handleBlur = (
@@ -226,9 +225,7 @@ const AutoCompleteDropDown = ({
             );
           }}
           onBlur={(e) => {
-            console.log("on blur", filteredCustomers);
             setIsDropdownOpen(false);
-
             const filteredValue =
               (filteredCustomers.length > 0 &&
                 filteredCustomers.filter(
