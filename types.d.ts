@@ -15,5 +15,6 @@ interface Window {
     insertFormData:any;
     getOrderDesignDetails:any;
     triggerFunction:any;
+    saveForm:any;
   };
 }
