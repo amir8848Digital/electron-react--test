@@ -39,7 +39,7 @@ const CommonFormComponent = ({
   };
 
   const updateStateFunction = (value: any, field: any) => {
-    let values = { ...orderMaster.formValues };
+    let values = { ...orderMaster };
     if (field.type === "autoComplete") {
       values = { ...values, ...value[0] };
     } else {
@@ -94,9 +94,8 @@ const CommonFormComponent = ({
                 </label>
                 <input
                   type="text"
-                  id={field.name}
                   className="form-control  fs-10"
-                  value={orderMaster.formValues[field.name] as string}
+                  value={orderMaster[field.name] as string}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />
@@ -111,7 +110,7 @@ const CommonFormComponent = ({
                   type="number"
                   id={field.name}
                   className="form-control fs-10"
-                  value={orderMaster.formValues[field.name] as number}
+                  value={orderMaster[field.name] as number}
                   onChange={(e) => handleChangeNumber(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />
@@ -128,7 +127,7 @@ const CommonFormComponent = ({
                   id="dateInput fs-10"
                   className="form-control fs-10"
                   placeholder="Choose a date"
-                  value={orderMaster.formValues[field.name] as string}
+                  value={orderMaster[field.name] as string}
                   onChange={(e) => handleCalendarChange(e, field.name)}
                 />
               </div>
@@ -142,8 +141,8 @@ const CommonFormComponent = ({
                 </label>
                 <AutoCompleteDropDown
                   field={field}
-                  formValues={orderMaster.formValues}
-                  defaultValue={orderMaster.formValues[field.name]}
+                  formValues={orderMaster}
+                  defaultValue={formMainObj[field.name]}
                   fieldName={formMainObj.fieldName}
                   updateStateFunction={updateStateFunction}
                   size={"small"}
