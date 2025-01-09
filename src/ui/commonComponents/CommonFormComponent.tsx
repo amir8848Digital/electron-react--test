@@ -52,7 +52,6 @@ const CommonFormComponent = ({
   };
 
   const handleOnSelect = async (data: any, value: any) => {
-    console.log(data, value, "handleOnSelect");
     if (data?.onSelect?.fetchFullForm) {
       const res = await window.electron.triggerFunction({
         path: data.onSelect.fetchFullForm,
@@ -66,40 +65,10 @@ const CommonFormComponent = ({
               (item: any) => item.order_id === value[0]?.order_id
             )
           : [];
-      console.log(orderDesignData, "orderDesignData");
-      setOrderMaster(orderDesignData);
-      // const orderDesignData = {
-      //   voucher_part1: "voucher1",
-      //   parent_id: "1",
-      //   customer_id: "1",
-      //   formName: "orderMaster",
-      //   order_design: [
-      //     {
-      //       design_code: "D001",
-      //       formName: "orderDesign",
-      //       rate_chart: [
-      //         {
-      //           category: "DDDDDDD",
-      //           formName: "orderRateChart",
-      //         },
-      //       ],
-      //       labour_chart: [
-      //         {
-      //           main_cd: "DDDDDDD",
-      //           sub_cd: "DDDDDDDF",
-      //           formName: "orderLabourChart",
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // };
+
       setOrderMaster(orderDesignData);
     }
   };
-
-  useEffect(() => {
-    console.log(orderMaster, "orderMaster");
-  }, [orderMaster]);
 
   const handdleSubmit = async (e: any) => {
     console.log({ orderMaster });

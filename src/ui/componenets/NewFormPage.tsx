@@ -115,6 +115,7 @@ const NewFormPage = () => {
       { label: "Fixed Price", name: "fixed_price", type: "number" },
       { label: "Actions", name: "actions", type: "button" },
     ],
+    
   };
 
   const initialState: FormValues = formObj.fields.reduce((acc, field) => {

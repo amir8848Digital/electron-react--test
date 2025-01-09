@@ -31,6 +31,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
   setOrderMaster,
   formObj,
 }) => {
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const fieldName = "orderDesign";
   const orderChartField = "orderRateChart";
   const orderLabourField = "orderLabourChart";
@@ -94,7 +95,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
 
   const addRow = () => {
     const newRow: Row = {
-      sr_no: orderMaster.order_design.length + 1,
+      sr_no: orderMaster.order_design?.length + 1,
       order_id: orderId,
       design_code: "",
       suffix: "",
@@ -115,8 +116,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
   };
 
   const handleAddTable = (row: Row) => {
-    console.log({ row });
-
     const newEntry = {
       order_design_id: null,
       category: "",
@@ -143,10 +142,10 @@ const TableComponent: React.FC<TableComponentProps> = ({
       sshp: 0,
       m_material: "",
     };
-
+    setActiveIndex(row.sr_no - 1);
     setOrderMaster((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
-      const designIndex = row.sr_no;
+      const designIndex = row.sr_no - 1;
 
       if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
         const currentDesign = { ...updatedOrderDesign[designIndex] };
@@ -190,6 +189,10 @@ const TableComponent: React.FC<TableComponentProps> = ({
 
     window.electron.insertFormData(combinedData);
   };
+
+  useEffect(() => {
+    console.log(orderMaster, "orderMaster");
+  }, [orderMaster]);
 
   return (
     <>
@@ -324,15 +327,22 @@ const TableComponent: React.FC<TableComponentProps> = ({
         </div>
         <div className="row">
           <div className="col-12 my-2">
-            {dataRateChart.length > 0 ? (
-              <RateChartTable data={orderMaster} setData={setOrderMaster} />
+            {orderMaster.order_design ? (
+              <RateChartTable
+                data={orderMaster}
+                setData={setOrderMaster}
+                index={activeIndex}
+              />
             ) : (
               ""
             )}
           </div>
           <div className="col-12 my-2">
-            {dataLabourChart.length > 0 ? (
-              <LabourChartTable data={orderMaster} setData={setOrderMaster} />
+            {orderMaster.order_design ? (
+              <LabourChartTable
+                data={orderMaster.order_design[activeIndex]?.labour_chart}
+                setData={setOrderMaster}
+              />
             ) : (
               ""
             )}
