@@ -2,6 +2,8 @@ import * as path from "path";
 import { promises as fs } from "fs";
 import { app } from "electron";
 import {getFormConfigPath} from "./pathResolver.js"
+import { triggerFunction } from "./triggerHandler.js";
+
 
 export function isDev(): boolean {
   return process.env.NODE_ENV === 'development';
@@ -59,34 +61,10 @@ export async function saveForm(client: any, formDataArray: any) {
   let configs = {};
   let savedData = [];
 
-  formDataArray = [{
-    "voucher_part1": "voucher1",
-    "order_id": "100",
-    "formName": "orderMaster",
-    "order_design": [
-      {
-        "order_id": "1001",
-        "design_code": "D001",
-        "formName": "orderDesign",
-        "rate_chart": [
-          {
-            "category": "DDDDDDD",
-            "formName": "orderRateChart",
-          }
-        ],
-        "labour_chart": [
-          {
-            "main_cd": "DDDDDDD",
-            "sub_cd": "DDDDDDDF",
-            "formName": "orderLabourChart",
-          }
-        ]
-      }
-    ]
-  }];
-
   for (let formData of formDataArray) {
-    const result = await saveFormData(client, formData, configs);
+    const path = `forms.${formData.formName}.main.saveForm`
+    console.log("func path:", path);
+    const result = await triggerFunction(client,{path, inputs:{configs,formData}});
     savedData.push(result);
   }
   let x  = {
@@ -97,7 +75,7 @@ export async function saveForm(client: any, formDataArray: any) {
   return x
 }
 
-async function saveFormData(
+export async function saveFormData(
   client: any,
   formData: any,
   configs: any,
@@ -105,25 +83,17 @@ async function saveFormData(
   parent_field: any | null = null,
   parent_id: any = null
 ) {
-  const formName = formData.formName;
-  let config = configs[formName] || await getFormConfig(formName);
-  if (!configs[formName]) {
-    configs[formName] = config;
-  }
-
-  const tableName = config.tableName;
-  const primaryKey = config.primary_key || "id";
-  let primaryKeyValue = null;
-  const { entries, arrayEntries } = processFormData(formData);
-  
-  
   let savedFormData = { ...formData };
   console.log("Saved Form Data:", savedFormData);
    
-  if (formData._delete === 1 && entries[primaryKey] && await checkIfRecordExists(client, tableName, primaryKey, entries[primaryKey])) {
-    await deleteData(client, tableName, primaryKey, entries[primaryKey]);
+  if (formData._delete === 1) {
+    await deleteData(client, formData, configs);
     savedFormData._operation = 'DELETE';
   } else {
+    const formName = formData.formName;
+    const { tableName,  primaryKey } = await getFormConfigDetails(formName, configs);
+    const { entries, arrayEntries } = processFormData(formData);
+    let primaryKeyValue = null;
     if (entries[primaryKey] && await checkIfRecordExists(client, tableName, primaryKey, entries[primaryKey])) {
       primaryKeyValue = await updateData(client, tableName, primaryKey, entries);
       savedFormData._operation = 'UPDATE';
@@ -131,7 +101,7 @@ async function saveFormData(
       if (parent_type && parent_field && parent_id) {
         entries["parent_type"] = parent_type;
         entries["parent_field"] = parent_field;
-        entries[config.parent_id] = parent_id;
+        entries["parent_id"] = parent_id;
       }
       primaryKeyValue = await insertData(client, tableName, primaryKey, entries);
       savedFormData._operation = 'INSERT';
@@ -221,13 +191,40 @@ async function updateData(client: any, tableName: string, primaryKey: string, en
 
 
 
-async function deleteData(client: any, tableName: string, primaryKey: string, primaryKeyValue: any){
-  const query = `
-    DELETE FROM ${tableName}
-    WHERE ${primaryKey} = $1;
-    `;
-  await client.query(query, [primaryKeyValue]);
+async function deleteData( client:any, 
+  formData:any, 
+  configs:any, 
+){
+  const { entries, arrayEntries } = processFormData(formData);
+  const { tableName,  primaryKey } = await getFormConfigDetails(formData.formName, configs);
+  const primaryKeyValue = entries[primaryKey];
+  if  (primaryKeyValue && await checkIfRecordExists(client, tableName, primaryKey, primaryKeyValue)){
+    for (let [arrayKey, arrayValue] of Object.entries(arrayEntries)) {
+      for (let element of arrayValue) {
+        await deleteData(client, element, configs);
+      }
+    }
+  
+    const query = `
+      DELETE FROM ${tableName}
+      WHERE ${primaryKey} = $1;
+      `;
+    await client.query(query, [primaryKeyValue]);
+
+  }
 }
+
+export async function getFormConfigDetails(formName: string, configs: any) {
+  let config = configs[formName] || await getFormConfig(formName);
+  if (!configs[formName]) {
+      configs[formName] = config;
+  }
+  const tableName = config.tableName;
+  const primaryKey = config.primary_key || "id";
+  return { tableName, primaryKey };
+}
+
+
 
 async function checkIfRecordExists(client: any, tableName: string, primaryKey: string, primaryKeyValue: any): Promise<boolean> {
   // Query to check if the record exists
