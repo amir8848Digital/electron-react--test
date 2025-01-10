@@ -5,7 +5,7 @@ import LabourChartTable from "./LabourChartTable";
 
 type Row = {
   sr_no: number;
-  order_id: number;
+  parent_id: number;
   design_code: string;
   suffix: string;
   size: number;
@@ -16,6 +16,7 @@ type Row = {
   exp_dely_date: string;
   prod_setting: string;
   fixed_price: number;
+  formName: string;
 };
 
 interface TableComponentProps {
@@ -37,7 +38,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
   const orderLabourField = "orderLabourChart";
 
   const initailDataRateChart = {
-    order_design_id: null,
+    _order_design_id: null,
     category: "",
     sub_category: "",
     sv_ln: "",
@@ -61,16 +62,18 @@ const TableComponent: React.FC<TableComponentProps> = ({
     h_set: 0,
     sshp: 0,
     m_material: "",
+    formName: "orderRateChart",
   };
 
   const initialDataLabourChart = {
-    order_design_id: null,
+    _order_design_id: null,
     maind_cd: "",
     sub_cd: "",
     by_qw: 0,
     quantity: 0,
     rate: 0,
     value: 0,
+    formName: "orderLabourChart",
   };
 
   const [dataRateChart, setDataRateChart] = useState<any[]>([]);
@@ -93,10 +96,30 @@ const TableComponent: React.FC<TableComponentProps> = ({
     });
   };
 
+  // sr_no: orderMaster.order_design?.length + 1,
+  // parent_id: orderId,
+  // design_code: "",
+  // suffix: "",
+  // size: 0,
+  // qty: 0,
+  // calc_price: 0,
+  // sales_price: 0,
+  // prod_dely_date: "",
+  // exp_dely_date: "",
+  // prod_setting: "",
+  // fixed_price: 0,
+  // formName: "orderDesign",
+
   const addRow = () => {
-    const newRow: Row = {
+    // const newRow = Object.entries(formObj.tableOne.tableFields)
+    //   .filter(([_, field]: [string, any]) => field.show)
+    //   .reduce((acc: any, [name, field]: [string, any]) => {
+    //     acc[name] = field.type === "number" ? 0 : "";
+    //     return acc;
+    //   }, {});
+    const newRow = {
       sr_no: orderMaster.order_design?.length + 1,
-      order_id: orderId,
+      parent_id: orderId,
       design_code: "",
       suffix: "",
       size: 0,
@@ -107,6 +130,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
       exp_dely_date: "",
       prod_setting: "",
       fixed_price: 0,
+      formName: "orderDesign",
     };
 
     setOrderMaster({
@@ -115,44 +139,30 @@ const TableComponent: React.FC<TableComponentProps> = ({
     });
   };
 
-  const handleAddTable = (row: Row) => {
-    const newEntry = {
-      order_design_id: null,
-      category: "",
-      sub_category: "",
-      sv_ln: "",
-      breadth: 0,
-      depth: 0,
-      quantity: 0,
-      pm_pointer: "",
-      wt: 0,
-      lme_rate: 0,
-      sales_rate: 0,
-      qw: 0,
-      sales_value: 0,
-      production_quantity: 0,
-      production_weight: 0,
-      setting: "",
-      setting_rate: 0,
-      setting_value: 0,
-      alloy: "",
-      alloy_rate: 0,
-      wset: 0,
-      h_set: 0,
-      sshp: 0,
-      m_material: "",
-    };
-    setActiveIndex(row.sr_no - 1);
+  const handleAddTable = (row: any, index: number) => {
+    setActiveIndex(index);
+    console.log(row);
     setOrderMaster((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
-      const designIndex = row.sr_no - 1;
+      const designIndex = index;
 
       if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
         const currentDesign = { ...updatedOrderDesign[designIndex] };
         if (!currentDesign.rate_chart) {
           currentDesign.rate_chart = [];
         }
-        currentDesign.rate_chart = [...currentDesign.rate_chart, newEntry];
+        if (!currentDesign.labour_chart) {
+          currentDesign.labour_chart = [];
+        }
+
+        currentDesign.rate_chart = [
+          ...currentDesign.rate_chart,
+          initailDataRateChart,
+        ];
+        currentDesign.labour_chart = [
+          ...currentDesign.labour_chart,
+          initialDataLabourChart,
+        ];
         updatedOrderDesign[designIndex] = currentDesign;
       }
 
@@ -186,13 +196,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
         formName: fieldName,
       });
     });
-
     window.electron.insertFormData(combinedData);
   };
-
-  useEffect(() => {
-    console.log(orderMaster, "orderMaster");
-  }, [orderMaster]);
 
   return (
     <>
@@ -205,15 +210,21 @@ const TableComponent: React.FC<TableComponentProps> = ({
           </div>
           <div>
             <div>
-              <h6 className="px-4">Design Code</h6>
+              <h6 className="px-4">{formObj.tableOne.title}</h6>
             </div>
             <table className="table table-bordered" style={{ width: "100%" }}>
               <thead>
                 <tr>
-                  {formObj.tableOne?.map((field: any, index: number) => {
-                    console.log(field);
-                    return <th key={index}>{field.label}</th>;
-                  })}
+                  {Object.keys(formObj.tableOne.tableFields).map(
+                    (field: string, index: number) => {
+                      const fieldData = formObj.tableOne.tableFields[field];
+                      return fieldData.show ? (
+                        <th key={index} className="fs-10">
+                          {fieldData.label}
+                        </th>
+                      ) : null; // Render header only if `show` is true
+                    }
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -221,10 +232,10 @@ const TableComponent: React.FC<TableComponentProps> = ({
                   return (
                     <tr key={index}>
                       {/* sr_no as a number */}
-                      {/* <td>{row.sr_no}</td> */}
+                      <td>{row.sr_no}</td>
 
                       {/* order_id as a number */}
-                      <td>{row.order_id}</td>
+                      <td>{row.parent_id}</td>
 
                       {/* design_code dropdown */}
                       <td>
@@ -312,7 +323,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                       ))}
                       <td>
                         <button
-                          onClick={() => handleAddTable(row)}
+                          onClick={() => handleAddTable(row, index)}
                           className="btn btn-success fs-10"
                         >
                           Add
@@ -340,8 +351,9 @@ const TableComponent: React.FC<TableComponentProps> = ({
           <div className="col-12 my-2">
             {orderMaster.order_design ? (
               <LabourChartTable
-                data={orderMaster.order_design[activeIndex]?.labour_chart}
+                data={orderMaster}
                 setData={setOrderMaster}
+                index={activeIndex}
               />
             ) : (
               ""

@@ -52,21 +52,13 @@ const CommonFormComponent = ({
   };
 
   const handleOnSelect = async (data: any, value: any) => {
+    console.log(data, value, "onSelect");
     if (data?.onSelect?.fetchFullForm) {
       const res = await window.electron.triggerFunction({
         path: data.onSelect.fetchFullForm,
-        inputs: {},
+        inputs: { value },
       });
-      console.log(res?.data?.orderDesign, "new");
-      let orderDesignData = res?.data?.orderDesign || [];
-      orderDesignData =
-        orderDesignData?.length > 0
-          ? orderDesignData.filter(
-              (item: any) => item.order_id === value[0]?.order_id
-            )
-          : [];
-
-      setOrderMaster(orderDesignData);
+      setOrderMaster(res.data);
     }
   };
 

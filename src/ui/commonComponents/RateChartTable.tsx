@@ -12,7 +12,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
   index,
 }) => {
   const fields = [
-    "order_design_id",
+    "_order_design_id",
     "category",
     "sub_category",
     "sv_ln",
@@ -71,7 +71,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
   return (
     <div className="card shadow">
       <div className="">
-        <h6>Rate Chart</h6>
+        <h6 className="px-4 pt-2">Rate Chart</h6>
       </div>
       <div className="table-responsive">
         <table className="table table-bordered">
@@ -90,7 +90,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                 <tr key={rowIndex}>
                   {fields?.map((field) => (
                     <td key={field}>
-                      {field === "order_design_id" ? (
+                      {field === "_order_design_id" ? (
                         <input
                           type="number"
                           value={row[field] || ""}

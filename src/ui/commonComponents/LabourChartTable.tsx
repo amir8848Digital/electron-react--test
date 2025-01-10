@@ -1,16 +1,18 @@
 import React from "react";
 
 interface LabourChartTableProps {
-  data: Array<Record<string, any>>;
+  data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
+  index: number;
 }
 
 const LabourChartTable: React.FC<LabourChartTableProps> = ({
   data,
   setData,
+  index,
 }) => {
   const fields = [
-    "order_design_id",
+    "_order_design_id",
     "main_cd",
     "sub_cd",
     "by_qw",
@@ -31,25 +33,30 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
     fieldName: string,
     value: string
   ) => {
-    const updatedData = [...data];
-
-    // Convert value to number if the field is numeric
-    if (["by_qw", "quantity", "rate", "value"].includes(fieldName)) {
-      updatedData[rowIndex][fieldName] = parseFloat(value) || 0;
-    } else {
-      updatedData[rowIndex][fieldName] = value;
-    }
-
-    setData(updatedData);
+    setData((prev: any) => {
+      const updatedOrderDesign = [...prev.order_design];
+      const design = { ...updatedOrderDesign[index] };
+      const updatedRateChart = [...design.labour_chart];
+      updatedRateChart[rowIndex] = {
+        ...updatedRateChart[rowIndex],
+        [fieldName]: value,
+      };
+      design.labour_chart = updatedRateChart;
+      updatedOrderDesign[index] = design;
+      return {
+        ...prev,
+        order_design: updatedOrderDesign,
+      };
+    });
   };
 
   return (
     <div className="card shadow">
       <div className="p-2 mb-0">
-        <h6>Labour Chart</h6>
+        <h6 className="px-4 pt-2">Labour Chart</h6>
       </div>
       <div className="table-responsive">
-        {data?.length > 0 ? (
+        {data?.order_design[index]?.labour_chart?.length > 0 ? (
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -61,36 +68,38 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
               </tr>
             </thead>
             <tbody>
-              {data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {fields.map((field) => (
-                    <td key={field}>
-                      {field === "order_design_id" ? (
-                        // Read-only field for order_design_id
-                        <input
-                          type="number"
-                          value={row[field] || ""}
-                          readOnly
-                          className="form-control  fs-10 "
-                        />
-                      ) : (
-                        <input
-                          type={
-                            ["quantity", "rate", "value"].includes(field)
-                              ? "number"
-                              : "text"
-                          }
-                          value={row[field] || ""}
-                          onChange={(e) =>
-                            handleCellChange(rowIndex, field, e.target.value)
-                          }
-                          className="form-control"
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {data?.order_design[index]?.labour_chart?.map(
+                (row: any, rowIndex: number) => (
+                  <tr key={rowIndex}>
+                    {fields.map((field) => (
+                      <td key={field}>
+                        {field === "_order_design_id" ? (
+                          // Read-only field for order_design_id
+                          <input
+                            type="number"
+                            value={row[field] || ""}
+                            readOnly
+                            className="form-control  fs-10 "
+                          />
+                        ) : (
+                          <input
+                            type={
+                              ["quantity", "rate", "value"].includes(field)
+                                ? "number"
+                                : "text"
+                            }
+                            value={row[field] || ""}
+                            onChange={(e) =>
+                              handleCellChange(rowIndex, field, e.target.value)
+                            }
+                            className="form-control"
+                          />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         ) : (
