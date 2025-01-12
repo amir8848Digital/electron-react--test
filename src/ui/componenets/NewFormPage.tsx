@@ -6,7 +6,7 @@ import CommonFormComponent from "../commonComponents/CommonFormComponent";
 
 const NewFormPage = () => {
   interface FormValues {
-    [key: string]: string | Date | null | Date | number;
+    [key: string]: string | Date | null | Date | number ;
   }
   interface Customer {
     customer_id: number;
@@ -84,9 +84,9 @@ const NewFormPage = () => {
       { label: "LML Sales", name: "lml_sales", type: "number" },
       { label: "CHI X KT", name: "chi_x_kt", type: "text" },
       { label: "PO Number", name: "po_no", type: "text" },
-      { label: "PO Date", name: "po_date", type: "calendar" },
+      { label: "PO Date", name: "po_date", type: "calendar", },
       { label: "Priority", name: "priority", type: "text" },
-      { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar" },
+      { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar"  },
       {
         label: "Product Delivery Date",
         name: "prod_del_date",
@@ -96,6 +96,12 @@ const NewFormPage = () => {
       { label: "Password", name: "pwd", type: "text" },
       { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
       { label: "Refresh Date", name: "refresh_date", type: "calendar" },
+      {
+        label:"Is New",
+        name:"is_new",
+        value:1,
+        show:false,
+      }
     ],
     tableOne: {
       title: "Order Design",
@@ -122,19 +128,28 @@ const NewFormPage = () => {
         prod_setting: { label: "Prod Setting", type: "text", show: true },
         fixed_price: { label: "Fixed Price", type: "number", show: true },
         actions: { label: "Actions", type: "button", show: true },
-        formName: { label: "fieldName", type: "text", show: true },
+        formName: { label: "fieldName", type: "text", show: false },
       },
     },
   };
 
+  const initializeFieldValue = (field: typeof formObj.fields[number]) => {
+    if (field.type === "calendar") return null;
+    if (field.type === "number") return 0;
+    return field.value ? 1  : "";
+  };
+
   const initialState: FormValues = formObj.fields.reduce((acc, field) => {
-    acc[field.name] = field.type === "calendar" ? null : "";
+    acc[field.name] = initializeFieldValue(field) ;
     return acc;
   }, {} as FormValues);
   const [orderMaster, setOrderMaster] = useState<any>({
     ...initialState,
     order_design: [],
   });
+
+  
+  console.log(orderMaster)
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = (data: Record<string, any>) => {
@@ -147,6 +162,18 @@ const NewFormPage = () => {
 
   const handleClose = () => {
     setShowModal(false);
+  };
+
+  const handdleSubmit = async (e: any) => {
+    e.preventDefault();
+    const res = await window.electron.saveForm([
+      {
+        ...orderMaster,
+        formName: formObj.fieldName,
+      },
+    ]);
+    console.log(res, "handdleSubmit");
+    setOrderMaster(res?.data?.orderMaster);
   };
 
   return (
@@ -191,6 +218,14 @@ const NewFormPage = () => {
           />
         )}
       </div>
+         <div className="p-4 text-end">
+          <button
+            className="btn btn-success px-4 fs-10"
+           onClick={handleSubmit}
+          >
+            Submit
+          </button>
+        </div>
     </div>
   );
 };

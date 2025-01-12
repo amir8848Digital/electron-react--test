@@ -4,12 +4,14 @@ interface LabourChartTableProps {
   data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
   index: number;
+  setOrderMaster:any
 }
 
 const LabourChartTable: React.FC<LabourChartTableProps> = ({
   data,
   setData,
   index,
+  setOrderMaster
 }) => {
   const fields = [
     "_order_design_id",
@@ -49,14 +51,59 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
       };
     });
   };
+  const initialDataLabourChart = {
+    _order_design_id: null,
+    maind_cd: "",
+    sub_cd: "",
+    by_qw: 0,
+    quantity: 0,
+    rate: 0,
+    value: 0,
+    formName: "orderLabourChart",
+  };
+
+  const addRow =()=>{
+    setOrderMaster((prev: any) => {                                                                                                                                                              
+      const updatedOrderDesign = [...prev.order_design];
+      const designIndex = index;
+
+      if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
+        const currentDesign = { ...updatedOrderDesign[designIndex] };
+        if (!currentDesign.rate_chart) {
+          currentDesign.rate_chart = [];
+        }
+        if (!currentDesign.labour_chart) {
+          currentDesign.labour_chart = [];
+        }
+
+        // currentDesign.rate_chart = [
+        //   ...currentDesign.rate_chart,
+        //   initailDataRateChart,
+        // ];
+        currentDesign.labour_chart = [
+          ...currentDesign.labour_chart,
+          initialDataLabourChart,
+        ];
+        updatedOrderDesign[designIndex] = currentDesign;
+      }
+
+      return {
+        ...prev,
+        order_design: updatedOrderDesign,
+      };
+    });
+  }
 
   return (
     <div className="card shadow">
-      <div className="p-2 mb-0">
+     <div className="d-flex justify-content-between">
         <h6 className="px-4 pt-2">Labour Chart</h6>
+        <div className="px-4 py-1" >
+        <button className="btn btn-success fs-10" onClick={addRow}>Add</button>
+        </div>
       </div>
       <div className="table-responsive">
-        {data?.order_design[index]?.labour_chart?.length > 0 ? (
+        { 
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -102,9 +149,7 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
               )}
             </tbody>
           </table>
-        ) : (
-          <></>
-        )}
+        }
       </div>
     </div>
   );

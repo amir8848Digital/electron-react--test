@@ -3,6 +3,7 @@ import AutoCompleteDropDown from "./AutoCompleteDropDown";
 import RateChartTable from "./RateChartTable";
 import LabourChartTable from "./LabourChartTable";
 
+
 type Row = {
   sr_no: number;
   parent_id: number;
@@ -32,38 +33,12 @@ const TableComponent: React.FC<TableComponentProps> = ({
   setOrderMaster,
   formObj,
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState<number>();
   const fieldName = "orderDesign";
   const orderChartField = "orderRateChart";
   const orderLabourField = "orderLabourChart";
 
-  const initailDataRateChart = {
-    _order_design_id: null,
-    category: "",
-    sub_category: "",
-    sv_ln: "",
-    breadth: 0,
-    depth: 0,
-    quantity: 0,
-    pm_pointer: "",
-    wt: 0,
-    lme_rate: 0,
-    sales_rate: 0,
-    qw: 0,
-    sales_value: 0,
-    production_quantity: 0,
-    production_weight: 0,
-    setting: "",
-    setting_rate: 0,
-    setting_value: 0,
-    alloy: "",
-    alloy_rate: 0,
-    wset: 0,
-    h_set: 0,
-    sshp: 0,
-    m_material: "",
-    formName: "orderRateChart",
-  };
+
 
   const initialDataLabourChart = {
     _order_design_id: null,
@@ -85,10 +60,12 @@ const TableComponent: React.FC<TableComponentProps> = ({
     value: any,
     index: number
   ) => {
+    console.log(field,index, value)
     let updatedRowData = [...orderMaster.order_design];
     updatedRowData = updatedRowData.map((row, i) =>
       i === index ? { ...row, [field]: value } : row
     );
+    console.log(updatedRowData)
     // setRowData(updatedRowData);
     setOrderMaster({
       ...orderMaster,
@@ -139,30 +116,58 @@ const TableComponent: React.FC<TableComponentProps> = ({
     });
   };
 
+  const initailDataRateChart = {
+    _order_design_id: null,
+    category: "",
+    sub_category: "",
+    sv_ln: "",
+    breadth: 0,
+    depth: 0,
+    quantity: 0,
+    pm_pointer: "",
+    wt: 0,
+    lme_rate: 0,
+    sales_rate: 0,
+    qw: 0,
+    sales_value: 0,
+    production_quantity: 0,
+    production_weight: 0,
+    setting: "",
+    setting_rate: 0,
+    setting_value: 0,
+    alloy: "",
+    alloy_rate: 0,
+    wset: 0,
+    h_set: 0,
+    sshp: 0,
+    m_material: "",
+    formName: "orderRateChart",
+  };
+
   const handleAddTable = (row: any, index: number) => {
     setActiveIndex(index);
     console.log(row);
-    setOrderMaster((prev: any) => {
+    setOrderMaster((prev: any) => {                                                                                                                                                              
       const updatedOrderDesign = [...prev.order_design];
       const designIndex = index;
 
       if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
         const currentDesign = { ...updatedOrderDesign[designIndex] };
         if (!currentDesign.rate_chart) {
-          currentDesign.rate_chart = [];
+          currentDesign.rate_chart = [{...initailDataRateChart}];
         }
         if (!currentDesign.labour_chart) {
-          currentDesign.labour_chart = [];
+          currentDesign.labour_chart = [{...initialDataLabourChart}];
         }
 
-        currentDesign.rate_chart = [
-          ...currentDesign.rate_chart,
-          initailDataRateChart,
-        ];
-        currentDesign.labour_chart = [
-          ...currentDesign.labour_chart,
-          initialDataLabourChart,
-        ];
+    //     currentDesign.rate_chart = [
+    //       ...currentDesign.rate_chart,
+    //       initailDataRateChart,
+    //     ];
+    //     currentDesign.labour_chart = [
+    //       ...currentDesign.labour_chart,
+    //       initialDataLabourChart,
+    //     ];
         updatedOrderDesign[designIndex] = currentDesign;
       }
 
@@ -173,32 +178,32 @@ const TableComponent: React.FC<TableComponentProps> = ({
     });
   };
 
-  const handleMainSubmit = () => {
-    const combinedData: any[] = [];
+  // const handleMainSubmit = () => {
+  //   const combinedData: any[] = [];
 
-    dataRateChart.forEach((item) => {
-      combinedData.push({
-        formData: item,
-        formName: orderChartField,
-      });
-    });
+  //   dataRateChart.forEach((item) => {
+  //     combinedData.push({
+  //       formData: item,
+  //       formName: orderChartField,
+  //     });
+  //   });
 
-    dataLabourChart.forEach((item) => {
-      combinedData.push({
-        formData: item,
-        formName: orderLabourField,
-      });
-    });
+  //   dataLabourChart.forEach((item) => {
+  //     combinedData.push({
+  //       formData: item,
+  //       formName: orderLabourField,
+  //     });
+  //   });
 
-    setOrderMaster.rowData.forEach((item: any) => {
-      combinedData.push({
-        formData: item,
-        formName: fieldName,
-      });
-    });
-    window.electron.insertFormData(combinedData);
-  };
-
+  //   setOrderMaster.rowData.forEach((item: any) => {
+  //     combinedData.push({
+  //       formData: item,
+  //       formName: fieldName,
+  //     });
+  //   });
+  //   window.electron.insertFormData(combinedData);
+  // };
+console.log(orderMaster)
   return (
     <>
       <div className="container-fluid">
@@ -231,14 +236,9 @@ const TableComponent: React.FC<TableComponentProps> = ({
                 {orderMaster?.order_design?.map((row: any, index: any) => {
                   return (
                     <tr key={index}>
-                      {/* sr_no as a number */}
                       <td>{row.sr_no}</td>
-
-                      {/* order_id as a number */}
                       <td>{row.parent_id}</td>
-
-                      {/* design_code dropdown */}
-                      <td>
+                       <td>
                         <AutoCompleteDropDown
                           field={{
                             name: "design_code",
@@ -255,10 +255,9 @@ const TableComponent: React.FC<TableComponentProps> = ({
                               index
                             )
                           }
+                          defaultValue={row.design_code}
                         />
                       </td>
-
-                      {/* Other fields */}
                       {[
                         "suffix",
                         "size",
@@ -337,30 +336,32 @@ const TableComponent: React.FC<TableComponentProps> = ({
           </div>
         </div>
         <div className="row">
-          <div className="col-12 my-2">
-            {orderMaster.order_design ? (
+          <div className="col-6 my-2">
+            { typeof activeIndex === "number" && orderMaster.order_design[activeIndex] ? (
               <RateChartTable
                 data={orderMaster}
                 setData={setOrderMaster}
-                index={activeIndex}
+                index={activeIndex }
+                setOrderMaster={setOrderMaster}
               />
             ) : (
               ""
             )}
           </div>
-          <div className="col-12 my-2">
-            {orderMaster.order_design ? (
+          <div className="col-6 my-2">
+            {  typeof activeIndex === "number" && orderMaster.order_design[activeIndex] ? (
               <LabourChartTable
                 data={orderMaster}
                 setData={setOrderMaster}
                 index={activeIndex}
+                setOrderMaster={setOrderMaster}
               />
             ) : (
               ""
             )}
           </div>
         </div>
-        <div className="p-4 text-end">
+        {/* <div className="p-4 text-end">
           <button
             type="submit"
             className="btn btn-success px-4 fs-10"
@@ -368,7 +369,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
           >
             Submit
           </button>
-        </div>
+        </div> */}
       </div>
     </>
   );

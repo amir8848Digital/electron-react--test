@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import AutoCompleteDropDown from "./AutoCompleteDropDown";
+import { formatToYYYYMMDD } from "../utils/commonFunctions";
+import { First } from "react-bootstrap/esm/PageItem";
+
 
 type Props = {};
 
@@ -13,7 +16,6 @@ const CommonFormComponent = ({
   }
 
   const stateUpdater = (name: any, value: any) => {
-    console.log({ name, value });
     setOrderMaster((prev: any) => ({
       ...prev,
       [name]: value,
@@ -39,12 +41,15 @@ const CommonFormComponent = ({
   };
 
   const updateStateFunction = (value: any, field: any) => {
+  
     let values = { ...orderMaster };
     if (field.type === "autoComplete") {
-      values = { ...values, ...value[0] };
+      values = { ...values, [field.name]:value[0][field.name] };
     } else {
       values = { ...values, [field.name]: value };
     }
+    console.log(values,"values")
+
     setOrderMaster((prev: any) => ({
       ...prev,
       ...values,
@@ -58,25 +63,14 @@ const CommonFormComponent = ({
         path: data.onSelect.fetchFullForm,
         inputs: { value },
       });
+      console.log(res)
       setOrderMaster(res.data);
     }
   };
 
-  const handdleSubmit = async (e: any) => {
-    console.log({ orderMaster });
-    e.preventDefault();
-    const res = await window.electron.saveForm([
-      {
-        ...orderMaster,
-        formName: formMainObj.fieldName,
-      },
-    ]);
-    console.log(res, "handdleSubmit");
-    // setOrderMaster(res?.data?.orderMaster);
-  };
-
+ 
   return (
-    <form onSubmit={handdleSubmit}>
+    <form >
       <div className="row p-4 g-2">
         {formMainObj?.fields?.map((field: any, index: number) => (
           <div className="col-md-2" key={index}>
@@ -88,6 +82,7 @@ const CommonFormComponent = ({
                 <input
                   type="text"
                   className="form-control  fs-10"
+                 
                   value={orderMaster[field?.name] as string}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={`Enter ${field.label}`}
@@ -103,7 +98,7 @@ const CommonFormComponent = ({
                   type="number"
                   id={field.name}
                   className="form-control fs-10"
-                  value={Number(orderMaster[field.name] as number)}
+                  value={orderMaster[field.name]}
                   onChange={(e) => handleChangeNumber(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />
@@ -120,7 +115,7 @@ const CommonFormComponent = ({
                   id="dateInput fs-10"
                   className="form-control fs-10"
                   placeholder="Choose a date"
-                  value={orderMaster[field.name] as string}
+                  value={formatToYYYYMMDD(orderMaster[field.name] as string)}
                   onChange={(e) => handleCalendarChange(e, field.name)}
                 />
               </div>
@@ -145,11 +140,7 @@ const CommonFormComponent = ({
             )}
           </div>
         ))}
-        <div className="">
-          <button type="submit" className="btn btn-primary fs-12">
-            Submit
-          </button>
-        </div>
+      
       </div>
     </form>
   );

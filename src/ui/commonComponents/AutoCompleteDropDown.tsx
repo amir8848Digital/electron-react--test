@@ -10,7 +10,7 @@ const AutoCompleteDropDown = ({
   // setFormValues,
   fieldName,
   updateStateFunction,
-  defaultValue = "",
+  defaultValue ,
   handleOnSelect,
 }: any) => {
   interface Customer {
@@ -147,18 +147,19 @@ const AutoCompleteDropDown = ({
     isDropdownOpen: any,
     setIsDropdownOpen: any,
     setFilter: any,
-    setFilteredCustomers: any
+    setFilteredCustomers: any,
+    isOnFocus?:boolean
   ) => {
     setIsDropdownOpen(true);
     setFilter(e.target.value);
-    console.log(formValues, "target value");
     const res = await window.electron.getAutoCompleteData({
       formName: fieldName,
       fieldname: field.name,
       value: e.target.value,
     });
-
-    updateStateFunction(e.target.value, field);
+    if (!isOnFocus) {
+      updateStateFunction(e.target.value, field);
+    }
     setFilteredCustomers(res);
   };
 
@@ -168,7 +169,6 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen: any,
     field: any
   ) => {
-    console.log({ customer, field });
     setFilter(customer[field.name]);
     setIsDropdownOpen(false);
     updateStateFunction(customer[field.name], field);
@@ -189,7 +189,9 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen(false);
     setFocusedIndex(0);
   };
-
+useEffect(()=>{
+setFilter(defaultValue)
+},[formValues])
   return (
     <div>
       <div className="position-relative">
@@ -207,7 +209,8 @@ const AutoCompleteDropDown = ({
               isDropdownOpen,
               setIsDropdownOpen,
               setFilter,
-              setFilteredCustomers
+              setFilteredCustomers,
+
             )
           }
           onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,7 +224,8 @@ const AutoCompleteDropDown = ({
               isDropdownOpen,
               setIsDropdownOpen,
               setFilter,
-              setFilteredCustomers
+              setFilteredCustomers,
+              true
             );
           }}
           onBlur={(e) => {
