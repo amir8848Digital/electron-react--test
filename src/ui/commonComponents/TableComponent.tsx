@@ -232,7 +232,12 @@ const TableComponent: React.FC<TableComponentProps> = ({
               <tbody>
                 {orderMaster?.order_design?.map((row: any, index: any) => {
                   return (
-                    <tr key={index}>
+                    <tr
+                      key={index}
+                      className={`${
+                        activeIndex === index ? "table-active" : ""
+                      } `}
+                    >
                       <td>{row.sr_no}</td>
                       <td>{row.parent_id}</td>
                       <td>

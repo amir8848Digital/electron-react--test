@@ -63,7 +63,6 @@ const CommonFormComponent = ({
           path: data.onSelect.fetchFullForm,
           inputs: { value },
         });
-        console.log(res, "res");
         setOrderMaster({ ...res.data, _is_new: 0 });
       }
     }

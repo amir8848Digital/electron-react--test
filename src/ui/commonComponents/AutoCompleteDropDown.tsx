@@ -18,13 +18,13 @@ const AutoCompleteDropDown = ({
     customer_name: string;
   }
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [filter, setFilter] = useState(null);
   const [tableHead, setTableHead] = useState<any>({});
   const [tableData, setTableData] = useState<any>({});
   const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
@@ -74,6 +74,7 @@ const AutoCompleteDropDown = ({
         });
       }
     } else if (e.key === "Enter" && focusedIndex !== null) {
+      
       handleSelectRow(
         filteredCustomers[focusedIndex],
         setFilter,
