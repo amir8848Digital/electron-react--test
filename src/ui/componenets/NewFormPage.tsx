@@ -137,7 +137,7 @@ const NewFormPage = () => {
   const initializeFieldValue = (field: (typeof formObj.fields)[number]) => {
     if (field.type === "calendar") return null;
     if (field.type === "number") return 0;
-    return field.value ? 1 : "";
+    return field.value ? 1 : null;
   };
 
   const initialState: FormValues = formObj.fields.reduce((acc, field) => {
