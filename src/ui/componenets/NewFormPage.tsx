@@ -6,7 +6,7 @@ import CommonFormComponent from "../commonComponents/CommonFormComponent";
 
 const NewFormPage = () => {
   interface FormValues {
-    [key: string]: string | Date | null | Date | number ;
+    [key: string]: string | Date | null | Date | number;
   }
   interface Customer {
     customer_id: number;
@@ -84,9 +84,9 @@ const NewFormPage = () => {
       { label: "LML Sales", name: "lml_sales", type: "number" },
       { label: "CHI X KT", name: "chi_x_kt", type: "text" },
       { label: "PO Number", name: "po_no", type: "text" },
-      { label: "PO Date", name: "po_date", type: "calendar", },
+      { label: "PO Date", name: "po_date", type: "calendar" },
       { label: "Priority", name: "priority", type: "text" },
-      { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar"  },
+      { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar" },
       {
         label: "Product Delivery Date",
         name: "prod_del_date",
@@ -97,11 +97,11 @@ const NewFormPage = () => {
       { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
       { label: "Refresh Date", name: "refresh_date", type: "calendar" },
       {
-        label:"Is New",
-        name:"is_new",
-        value:1,
-        show:false,
-      }
+        label: "Is New",
+        name: "_is_new",
+        value: 1,
+        show: false,
+      },
     ],
     tableOne: {
       title: "Order Design",
@@ -133,48 +133,57 @@ const NewFormPage = () => {
     },
   };
 
-  const initializeFieldValue = (field: typeof formObj.fields[number]) => {
+  const initializeFieldValue = (field: (typeof formObj.fields)[number]) => {
     if (field.type === "calendar") return null;
     if (field.type === "number") return 0;
-    return field.value ? 1  : "";
+    return field.value ? 1 : "";
   };
 
   const initialState: FormValues = formObj.fields.reduce((acc, field) => {
-    acc[field.name] = initializeFieldValue(field) ;
+    acc[field.name] = initializeFieldValue(field);
     return acc;
   }, {} as FormValues);
+  
   const [orderMaster, setOrderMaster] = useState<any>({
     ...initialState,
     order_design: [],
   });
 
-  
-  console.log(orderMaster)
+  console.log(orderMaster);
   const [showModal, setShowModal] = useState(false);
 
-  const handleSubmit = (data: Record<string, any>) => {
-    window.electron.insertFormData([
-      { formData: data, formName: "orderDetails" },
-    ]);
-    console.log("Form submitted with data:", data);
-    setShowModal(false);
-  };
+  // const handleSubmit = (data: Record<string, any>) => {
+  //   window.electron.insertFormData([
+  //     { formData: data, formName: "orderDetails" },
+  //   ]);
+  //   console.log("Form submitted with data:", data);
+  //   setShowModal(false);
+  // };
 
   const handleClose = () => {
     setShowModal(false);
   };
 
-  const handdleSubmit = async (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const res = await window.electron.saveForm([
-      {
-        ...orderMaster,
-        formName: formObj.fieldName,
-      },
-    ]);
-    console.log(res, "handdleSubmit");
-    setOrderMaster(res?.data?.orderMaster);
+    console.log(orderMaster, "orderMaster");
+    try {
+      const res = await window.electron.saveForm([
+        {
+          ...orderMaster,
+          formName: formObj.fieldName,
+        },
+      ]);
+      console.log(res, "handdleSubmit");
+      if (res?.data) {
+        setOrderMaster(res?.data);
+      }
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
   };
+
+  console.log(orderMaster, "orderMaster");
 
   return (
     <div className="container-fluid">
@@ -201,7 +210,7 @@ const NewFormPage = () => {
         <div className="">
           {
             <TableComponent
-              orderId={orderMaster.order_id as number}
+              orderId={orderMaster?.order_id as number}
               orderMaster={orderMaster}
               setOrderMaster={setOrderMaster}
               formObj={formObj}
@@ -209,23 +218,12 @@ const NewFormPage = () => {
           }
         </div>
       </div>
-      <div>
-        {showModal && (
-          <ModalForm
-            orderMasterId={orderMaster?.order_id as number}
-            onSubmit={handleSubmit}
-            onClose={handleClose}
-          />
-        )}
+      <div></div>
+      <div className="p-4 text-end">
+        <button className="btn btn-success px-4 fs-10" onClick={handleSubmit}>
+          Submit
+        </button>
       </div>
-         <div className="p-4 text-end">
-          <button
-            className="btn btn-success px-4 fs-10"
-           onClick={handleSubmit}
-          >
-            Submit
-          </button>
-        </div>
     </div>
   );
 };

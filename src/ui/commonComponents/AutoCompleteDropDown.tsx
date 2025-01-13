@@ -10,7 +10,7 @@ const AutoCompleteDropDown = ({
   // setFormValues,
   fieldName,
   updateStateFunction,
-  defaultValue ,
+  defaultValue,
   handleOnSelect,
 }: any) => {
   interface Customer {
@@ -148,7 +148,7 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen: any,
     setFilter: any,
     setFilteredCustomers: any,
-    isOnFocus?:boolean
+    isOnFocus?: boolean
   ) => {
     setIsDropdownOpen(true);
     setFilter(e.target.value);
@@ -189,9 +189,9 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen(false);
     setFocusedIndex(0);
   };
-useEffect(()=>{
-setFilter(defaultValue)
-},[formValues])
+  useEffect(() => {
+    setFilter(defaultValue);
+  }, [formValues]);
   return (
     <div>
       <div className="position-relative">
@@ -209,13 +209,11 @@ setFilter(defaultValue)
               isDropdownOpen,
               setIsDropdownOpen,
               setFilter,
-              setFilteredCustomers,
-
+              setFilteredCustomers
             )
           }
           onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
             setIsDropdownOpen(true);
-            console.log("on focus");
             setFilter(null);
             handleFilterChange(
               e,
@@ -239,8 +237,8 @@ setFilter(defaultValue)
 
             if (filteredValue?.length > 0) {
               setFilter((prev: any) => prev);
-              updateStateFunction(filteredValue, field);
-              handleOnSelect(tableData, filteredValue);
+              updateStateFunction(filteredValue[0][field.name], field);
+              handleOnSelect(tableData, filteredValue, field.name);
             } else {
               setFilter(null);
             }

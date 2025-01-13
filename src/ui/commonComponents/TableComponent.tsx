@@ -3,7 +3,6 @@ import AutoCompleteDropDown from "./AutoCompleteDropDown";
 import RateChartTable from "./RateChartTable";
 import LabourChartTable from "./LabourChartTable";
 
-
 type Row = {
   sr_no: number;
   parent_id: number;
@@ -38,8 +37,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
   const orderChartField = "orderRateChart";
   const orderLabourField = "orderLabourChart";
 
-
-
   const initialDataLabourChart = {
     _order_design_id: null,
     maind_cd: "",
@@ -60,12 +57,12 @@ const TableComponent: React.FC<TableComponentProps> = ({
     value: any,
     index: number
   ) => {
-    console.log(field,index, value)
+    console.log(field, index, value);
     let updatedRowData = [...orderMaster.order_design];
     updatedRowData = updatedRowData.map((row, i) =>
       i === index ? { ...row, [field]: value } : row
     );
-    console.log(updatedRowData)
+    console.log(updatedRowData);
     // setRowData(updatedRowData);
     setOrderMaster({
       ...orderMaster,
@@ -147,27 +144,27 @@ const TableComponent: React.FC<TableComponentProps> = ({
   const handleAddTable = (row: any, index: number) => {
     setActiveIndex(index);
     console.log(row);
-    setOrderMaster((prev: any) => {                                                                                                                                                              
+    setOrderMaster((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
       const designIndex = index;
 
       if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
         const currentDesign = { ...updatedOrderDesign[designIndex] };
         if (!currentDesign.rate_chart) {
-          currentDesign.rate_chart = [{...initailDataRateChart}];
+          currentDesign.rate_chart = [{ ...initailDataRateChart }];
         }
         if (!currentDesign.labour_chart) {
-          currentDesign.labour_chart = [{...initialDataLabourChart}];
+          currentDesign.labour_chart = [{ ...initialDataLabourChart }];
         }
 
-    //     currentDesign.rate_chart = [
-    //       ...currentDesign.rate_chart,
-    //       initailDataRateChart,
-    //     ];
-    //     currentDesign.labour_chart = [
-    //       ...currentDesign.labour_chart,
-    //       initialDataLabourChart,
-    //     ];
+        //     currentDesign.rate_chart = [
+        //       ...currentDesign.rate_chart,
+        //       initailDataRateChart,
+        //     ];
+        //     currentDesign.labour_chart = [
+        //       ...currentDesign.labour_chart,
+        //       initialDataLabourChart,
+        //     ];
         updatedOrderDesign[designIndex] = currentDesign;
       }
 
@@ -203,7 +200,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
   //   });
   //   window.electron.insertFormData(combinedData);
   // };
-console.log(orderMaster)
+
   return (
     <>
       <div className="container-fluid">
@@ -238,7 +235,7 @@ console.log(orderMaster)
                     <tr key={index}>
                       <td>{row.sr_no}</td>
                       <td>{row.parent_id}</td>
-                       <td>
+                      <td>
                         <AutoCompleteDropDown
                           field={{
                             name: "design_code",
@@ -337,11 +334,12 @@ console.log(orderMaster)
         </div>
         <div className="row">
           <div className="col-6 my-2">
-            { typeof activeIndex === "number" && orderMaster.order_design[activeIndex] ? (
+            {typeof activeIndex === "number" &&
+            orderMaster.order_design[activeIndex] ? (
               <RateChartTable
                 data={orderMaster}
                 setData={setOrderMaster}
-                index={activeIndex }
+                index={activeIndex}
                 setOrderMaster={setOrderMaster}
               />
             ) : (
@@ -349,7 +347,8 @@ console.log(orderMaster)
             )}
           </div>
           <div className="col-6 my-2">
-            {  typeof activeIndex === "number" && orderMaster.order_design[activeIndex] ? (
+            {typeof activeIndex === "number" &&
+            orderMaster.order_design[activeIndex] ? (
               <LabourChartTable
                 data={orderMaster}
                 setData={setOrderMaster}

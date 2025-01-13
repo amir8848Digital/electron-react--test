@@ -3,7 +3,6 @@ import AutoCompleteDropDown from "./AutoCompleteDropDown";
 import { formatToYYYYMMDD } from "../utils/commonFunctions";
 import { First } from "react-bootstrap/esm/PageItem";
 
-
 type Props = {};
 
 const CommonFormComponent = ({
@@ -41,14 +40,14 @@ const CommonFormComponent = ({
   };
 
   const updateStateFunction = (value: any, field: any) => {
-  
     let values = { ...orderMaster };
+    console.log(value, field, "value");
     if (field.type === "autoComplete") {
-      values = { ...values, [field.name]:value[0][field.name] };
+      values = { ...values, [field.name]: Number(value) };
     } else {
       values = { ...values, [field.name]: value };
     }
-    console.log(values,"values")
+    console.log(values, "values");
 
     setOrderMaster((prev: any) => ({
       ...prev,
@@ -56,33 +55,33 @@ const CommonFormComponent = ({
     }));
   };
 
-  const handleOnSelect = async (data: any, value: any) => {
-    console.log(data, value, "onSelect");
-    if (data?.onSelect?.fetchFullForm) {
-      const res = await window.electron.triggerFunction({
-        path: data.onSelect.fetchFullForm,
-        inputs: { value },
-      });
-      console.log(res)
-      setOrderMaster(res.data);
+  const handleOnSelect = async (data: any, value: any, field: any) => {
+    console.log(data, value, field, "onSelect");
+    if (data.onSelect) {
+      if (data?.onSelect?.fetchFullForm) {
+        const res = await window.electron.triggerFunction({
+          path: data.onSelect.fetchFullForm,
+          inputs: { value },
+        });
+        console.log(res, "res");
+        setOrderMaster(res.data);
+      }
     }
   };
 
- 
   return (
-    <form >
+    <form>
       <div className="row p-4 g-2">
         {formMainObj?.fields?.map((field: any, index: number) => (
           <div className="col-md-2" key={index}>
             {field.type === "text" && (
               <div className="">
-                <label id={field.name} className="form-label fs-10">
-                  {field.label}
+                <label id={field?.name} className="form-label fs-10">
+                  {field?.label}
                 </label>
                 <input
                   type="text"
                   className="form-control  fs-10"
-                 
                   value={orderMaster[field?.name] as string}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={`Enter ${field.label}`}
@@ -91,12 +90,12 @@ const CommonFormComponent = ({
             )}
             {field.type === "number" && (
               <div className="">
-                <label htmlFor={field.name} className="form-label fs-10">
-                  {field.label}
+                <label htmlFor={field?.name} className="form-label fs-10">
+                  {field?.label}
                 </label>
                 <input
                   type="number"
-                  id={field.name}
+                  id={field?.name}
                   className="form-control fs-10"
                   value={orderMaster[field.name]}
                   onChange={(e) => handleChangeNumber(e, field.name)}
@@ -108,14 +107,18 @@ const CommonFormComponent = ({
             {field.type === "calendar" && (
               <div className="">
                 <label htmlFor="dateInput" className="form-label fs-10">
-                  {field.label || "Select Date"}
+                  {field?.label || "Select Date"}
                 </label>
                 <input
                   type="date"
                   id="dateInput fs-10"
                   className="form-control fs-10"
                   placeholder="Choose a date"
-                  value={formatToYYYYMMDD(orderMaster[field.name] as string)}
+                  value={
+                    orderMaster[field.name]
+                      ? formatToYYYYMMDD(orderMaster[field.name] as string)
+                      : 0
+                  }
                   onChange={(e) => handleCalendarChange(e, field.name)}
                 />
               </div>
@@ -124,8 +127,8 @@ const CommonFormComponent = ({
             {/* Autocomplete Input */}
             {field.type === "autoComplete" && (
               <div className="">
-                <label htmlFor={field.name} className="form-label fs-10">
-                  {field.label}
+                <label htmlFor={field?.name} className="form-label fs-10">
+                  {field?.label}
                 </label>
                 <AutoCompleteDropDown
                   field={field}
@@ -140,7 +143,6 @@ const CommonFormComponent = ({
             )}
           </div>
         ))}
-      
       </div>
     </form>
   );

@@ -1,38 +1,42 @@
 import * as path from "path";
 import { promises as fs } from "fs";
 import { app } from "electron";
-import {getFormConfigPath} from "./pathResolver.js"
+import { getFormConfigPath } from "./pathResolver.js";
 
 export function isDev(): boolean {
-  return process.env.NODE_ENV === 'development';
+  return process.env.NODE_ENV === "development";
 }
 export async function getAutoCompleteData(client: any, query: any) {
-    const formName = query.formName;
-    const config = await getFormConfig(formName)
-    return getData(client, config.autoCompleteFields[query.fieldname], query);
+  const formName = query.formName;
+  const config = await getFormConfig(formName);
+  return getData(client, config.autoCompleteFields[query.fieldname], query);
 }
-
 
 export async function getFormConfig(formName: string) {
-    const configFilePath = getFormConfigPath(formName);
-    const configModule = await import(configFilePath, { with: { type: "json" } });
-    return configModule.default
+  const configFilePath = getFormConfigPath(formName);
+  const configModule = await import(configFilePath, { with: { type: "json" } });
+  return configModule.default;
 }
 
-async function getData(client: any, queryConfig: any, query: any): Promise<any[]> {
-
+async function getData(
+  client: any,
+  queryConfig: any,
+  query: any
+): Promise<any[]> {
   let queryConditions = "";
   const params: any[] = [];
 
   if (query && query.value) {
-    const searchValue = query.value.trim().replace(/['"]/g, '');
+    const searchValue = query.value.trim().replace(/['"]/g, "");
     const searchPattern = `%${searchValue}%`;
-    queryConditions = queryConfig.searchFields.map((field: any, index: number) => {
-      params.push(searchPattern);
-      return `${field}::TEXT ILIKE $${index + 1}`;
-    }).join(" OR ");
+    queryConditions = queryConfig.searchFields
+      .map((field: any, index: number) => {
+        params.push(searchPattern);
+        return `${field}::TEXT ILIKE $${index + 1}`;
+      })
+      .join(" OR ");
   }
-    const sqlQuery = `
+  const sqlQuery = `
       SELECT 
           ${queryConfig.columns.join(", ")}
       FROM ${queryConfig.table}
@@ -40,31 +44,36 @@ async function getData(client: any, queryConfig: any, query: any): Promise<any[]
       LIMIT 20;
     `;
 
-
-    const result: any = await client.query(sqlQuery, params);
-    return result.rows;
+  const result: any = await client.query(sqlQuery, params);
+  return result.rows;
 }
 
 export async function getOrderDesignDetails(client: any, designCode: string) {
-  let labourChart = await client.query("SELECT * FROM labour_chart WHERE design_code = $1", [designCode]);
-  let rateChart = await client.query("SELECT * FROM rate_chart WHERE design_code = $1", [designCode]);
+  let labourChart = await client.query(
+    "SELECT * FROM labour_chart WHERE design_code = $1",
+    [designCode]
+  );
+  let rateChart = await client.query(
+    "SELECT * FROM rate_chart WHERE design_code = $1",
+    [designCode]
+  );
   return { rateChart: rateChart.rows, labourChart: labourChart.rows };
 }
 export async function saveForm(client: any, formDataArray: any) {
   let configs = {};
   let savedData = [];
-  console.log(formDataArray,"FFFFFFFFFFFFFFF")
+  console.log(formDataArray, "FFFFFFFFFFFFFFF");
 
   for (let formData of formDataArray) {
     const result = await saveFormData(client, formData, configs);
     savedData.push(result);
   }
-  let x  = {
+  let x = {
     status: "success",
     message: "Data saved successfully",
-    data: savedData
+    data: savedData[0],
   };
-  return x
+  return x;
 }
 
 async function saveFormData(
@@ -76,7 +85,7 @@ async function saveFormData(
   parent_id: any = null
 ) {
   const formName = formData.formName;
-  let config = configs[formName] || await getFormConfig(formName);
+  let config = configs[formName] || (await getFormConfig(formName));
   if (!configs[formName]) {
     configs[formName] = config;
   }
@@ -85,25 +94,51 @@ async function saveFormData(
   const primaryKey = config.primary_key || "id";
   let primaryKeyValue = null;
   const { entries, arrayEntries } = processFormData(formData);
-  
-  
+
   let savedFormData = { ...formData };
-   
-  if (formData._delete === 1 && entries[primaryKey] && await checkIfRecordExists(client, tableName, primaryKey, entries[primaryKey])) {
+
+  if (
+    formData._delete === 1 &&
+    entries[primaryKey] &&
+    (await checkIfRecordExists(
+      client,
+      tableName,
+      primaryKey,
+      entries[primaryKey]
+    ))
+  ) {
     await deleteData(client, tableName, primaryKey, entries[primaryKey]);
-    savedFormData._operation = 'DELETE';
+    savedFormData._operation = "DELETE";
   } else {
-    if (entries[primaryKey] && await checkIfRecordExists(client, tableName, primaryKey, entries[primaryKey])) {
-      primaryKeyValue = await updateData(client, tableName, primaryKey, entries);
-      savedFormData._operation = 'UPDATE';
+    if (
+      entries[primaryKey] &&
+      (await checkIfRecordExists(
+        client,
+        tableName,
+        primaryKey,
+        entries[primaryKey]
+      ))
+    ) {
+      primaryKeyValue = await updateData(
+        client,
+        tableName,
+        primaryKey,
+        entries
+      );
+      savedFormData._operation = "UPDATE";
     } else {
       if (parent_type && parent_field && parent_id) {
         entries["parent_type"] = parent_type;
         entries["parent_field"] = parent_field;
         entries["parent_id"] = parent_id;
       }
-      primaryKeyValue = await insertData(client, tableName, primaryKey, entries);
-      savedFormData._operation = 'INSERT';
+      primaryKeyValue = await insertData(
+        client,
+        tableName,
+        primaryKey,
+        entries
+      );
+      savedFormData._operation = "INSERT";
     }
 
     // Add the primary key to the response
@@ -131,19 +166,22 @@ async function saveFormData(
 }
 
 const non_included_fields_from_form = [
-  "parent_type", 
-  "parent_field", 
-  "parent_id", 
-  "formName"
+  "parent_type",
+  "parent_field",
+  "parent_id",
+  "formName",
 ];
 
-function processFormData(formData: any): { entries: { [key: string]: any }, arrayEntries: { [key: string]: any } } {
+function processFormData(formData: any): {
+  entries: { [key: string]: any };
+  arrayEntries: { [key: string]: any };
+} {
   let entries: { [key: string]: any } = {};
   let arrayEntries: { [key: string]: any } = {};
   for (let [key, value] of Object.entries(formData)) {
-    if (!key.startsWith('_') && !non_included_fields_from_form.includes(key)) {
+    if (!key.startsWith("_") && !non_included_fields_from_form.includes(key)) {
       if (Array.isArray(value)) {
-        arrayEntries[key] = value; 
+        arrayEntries[key] = value;
       } else {
         entries[key] = value;
       }
@@ -152,7 +190,12 @@ function processFormData(formData: any): { entries: { [key: string]: any }, arra
   return { entries, arrayEntries };
 }
 
-async function insertData(client: any, tableName: string, primaryKey: string, entries: any) {
+async function insertData(
+  client: any,
+  tableName: string,
+  primaryKey: string,
+  entries: any
+) {
   const columns = Object.keys(entries);
   const values = Object.values(entries);
   const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
@@ -161,14 +204,19 @@ async function insertData(client: any, tableName: string, primaryKey: string, en
     VALUES (${placeholders})
     RETURNING ${primaryKey};
   `;
-  console.log(query,values)
+  console.log(query, values);
   const r = await client.query(query, values);
   return r.rows[0]?.[primaryKey];
 }
 
-async function updateData(client: any, tableName: string, primaryKey: string, entries: any) {
+async function updateData(
+  client: any,
+  tableName: string,
+  primaryKey: string,
+  entries: any
+) {
   const primaryKeyValue = entries[primaryKey];
-  delete entries[primaryKey];  // Remove the primary key from entries
+  delete entries[primaryKey]; // Remove the primary key from entries
 
   const setClauses = Object.keys(entries)
     .map((key, index) => `${key} = $${index + 1}`)
@@ -185,12 +233,15 @@ async function updateData(client: any, tableName: string, primaryKey: string, en
   `;
 
   const result = await client.query(query, values);
-  return primaryKeyValue; 
+  return primaryKeyValue;
 }
 
-
-
-async function deleteData(client: any, tableName: string, primaryKey: string, primaryKeyValue: any){
+async function deleteData(
+  client: any,
+  tableName: string,
+  primaryKey: string,
+  primaryKeyValue: any
+) {
   const query = `
     DELETE FROM ${tableName}
     WHERE ${primaryKey} = $1;
@@ -198,7 +249,12 @@ async function deleteData(client: any, tableName: string, primaryKey: string, pr
   await client.query(query, [primaryKeyValue]);
 }
 
-async function checkIfRecordExists(client: any, tableName: string, primaryKey: string, primaryKeyValue: any): Promise<boolean> {
+async function checkIfRecordExists(
+  client: any,
+  tableName: string,
+  primaryKey: string,
+  primaryKeyValue: any
+): Promise<boolean> {
   // Query to check if the record exists
   const query = `
     SELECT COUNT(*) AS count 
