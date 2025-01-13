@@ -103,12 +103,13 @@ const NewFormPage = () => {
         value: 1,
         show: false,
       },
+      
     ],
     tableOne: {
       title: "Order Design",
       name: "order_design",
       tableFields: {
-        _sr_no: { label: "Sr No", type: "number", show: true },
+        // _sr_no: { label: "Sr No", type: "number", show: true },
         order_id: { label: "Order ID", type: "number", show: true },
         design_code: { label: "Design Code", type: "autoComplete", show: true },
         suffix: { label: "Suffix", type: "text", show: true },
@@ -186,8 +187,6 @@ const NewFormPage = () => {
       console.error("Error saving data:", error);
     }
   };
-
-  console.log(orderMaster._is_new, "orderMaster");
 
   return (
     <div className="container-fluid">

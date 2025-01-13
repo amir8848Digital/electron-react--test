@@ -92,7 +92,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
     //     return acc;
     //   }, {});
     const newRow = {
-      sr_no: orderMaster.order_design?.length + 1,
+      // sr_no: orderMaster.order_design?.length + 1,
       parent_id: orderId,
       design_code: "",
       suffix: "",
@@ -238,7 +238,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
                         activeIndex === index ? "table-active" : ""
                       } `}
                     >
-                      <td>{row.sr_no}</td>
                       <td>{row.parent_id}</td>
                       <td>
                         <AutoCompleteDropDown

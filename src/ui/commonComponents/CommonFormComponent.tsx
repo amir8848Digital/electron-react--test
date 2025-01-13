@@ -47,8 +47,6 @@ const CommonFormComponent = ({
     } else {
       values = { ...values, [field.name]: value };
     }
-    console.log(values, "values");
-
     setOrderMaster((prev: any) => ({
       ...prev,
       ...values,
@@ -95,6 +93,7 @@ const CommonFormComponent = ({
                 <input
                   type="number"
                   id={field?.name}
+                  name={field?.name}
                   className="form-control fs-10"
                   value={orderMaster[field.name]}
                   onChange={(e) => handleChangeNumber(e, field.name)}
@@ -112,6 +111,7 @@ const CommonFormComponent = ({
                   type="date"
                   id="dateInput fs-10"
                   className="form-control fs-10"
+                  name={field?.name}
                   placeholder="Choose a date"
                   value={
                     orderMaster[field.name]
@@ -132,7 +132,7 @@ const CommonFormComponent = ({
                 <AutoCompleteDropDown
                   field={field}
                   formValues={orderMaster}
-                  defaultValue={formMainObj[field.name]}
+                  defaultValue={orderMaster[field.name]}
                   fieldName={formMainObj.fieldName}
                   updateStateFunction={updateStateFunction}
                   size={"small"}

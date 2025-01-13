@@ -74,7 +74,19 @@ const AutoCompleteDropDown = ({
         });
       }
     } else if (e.key === "Enter" && focusedIndex !== null) {
-      
+      const filteredValue =
+        (filteredCustomers.length > 0 &&
+          filteredCustomers.filter(
+            (item) => item[field.name] === Number(filter)
+          )) ||
+        [];
+      if (filteredValue?.length > 0 || !filter) {
+        setFilter((prev: any) => prev);
+        updateStateFunction(filteredValue[0][field.name], field);
+        handleOnSelect(tableData, filteredValue, field.name);
+      } else {
+        setFilter(null);
+      }
       handleSelectRow(
         filteredCustomers[focusedIndex],
         setFilter,
@@ -158,9 +170,9 @@ const AutoCompleteDropDown = ({
       fieldname: field.name,
       value: e.target.value,
     });
-    if (!isOnFocus) {
-      updateStateFunction(e.target.value, field);
-    }
+    // if (!isOnFocus) {
+    //   updateStateFunction(e.target.value, field);
+    // }
     setFilteredCustomers(res);
   };
 
@@ -190,9 +202,10 @@ const AutoCompleteDropDown = ({
     setIsDropdownOpen(false);
     setFocusedIndex(0);
   };
-  useEffect(() => {
-    setFilter(defaultValue);
-  }, [formValues]);
+  // useEffect(() => {
+  //   setFilter(defaultValue);
+  // }, [formValues]);
+
   return (
     <div>
       <div className="position-relative">
@@ -201,6 +214,7 @@ const AutoCompleteDropDown = ({
           type="text"
           id={field.name}
           className="form-control fs-10"
+          name={field?.name}
           value={filter !== null ? filter : defaultValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleFilterChange(
@@ -235,8 +249,7 @@ const AutoCompleteDropDown = ({
                   (item) => item[field.name] === Number(filter)
                 )) ||
               [];
-
-            if (filteredValue?.length > 0) {
+            if (filteredValue?.length > 0 || !filter) {
               setFilter((prev: any) => prev);
               updateStateFunction(filteredValue[0][field.name], field);
               handleOnSelect(tableData, filteredValue, field.name);
