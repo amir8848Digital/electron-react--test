@@ -3,6 +3,7 @@ import AutoCompleteDropDown from "../commonComponents/AutoCompleteDropDown";
 import TableComponent from "../commonComponents/TableComponent";
 import ModalForm from "../commonComponents/ModalForm";
 import CommonFormComponent from "../commonComponents/CommonFormComponent";
+import { toast, ToastContainer } from "react-toastify";
 
 const NewFormPage = () => {
   interface FormValues {
@@ -143,7 +144,7 @@ const NewFormPage = () => {
     acc[field.name] = initializeFieldValue(field);
     return acc;
   }, {} as FormValues);
-  
+
   const [orderMaster, setOrderMaster] = useState<any>({
     ...initialState,
     order_design: [],
@@ -176,17 +177,21 @@ const NewFormPage = () => {
       ]);
       console.log(res, "handdleSubmit");
       if (res?.data) {
+        toast.success(res.message);
         setOrderMaster(res?.data);
+      } else {
+        toast.error(res.error.message);
       }
     } catch (error) {
       console.error("Error saving data:", error);
     }
   };
 
-  console.log(orderMaster, "orderMaster");
+  console.log(orderMaster._is_new, "orderMaster");
 
   return (
     <div className="container-fluid">
+      <ToastContainer />
       <div className="card shadow my-4">
         <CommonFormComponent
           formMainObj={formObj}
@@ -208,17 +213,19 @@ const NewFormPage = () => {
       </div>
       <div className="card shadow">
         <div className="">
-          {
+          {!orderMaster._is_new ? (
             <TableComponent
               orderId={orderMaster?.order_id as number}
               orderMaster={orderMaster}
               setOrderMaster={setOrderMaster}
               formObj={formObj}
             />
-          }
+          ) : (
+            ""
+          )}
         </div>
       </div>
-      <div></div>
+
       <div className="p-4 text-end">
         <button className="btn btn-success px-4 fs-10" onClick={handleSubmit}>
           Submit

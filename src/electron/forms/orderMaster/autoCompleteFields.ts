@@ -3,6 +3,7 @@ export async function fetchFullForm(client: any, kwargs: any) {
   const query = `
  SELECT
     om.*,
+    'orderMaster' as "formName",
     JSON_AGG(
         JSON_BUILD_OBJECT(
             'order_design_id', od.order_design_id,
@@ -10,16 +11,17 @@ export async function fetchFullForm(client: any, kwargs: any) {
             'design_code', od.design_code,
             'calc_price', od.calc_price,
             'suffix', od.suffix,
+            'formName', 'orderDesign',
             'rate_chart', (
                 SELECT JSON_AGG(
-                    to_jsonb(orc)
+                    to_jsonb(orc) || JSONB_BUILD_OBJECT('formName', 'OrderRateChart')
                 )
                 FROM order_rate_chart orc
                 WHERE orc.parent_id = CAST(od.order_design_id AS VARCHAR)
             ),
             'labour_chart', (
                 SELECT JSON_AGG(
-                    to_jsonb(olc)
+                    to_jsonb(olc) || JSONB_BUILD_OBJECT('formName', 'OrderLabourChart')
                 )
                 FROM order_labour_chart olc
                 WHERE olc.parent_id = CAST(od.order_design_id AS VARCHAR)

@@ -322,7 +322,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                           onClick={() => handleAddTable(row, index)}
                           className="btn btn-success fs-10"
                         >
-                          Add
+                          fetch
                         </button>
                       </td>
                     </tr>

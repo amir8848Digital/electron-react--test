@@ -64,7 +64,7 @@ const CommonFormComponent = ({
           inputs: { value },
         });
         console.log(res, "res");
-        setOrderMaster(res.data);
+        setOrderMaster({ ...res.data, _is_new: 0 });
       }
     }
   };
