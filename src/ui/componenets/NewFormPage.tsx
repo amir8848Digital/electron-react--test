@@ -29,6 +29,46 @@ const NewFormPage = () => {
     fixed_price: number;
   };
 
+  const handleAddTable = (
+    row: any,
+    index: number,
+    setActiveIndex: any,
+    setOrderMaster: any,
+    initailDataRateChart: any,
+    initialDataLabourChart: any
+  ) => {
+    setActiveIndex(index);
+    setOrderMaster((prev: any) => {
+      const updatedOrderDesign = [...prev.order_design];
+      const designIndex = index;
+
+      if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
+        const currentDesign = { ...updatedOrderDesign[designIndex] };
+        if (!currentDesign.rate_chart) {
+          currentDesign.rate_chart = [{ ...initailDataRateChart }];
+        }
+        if (!currentDesign.labour_chart) {
+          currentDesign.labour_chart = [{ ...initialDataLabourChart }];
+        }
+
+        //     currentDesign.rate_chart = [
+        //       ...currentDesign.rate_chart,
+        //       initailDataRateChart,
+        //     ];
+        //     currentDesign.labour_chart = [
+        //       ...currentDesign.labour_chart,
+        //       initialDataLabourChart,
+        //     ];
+        updatedOrderDesign[designIndex] = currentDesign;
+      }
+
+      return {
+        ...prev,
+        order_design: updatedOrderDesign,
+      };
+    });
+  };
+
   const formObj = {
     fieldName: "orderMaster",
     fields: [
@@ -108,29 +148,82 @@ const NewFormPage = () => {
       title: "Order Design",
       name: "order_design",
       tableFields: {
-        // _sr_no: { label: "Sr No", type: "number", show: true },
-        order_id: { label: "Order ID", type: "number", show: true },
-        design_code: { label: "Design Code", type: "autoComplete", show: true },
-        suffix: { label: "Suffix", type: "text", show: true },
-        size: { label: "Size", type: "text", show: true },
-        qty: { label: "Quantity", type: "number", show: true },
-        calc_price: { label: "Calculated Price", type: "number", show: true },
-        sales_price: { label: "Sales Price", type: "number", show: true },
+        parent_id: {
+          label: "Order ID",
+          name: "parent_id",
+          type: "text",
+          show: true,
+          disabled: true,
+        },
+        design_code: {
+          label: "Design Code",
+          value: "design_code",
+          type: "autoComplete",
+          show: true,
+        },
+        suffix: { label: "Suffix", name: "suffix", type: "text", show: true },
+        size: { label: "Size", name: "size", type: "text", show: true },
+        qty: { label: "Quantity", name: "qty", type: "number", show: true },
+        calc_price: {
+          label: "Calculated Price",
+          value: "calc_price",
+          type: "number",
+          show: true,
+        },
+        sales_price: {
+          label: "Sales Price",
+          value: "sales_price",
+          type: "number",
+          show: true,
+        },
         prod_dely_date: {
           label: "Prod Delivery Date",
+          name: "prod_dely_date",
           type: "date",
           show: true,
         },
         exp_dely_date: {
           label: "Expected Delivery Date",
+          name: "exp_dely_date",
           type: "date",
           show: true,
         },
-        prod_setting: { label: "Prod Setting", type: "text", show: true },
-        fixed_price: { label: "Fixed Price", type: "number", show: true },
-        actions: { label: "Actions", type: "button", show: true },
+        prod_setting: {
+          label: "Prod Setting",
+          name: "prod_setting",
+          type: "text",
+          show: true,
+        },
+        fixed_price: {
+          label: "Fixed Price",
+          name: "fixed_price",
+          type: "number",
+          show: true,
+        },
+        actions: {
+          label: "fetch",
+          type: "button",
+          show: false,
+          // functionName: handleAddTable,
+          // functionParams: [
+          //   row,
+          //   index,
+          //   setActiveIndex,
+          //   setOrderMaster,
+          //   initailDataRateChart,
+          //   initialDataLabourChart,
+          // ],
+        },
         formName: { label: "fieldName", type: "text", show: false },
       },
+      childTables: [
+        { childTableOne: {
+
+        } },
+        {
+          childTableTwo: {},
+        },
+      ],
     },
   };
 
@@ -224,22 +317,11 @@ const NewFormPage = () => {
           orderMaster={orderMaster}
           setOrderMaster={setOrderMaster}
         />
-        <div>
-          {/* <div className="d-flex justify-content-end my-2 ">
-            <div className="me-2">
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn btn-success fs-10"
-              >
-                Open Modal
-              </button>
-            </div>
-          </div> */}
-        </div>
       </div>
       <div className="card shadow">
         <div className="">
           {!orderMaster._is_new ? (
+            
             <TableComponent
               orderId={orderMaster?.order_id as number}
               orderMaster={orderMaster}

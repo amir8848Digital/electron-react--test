@@ -53,16 +53,15 @@ const TableComponent: React.FC<TableComponentProps> = ({
 
   const handleRowChange = (
     rowId: number | string,
-    field: keyof Row,
+    field: string,
     value: any,
     index: number
   ) => {
-    console.log(field, index, value);
     let updatedRowData = [...orderMaster.order_design];
     updatedRowData = updatedRowData.map((row, i) =>
       i === index ? { ...row, [field]: value } : row
     );
-    console.log(updatedRowData);
+
     // setRowData(updatedRowData);
     setOrderMaster({
       ...orderMaster,
@@ -85,14 +84,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
   // formName: "orderDesign",
 
   const addRow = () => {
-    // const newRow = Object.entries(formObj.tableOne.tableFields)
-    //   .filter(([_, field]: [string, any]) => field.show)
-    //   .reduce((acc: any, [name, field]: [string, any]) => {
-    //     acc[name] = field.type === "number" ? 0 : "";
-    //     return acc;
-    //   }, {});
     const newRow = {
-      // sr_no: orderMaster.order_design?.length + 1,
       parent_id: orderId,
       design_code: null,
       suffix: null,
@@ -106,13 +98,12 @@ const TableComponent: React.FC<TableComponentProps> = ({
       fixed_price: 0,
       formName: "orderDesign",
     };
-
     setOrderMaster({
       ...orderMaster,
       order_design: [...orderMaster.order_design, { ...newRow }],
     });
   };
-  console.log(orderMaster, "orderMaster");
+
   const initailDataRateChart = {
     _order_design_id: null,
     category: "",
@@ -143,9 +134,15 @@ const TableComponent: React.FC<TableComponentProps> = ({
     formName: "orderRateChart",
   };
 
-  const handleAddTable = (row: any, index: number) => {
+  const handleAddTable = (
+    row: any,
+    index: number,
+    setActiveIndex: any,
+    setOrderMaster: any,
+    initailDataRateChart: any,
+    initialDataLabourChart: any
+  ) => {
     setActiveIndex(index);
-    console.log(row);
     setOrderMaster((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
       const designIndex = index;
@@ -176,33 +173,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
       };
     });
   };
-
-  // const handleMainSubmit = () => {
-  //   const combinedData: any[] = [];
-
-  //   dataRateChart.forEach((item) => {
-  //     combinedData.push({
-  //       formData: item,
-  //       formName: orderChartField,
-  //     });
-  //   });
-
-  //   dataLabourChart.forEach((item) => {
-  //     combinedData.push({
-  //       formData: item,
-  //       formName: orderLabourField,
-  //     });
-  //   });
-
-  //   setOrderMaster.rowData.forEach((item: any) => {
-  //     combinedData.push({
-  //       formData: item,
-  //       formName: fieldName,
-  //     });
-  //   });
-  //   window.electron.insertFormData(combinedData);
-  // };
-
   return (
     <>
       <div className="container-fluid">
@@ -223,6 +193,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
             >
               <thead>
                 <tr>
+                  {/* Dynamically generate table headers */}
                   {Object.keys(formObj.tableOne.tableFields).map(
                     (field: string, index: number) => {
                       const fieldData = formObj.tableOne.tableFields[field];
@@ -230,117 +201,118 @@ const TableComponent: React.FC<TableComponentProps> = ({
                         <th key={index} className="fs-10">
                           {fieldData.label}
                         </th>
-                      ) : null; // Render header only if `show` is true
+                      ) : null;
                     }
                   )}
+                  <th className="fs-10">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {orderMaster?.order_design?.map((row: any, index: any) => {
-                  return (
-                    <tr
-                      key={index}
-                      className={`${
-                        activeIndex === index ? "table-active" : ""
-                      } `}
-                    >
-                      <td>{row.parent_id}</td>
-                      <td>
-                        <AutoCompleteDropDown
-                          field={{
-                            name: "design_code",
-                            rowId: row.order_id,
-                            label: "Design Code",
-                          }}
-                          formValues={orderMaster.order_design}
-                          fieldName={fieldName}
-                          updateStateFunction={(value: string) =>
-                            handleRowChange(
-                              row.order_id as number,
-                              "design_code",
-                              value,
-                              index
-                            )
-                          }
-                          defaultValue={row.design_code}
-                        />
-                      </td>
-                      {[
-                        "suffix",
-                        "size",
-                        "qty",
-                        "calc_price", // This is a number field
-                        "sales_price", // This is a number field
-                        "prod_dely_date", // This is a date field
-                        "exp_dely_date", // This is a date field
-                        "prod_setting",
-                        "fixed_price", // This is a number field
-                      ].map((field: any) => (
-                        <td key={field}>
-                          {field === "calc_price" ||
-                          field === "sales_price" ||
-                          field === "fixed_price" ? (
-                            // Render as a number input for price fields
-                            <input
-                              type="number"
-                              name={`order_design[${index}][${field}]`}
-                              value={row[field as keyof Row] as number}
-                              onChange={(e) =>
-                                handleRowChange(
-                                  row.order_id as number | string,
-                                  field as keyof Row,
-                                  Number(e.target.value),
-                                  index
-                                )
-                              }
-                              className="form-control fs-10"
-                            />
-                          ) : field === "prod_dely_date" ||
-                            field === "exp_dely_date" ? (
-                            // Render as a date input for date fields
-                            <input
-                              type="date"
-                              value={row[field as keyof Row] as string}
-                              name={`order_design[${index}][${field}]`}
-                              onChange={(e) =>
-                                handleRowChange(
-                                  row.order_id as number | string,
-                                  field as keyof Row,
-                                  e.target.value,
-                                  index
-                                )
-                              }
-                              className="form-control  fs-10"
-                            />
-                          ) : (
-                            <input
-                              type="text"
-                              value={row[field as keyof Row] as string}
-                              name={`order_design[${index}][${field}]`}
-                              onChange={(e) =>
-                                handleRowChange(
-                                  row.order_id as number | string,
-                                  field as keyof Row,
-                                  e.target.value,
-                                  index
-                                )
-                              }
-                              className="form-control fs-10"
-                            />
-                          )}
-                        </td>
-                      ))}
-                      <td>
-                        <button
-                          onClick={() => handleAddTable(row, index)}
-                          className="btn btn-success fs-10"
-                        >
-                          fetch
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {/* Dynamically generate table rows */}
+                {orderMaster?.order_design?.map((row: any, index: any) => (
+                  <tr
+                    key={index}
+                    className={`${activeIndex === index ? "table-active" : ""}`}
+                  >
+                    {Object.keys(formObj.tableOne.tableFields).map(
+                      (field: string) => {
+                        const fieldData = formObj.tableOne.tableFields[field];
+                        if (!fieldData.show) return null;
+                        console.log(field);
+                        // Render inputs based on field type
+                        return (
+                          <td key={field}>
+                            {fieldData.type === "number" ? (
+                              <input
+                                type="number"
+                                name={`order_design[${index}][${field}]`}
+                                value={row[field]}
+                                disabled={!!fieldData.disabled}
+                                onChange={(e) =>
+                                  handleRowChange(
+                                    row.order_id,
+                                    field,
+                                    Number(e.target.value),
+                                    index
+                                  )
+                                }
+                                className="form-control fs-10"
+                              />
+                            ) : fieldData.type === "date" ? (
+                              <input
+                                type="date"
+                                name={`order_design[${index}][${field}]`}
+                                value={row[field]}
+                                disabled={!!fieldData.disabled}
+                                onChange={(e) =>
+                                  handleRowChange(
+                                    row.order_id,
+                                    field,
+                                    e.target.value,
+                                    index
+                                  )
+                                }
+                                className="form-control fs-10"
+                              />
+                            ) : fieldData.type === "autoComplete" ? (
+                              <AutoCompleteDropDown
+                                field={{
+                                  name: field,
+                                  rowId: row.parent_id,
+                                  label: fieldData.label,
+                                }}
+                                formValues={orderMaster.order_design}
+                                fieldName={fieldName}
+                                updateStateFunction={(value: string) =>
+                                  handleRowChange(
+                                    row.order_id,
+                                    field,
+                                    value,
+                                    index
+                                  )
+                                }
+                                defaultValue={row[field]}
+                              />
+                            ) : (
+                              <input
+                                type="text"
+                                name={`order_design[${index}][${field}]`}
+                                disabled={!!fieldData.disabled}
+                                value={row[field]}
+                                onChange={(e) =>
+                                  handleRowChange(
+                                    row.order_id,
+                                    field,
+                                    e.target.value,
+                                    index
+                                  )
+                                }
+                                className="form-control fs-10"
+                              />
+                            )}
+                          </td>
+                        );
+                      }
+                    )}
+                    <td>
+                      <button
+                        onClick={() =>
+                          handleAddTable(
+                            row,
+                            index,
+                            setActiveIndex,
+                            setOrderMaster,
+                            initailDataRateChart,
+                            initialDataLabourChart
+                          )
+                        }
+                        className="btn btn-success fs-10"
+                      >
+                        Fetch
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
