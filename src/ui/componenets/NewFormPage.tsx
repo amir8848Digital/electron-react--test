@@ -103,7 +103,6 @@ const NewFormPage = () => {
         value: 1,
         show: false,
       },
-      
     ],
     tableOne: {
       title: "Order Design",
@@ -150,8 +149,6 @@ const NewFormPage = () => {
     ...initialState,
     order_design: [],
   });
-
-  console.log(orderMaster);
   const [showModal, setShowModal] = useState(false);
 
   // const handleSubmit = (data: Record<string, any>) => {
@@ -179,7 +176,7 @@ const NewFormPage = () => {
       console.log(res, "handdleSubmit");
       if (res?.data) {
         toast.success(res.message);
-        setOrderMaster(res?.data);
+        setOrderMaster({ ...res?.data, _is_new: 0 });
       } else {
         toast.error(res.error.message);
       }

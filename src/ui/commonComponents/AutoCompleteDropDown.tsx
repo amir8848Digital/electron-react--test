@@ -170,9 +170,9 @@ const AutoCompleteDropDown = ({
       fieldname: field.name,
       value: e.target.value,
     });
-    // if (!isOnFocus) {
-    //   updateStateFunction(e.target.value, field);
-    // }
+    if (!isOnFocus) {
+      updateStateFunction(e.target.value, field);
+    }
     setFilteredCustomers(res);
   };
 

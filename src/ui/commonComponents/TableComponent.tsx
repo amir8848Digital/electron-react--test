@@ -94,25 +94,25 @@ const TableComponent: React.FC<TableComponentProps> = ({
     const newRow = {
       // sr_no: orderMaster.order_design?.length + 1,
       parent_id: orderId,
-      design_code: "",
-      suffix: "",
+      design_code: null,
+      suffix: null,
       size: 0,
       qty: 0,
       calc_price: 0,
       sales_price: 0,
-      prod_dely_date: "",
-      exp_dely_date: "",
-      prod_setting: "",
+      prod_dely_date: null,
+      exp_dely_date: null,
+      prod_setting: null,
       fixed_price: 0,
       formName: "orderDesign",
     };
 
     setOrderMaster({
       ...orderMaster,
-      order_design: [...orderMaster.order_design, newRow],
+      order_design: [...orderMaster.order_design, { ...newRow }],
     });
   };
-
+  console.log(orderMaster, "orderMaster");
   const initailDataRateChart = {
     _order_design_id: null,
     category: "",
@@ -138,6 +138,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
     h_set: 0,
     sshp: 0,
     m_material: "",
+    rate_chart: [],
+    labour_chart: [],
     formName: "orderRateChart",
   };
 
