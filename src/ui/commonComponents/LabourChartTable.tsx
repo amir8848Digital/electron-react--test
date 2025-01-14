@@ -4,14 +4,14 @@ interface LabourChartTableProps {
   data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
   index: number;
-  setOrderMaster:any
+  setOrderMaster: any;
 }
 
 const LabourChartTable: React.FC<LabourChartTableProps> = ({
   data,
   setData,
   index,
-  setOrderMaster
+  setOrderMaster,
 }) => {
   const fields = [
     "_order_design_id",
@@ -62,8 +62,8 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
     formName: "orderLabourChart",
   };
 
-  const addRow =()=>{
-    setOrderMaster((prev: any) => {                                                                                                                                                              
+  const addRow = () => {
+    setOrderMaster((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
       const designIndex = index;
 
@@ -92,18 +92,20 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
         order_design: updatedOrderDesign,
       };
     });
-  }
+  };
 
   return (
     <div className="card shadow">
-     <div className="d-flex justify-content-between">
+      <div className="d-flex justify-content-between">
         <h6 className="px-4 pt-2">Labour Chart</h6>
-        <div className="px-4 py-1" >
-        <button className="btn btn-success fs-10" onClick={addRow}>Add</button>
+        <div className="px-4 py-1">
+          <button className="btn btn-success fs-10" onClick={addRow}>
+            Add
+          </button>
         </div>
       </div>
       <div className="table-responsive">
-        { 
+        {
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -124,6 +126,11 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
                           // Read-only field for order_design_id
                           <input
                             type="number"
+                            name={`
+                              order_design[${index}].labour_chart[${rowIndex}][
+                                ${field}
+                              ]
+                            }`}
                             value={row[field] || ""}
                             readOnly
                             className="form-control  fs-10 "
@@ -135,11 +142,16 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
                                 ? "number"
                                 : "text"
                             }
+                            name={`
+                              order_design[${index}].labour_chart[${rowIndex}][
+                                ${field}
+                              ]
+                            }`}
                             value={row[field] || ""}
                             onChange={(e) =>
                               handleCellChange(rowIndex, field, e.target.value)
                             }
-                            className="form-control"
+                            className="form-control fs-10"
                           />
                         )}
                       </td>

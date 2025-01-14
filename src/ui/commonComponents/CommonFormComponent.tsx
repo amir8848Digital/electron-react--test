@@ -70,7 +70,7 @@ const CommonFormComponent = ({
     <form>
       <div className="row p-4 g-2">
         {formMainObj?.fields?.map((field: any, index: number) => (
-          <div className="col-md-2" key={index}>
+          <div className="col-md-2" key={index} id="form-group">
             {field.type === "text" && (
               <div className="">
                 <label id={field?.name} className="form-label fs-10">
@@ -80,6 +80,7 @@ const CommonFormComponent = ({
                   type="text"
                   className="form-control  fs-10"
                   value={orderMaster[field?.name] as string}
+                  name={field?.name}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={`Enter ${field.label}`}
                 />

@@ -4,7 +4,7 @@ interface RateChartTableProps {
   data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
   index: number;
-  setOrderMaster:any
+  setOrderMaster: any;
 }
 
 const RateChartTable: React.FC<RateChartTableProps> = ({
@@ -70,36 +70,36 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
     });
   };
 
-    const initailDataRateChart = {
-      _order_design_id: null,
-      category: "",
-      sub_category: "",
-      sv_ln: "",
-      breadth: 0,
-      depth: 0,
-      quantity: 0,
-      pm_pointer: "",
-      wt: 0,
-      lme_rate: 0,
-      sales_rate: 0,
-      qw: 0,
-      sales_value: 0,
-      production_quantity: 0,
-      production_weight: 0,
-      setting: "",
-      setting_rate: 0,
-      setting_value: 0,
-      alloy: "",
-      alloy_rate: 0,
-      wset: 0,
-      h_set: 0,
-      sshp: 0,
-      m_material: "",
-      formName: "orderRateChart",
-    };
- 
-  const addRow =()=>{
-    setOrderMaster((prev: any) => {                                                                                                                                                              
+  const initailDataRateChart = {
+    _order_design_id: null,
+    category: "",
+    sub_category: "",
+    sv_ln: "",
+    breadth: 0,
+    depth: 0,
+    quantity: 0,
+    pm_pointer: "",
+    wt: 0,
+    lme_rate: 0,
+    sales_rate: 0,
+    qw: 0,
+    sales_value: 0,
+    production_quantity: 0,
+    production_weight: 0,
+    setting: "",
+    setting_rate: 0,
+    setting_value: 0,
+    alloy: "",
+    alloy_rate: 0,
+    wset: 0,
+    h_set: 0,
+    sshp: 0,
+    m_material: "",
+    formName: "orderRateChart",
+  };
+
+  const addRow = () => {
+    setOrderMaster((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
       const designIndex = index;
 
@@ -128,14 +128,16 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
         order_design: updatedOrderDesign,
       };
     });
-  }
+  };
 
   return (
     <div className="card shadow">
       <div className="d-flex justify-content-between">
         <h6 className="px-4 pt-2">Rate Chart</h6>
-        <div className="px-4 py-1" >
-        <button className="btn btn-success fs-10" onClick={addRow}>Add</button>
+        <div className="px-4 py-1">
+          <button className="btn btn-success fs-10" onClick={addRow}>
+            Add
+          </button>
         </div>
       </div>
       <div className="table-responsive">
@@ -158,6 +160,11 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                       {field === "_order_design_id" ? (
                         <input
                           type="number"
+                          name={`
+                            order_design[${index}].rate_chart[${rowIndex}][
+                              ${field}
+                            ]
+                          }`}
                           value={row[field] || ""}
                           readOnly
                           className="form-control fs-10"
@@ -187,6 +194,11 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                               ? "number"
                               : "text"
                           }
+                          name={`
+                            order_design[${index}].rate_chart[${rowIndex}][
+                              ${field}
+                            ]
+                          }`}
                           value={row[field] || ""}
                           onChange={(e) =>
                             handleCellChange(rowIndex, field, e.target.value)

@@ -166,6 +166,36 @@ const NewFormPage = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     console.log(orderMaster, "orderMaster");
+    // const data = document.querySelectorAll(".card");
+    // console.log(data, "data");
+
+    // const formData: any = {};
+
+    // data.forEach((card) => {
+    //   const childElements = card.querySelectorAll("[name]");
+    //   childElements.forEach((child) => {
+    //     const name = child.getAttribute("name");
+    //     const value = (child as HTMLInputElement).value;
+    //     console.log(`Name: ${name}, Value: ${value}`);
+
+    //     if (name) {
+    //       const keys = name.split(/[\[\]\.]+/).filter(Boolean);
+    //       let current = formData;
+
+    //       keys.forEach((key, index) => {
+    //         if (index === keys.length - 1) {
+    //           current[key] = value;
+    //         } else {
+    //           if (!current[key]) {
+    //             current[key] = isNaN(Number(keys[index + 1])) ? {} : [];
+    //           }
+    //           current = current[key];
+    //         }
+    //       });
+    //     }
+    //   });
+    // });
+    // console.log("Constructed formData:", JSON.stringify(formData, null, 2));
     try {
       const res = await window.electron.saveForm([
         {
@@ -195,7 +225,7 @@ const NewFormPage = () => {
           setOrderMaster={setOrderMaster}
         />
         <div>
-          <div className="d-flex justify-content-end my-2 ">
+          {/* <div className="d-flex justify-content-end my-2 ">
             <div className="me-2">
               <button
                 onClick={() => setShowModal(true)}
@@ -204,7 +234,7 @@ const NewFormPage = () => {
                 Open Modal
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="card shadow">

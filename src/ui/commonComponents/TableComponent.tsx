@@ -216,7 +216,11 @@ const TableComponent: React.FC<TableComponentProps> = ({
             <div>
               <h6 className="px-4">{formObj.tableOne.title}</h6>
             </div>
-            <table className="table table-bordered" style={{ width: "100%" }}>
+            <table
+              className="table table-bordered"
+              style={{ width: "100%" }}
+              id="form-group"
+            >
               <thead>
                 <tr>
                   {Object.keys(formObj.tableOne.tableFields).map(
@@ -271,7 +275,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                         "exp_dely_date", // This is a date field
                         "prod_setting",
                         "fixed_price", // This is a number field
-                      ].map((field) => (
+                      ].map((field: any) => (
                         <td key={field}>
                           {field === "calc_price" ||
                           field === "sales_price" ||
@@ -279,6 +283,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                             // Render as a number input for price fields
                             <input
                               type="number"
+                              name={`order_design[${index}][${field}]`}
                               value={row[field as keyof Row] as number}
                               onChange={(e) =>
                                 handleRowChange(
@@ -296,6 +301,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                             <input
                               type="date"
                               value={row[field as keyof Row] as string}
+                              name={`order_design[${index}][${field}]`}
                               onChange={(e) =>
                                 handleRowChange(
                                   row.order_id as number | string,
@@ -310,6 +316,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                             <input
                               type="text"
                               value={row[field as keyof Row] as string}
+                              name={`order_design[${index}][${field}]`}
                               onChange={(e) =>
                                 handleRowChange(
                                   row.order_id as number | string,
