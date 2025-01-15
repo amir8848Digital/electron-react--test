@@ -59,10 +59,8 @@ const TableComponent: React.FC<TableComponentProps> = ({
   ) => {
     let updatedRowData = [...orderMaster.order_design];
     updatedRowData = updatedRowData.map((row, i) =>
-      i === index ? { ...row, [field]: value } : row
+      i === index ? { ...row, [field]: value, is_updated: 1 } : row
     );
-
-    // setRowData(updatedRowData);
     setOrderMaster({
       ...orderMaster,
       order_design: updatedRowData,
@@ -96,8 +94,10 @@ const TableComponent: React.FC<TableComponentProps> = ({
       exp_dely_date: null,
       prod_setting: null,
       fixed_price: 0,
+      is_new: 1,
       formName: "orderDesign",
     };
+
     setOrderMaster({
       ...orderMaster,
       order_design: [...orderMaster.order_design, { ...newRow }],
@@ -173,6 +173,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
       };
     });
   };
+  console.log("orderMaster", orderMaster);
   return (
     <>
       <div className="container-fluid">
@@ -208,7 +209,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {/* Dynamically generate table rows */}
                 {orderMaster?.order_design?.map((row: any, index: any) => (
                   <tr
                     key={index}
@@ -218,8 +218,6 @@ const TableComponent: React.FC<TableComponentProps> = ({
                       (field: string) => {
                         const fieldData = formObj.tableOne.tableFields[field];
                         if (!fieldData.show) return null;
-                        console.log(field);
-                        // Render inputs based on field type
                         return (
                           <td key={field}>
                             {fieldData.type === "number" ? (
@@ -273,6 +271,24 @@ const TableComponent: React.FC<TableComponentProps> = ({
                                 }
                                 defaultValue={row[field]}
                               />
+                            ) : fieldData.type === "icon" ? (
+                              <span
+                                onClick={() =>
+                                  fieldData.function(
+                                    row,
+                                    index,
+                                    orderMaster,
+                                    setOrderMaster
+                                  )
+                                }
+                                className={`icon-button text-center ${
+                                  row[field] === 0
+                                    ? "text-danger"
+                                    : "text-success"
+                                } `}
+                              >
+                                {fieldData.iconType}
+                              </span>
                             ) : (
                               <input
                                 type="text"

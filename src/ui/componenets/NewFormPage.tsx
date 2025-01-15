@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import AutoCompleteDropDown from "../commonComponents/AutoCompleteDropDown";
 import TableComponent from "../commonComponents/TableComponent";
-import ModalForm from "../commonComponents/ModalForm";
+import { MdDelete } from "react-icons/md";
 import CommonFormComponent from "../commonComponents/CommonFormComponent";
 import { toast, ToastContainer } from "react-toastify";
 
 const NewFormPage = () => {
   interface FormValues {
-    [key: string]: string | Date | null | Date | number;
+    [key: string]: string | Date | null | Date | number | undefined;
   }
   interface Customer {
     customer_id: number;
@@ -137,12 +137,6 @@ const NewFormPage = () => {
       { label: "Password", name: "pwd", type: "text" },
       { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
       { label: "Refresh Date", name: "refresh_date", type: "calendar" },
-      {
-        label: "Is New",
-        name: "_is_new",
-        value: 1,
-        show: false,
-      },
     ],
     tableOne: {
       title: "Order Design",
@@ -214,12 +208,57 @@ const NewFormPage = () => {
           //   initialDataLabourChart,
           // ],
         },
-        formName: { label: "fieldName", type: "text", show: false },
+        formName: {
+          label: "fieldName",
+          name: "orderDesign",
+          type: "text",
+          show: false,
+        },
+        is_deleted: {
+          label: "Deleted",
+          name: "is_deleted",
+          value: 0,
+          type: "icon",
+          iconType: <MdDelete className="text-danger" />,
+          secondaryIconType: <MdDelete />,
+          show: true,
+          function: function handleRowAction(
+            row: Row,
+            index: number,
+            state: any,
+            setState: any
+          ) {
+            setState((prevState: any) => {
+              const updatedOrderDesign = [...prevState.order_design];
+
+              if (!updatedOrderDesign[index]) {
+                console.error(`No order design found at index ${index}`);
+                return prevState;
+              }
+              const currentDesign = { ...updatedOrderDesign[index] };
+              if (currentDesign.is_delete === 1) {
+                currentDesign.is_delete = 0;
+              } else if (
+                currentDesign.is_delete === 0 ||
+                !currentDesign.is_delete
+              ) {
+                currentDesign.is_delete = 1;
+              }
+              if (currentDesign.is_delete === 1 && currentDesign.is_new) {
+                updatedOrderDesign.splice(index, 1);
+              } else {
+                updatedOrderDesign[index] = currentDesign;
+              }
+              return {
+                ...prevState,
+                order_design: updatedOrderDesign,
+              };
+            });
+          },
+        },
       },
       childTables: [
-        { childTableOne: {
-
-        } },
+        { childTableOne: {} },
         {
           childTableTwo: {},
         },
@@ -230,7 +269,7 @@ const NewFormPage = () => {
   const initializeFieldValue = (field: (typeof formObj.fields)[number]) => {
     if (field.type === "calendar") return null;
     if (field.type === "number") return 0;
-    return field.value ? 1 : null;
+    return null;
   };
 
   const initialState: FormValues = formObj.fields.reduce((acc, field) => {
@@ -240,6 +279,7 @@ const NewFormPage = () => {
 
   const [orderMaster, setOrderMaster] = useState<any>({
     ...initialState,
+    is_new: 1,
     order_design: [],
   });
   const [showModal, setShowModal] = useState(false);
@@ -259,36 +299,6 @@ const NewFormPage = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     console.log(orderMaster, "orderMaster");
-    // const data = document.querySelectorAll(".card");
-    // console.log(data, "data");
-
-    // const formData: any = {};
-
-    // data.forEach((card) => {
-    //   const childElements = card.querySelectorAll("[name]");
-    //   childElements.forEach((child) => {
-    //     const name = child.getAttribute("name");
-    //     const value = (child as HTMLInputElement).value;
-    //     console.log(`Name: ${name}, Value: ${value}`);
-
-    //     if (name) {
-    //       const keys = name.split(/[\[\]\.]+/).filter(Boolean);
-    //       let current = formData;
-
-    //       keys.forEach((key, index) => {
-    //         if (index === keys.length - 1) {
-    //           current[key] = value;
-    //         } else {
-    //           if (!current[key]) {
-    //             current[key] = isNaN(Number(keys[index + 1])) ? {} : [];
-    //           }
-    //           current = current[key];
-    //         }
-    //       });
-    //     }
-    //   });
-    // });
-    // console.log("Constructed formData:", JSON.stringify(formData, null, 2));
     try {
       const res = await window.electron.saveForm([
         {
@@ -321,7 +331,6 @@ const NewFormPage = () => {
       <div className="card shadow">
         <div className="">
           {!orderMaster._is_new ? (
-            
             <TableComponent
               orderId={orderMaster?.order_id as number}
               orderMaster={orderMaster}
