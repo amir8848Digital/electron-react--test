@@ -11,7 +11,6 @@ const DropdownList = ({
   onSelect: (e: any, item: any) => void;
   tableHead: any;
 }) => {
-  console.log(items, tableHead, "selected");
   return (
     <div
       className="dropdown-menu show overflow-auto"

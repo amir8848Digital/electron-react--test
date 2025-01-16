@@ -1,16 +1,20 @@
 import React from "react";
 
 interface LabourChartTableProps {
-  data: Array<Record<string, any>>;
+  data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
+  index: number;
+  setOrderMaster: any;
 }
 
 const LabourChartTable: React.FC<LabourChartTableProps> = ({
   data,
   setData,
+  index,
+  setOrderMaster,
 }) => {
   const fields = [
-    "order_design_id",
+    "_order_design_id",
     "main_cd",
     "sub_cd",
     "by_qw",
@@ -31,25 +35,77 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
     fieldName: string,
     value: string
   ) => {
-    const updatedData = [...data];
+    setData((prev: any) => {
+      const updatedOrderDesign = [...prev.order_design];
+      const design = { ...updatedOrderDesign[index] };
+      const updatedRateChart = [...design.labour_chart];
+      updatedRateChart[rowIndex] = {
+        ...updatedRateChart[rowIndex],
+        [fieldName]: value,
+      };
+      design.labour_chart = updatedRateChart;
+      updatedOrderDesign[index] = design;
+      return {
+        ...prev,
+        order_design: updatedOrderDesign,
+      };
+    });
+  };
+  const initialDataLabourChart = {
+    _order_design_id: null,
+    maind_cd: "",
+    sub_cd: "",
+    by_qw: 0,
+    quantity: 0,
+    rate: 0,
+    value: 0,
+    formName: "orderLabourChart",
+  };
 
-    // Convert value to number if the field is numeric
-    if (["by_qw", "quantity", "rate", "value"].includes(fieldName)) {
-      updatedData[rowIndex][fieldName] = parseFloat(value) || 0;
-    } else {
-      updatedData[rowIndex][fieldName] = value;
-    }
+  const addRow = () => {
+    setOrderMaster((prev: any) => {
+      const updatedOrderDesign = [...prev.order_design];
+      const designIndex = index;
 
-    setData(updatedData);
+      if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
+        const currentDesign = { ...updatedOrderDesign[designIndex] };
+        if (!currentDesign.rate_chart) {
+          currentDesign.rate_chart = [];
+        }
+        if (!currentDesign.labour_chart) {
+          currentDesign.labour_chart = [];
+        }
+
+        // currentDesign.rate_chart = [
+        //   ...currentDesign.rate_chart,
+        //   initailDataRateChart,
+        // ];
+        currentDesign.labour_chart = [
+          ...currentDesign.labour_chart,
+          initialDataLabourChart,
+        ];
+        updatedOrderDesign[designIndex] = currentDesign;
+      }
+
+      return {
+        ...prev,
+        order_design: updatedOrderDesign,
+      };
+    });
   };
 
   return (
     <div className="card shadow">
-      <div className="p-2 mb-0">
-        <h6>Labour Chart</h6>
+      <div className="d-flex justify-content-between">
+        <h6 className="px-4 pt-2">Labour Chart</h6>
+        <div className="px-4 py-1">
+          <button className="btn btn-success fs-10" onClick={addRow}>
+            Add
+          </button>
+        </div>
       </div>
       <div className="table-responsive">
-        {data?.length > 0 ? (
+        {
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -61,41 +117,51 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
               </tr>
             </thead>
             <tbody>
-              {data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {fields.map((field) => (
-                    <td key={field}>
-                      {field === "order_design_id" ? (
-                        // Read-only field for order_design_id
-                        <input
-                          type="number"
-                          value={row[field] || ""}
-                          readOnly
-                          className="form-control  fs-10 "
-                        />
-                      ) : (
-                        <input
-                          type={
-                            ["quantity", "rate", "value"].includes(field)
-                              ? "number"
-                              : "text"
-                          }
-                          value={row[field] || ""}
-                          onChange={(e) =>
-                            handleCellChange(rowIndex, field, e.target.value)
-                          }
-                          className="form-control"
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {data?.order_design[index]?.labour_chart?.map(
+                (row: any, rowIndex: number) => (
+                  <tr key={rowIndex}>
+                    {fields.map((field) => (
+                      <td key={field}>
+                        {field === "_order_design_id" ? (
+                          // Read-only field for order_design_id
+                          <input
+                            type="number"
+                            name={`
+                              order_design[${index}].labour_chart[${rowIndex}][
+                                ${field}
+                              ]
+                            }`}
+                            value={row[field] || ""}
+                            readOnly
+                            className="form-control  fs-10 "
+                          />
+                        ) : (
+                          <input
+                            type={
+                              ["quantity", "rate", "value"].includes(field)
+                                ? "number"
+                                : "text"
+                            }
+                            name={`
+                              order_design[${index}].labour_chart[${rowIndex}][
+                                ${field}
+                              ]
+                            }`}
+                            value={row[field] || ""}
+                            onChange={(e) =>
+                              handleCellChange(rowIndex, field, e.target.value)
+                            }
+                            className="form-control fs-10"
+                          />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
-        ) : (
-          <></>
-        )}
+        }
       </div>
     </div>
   );

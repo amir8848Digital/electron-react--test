@@ -9,11 +9,11 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      // element: <Layout />,
       children: [
         {
           path: "/",
-          Component: FormPage,
+          Component: NewFormPage,
         },
         {
           path: "/customer-form",

@@ -1,270 +1,352 @@
 import React, { useEffect, useRef, useState } from "react";
 import AutoCompleteDropDown from "../commonComponents/AutoCompleteDropDown";
 import TableComponent from "../commonComponents/TableComponent";
-import ModalForm from "../commonComponents/ModalForm";
+import { MdDelete } from "react-icons/md";
+import CommonFormComponent from "../commonComponents/CommonFormComponent";
+import { toast, ToastContainer } from "react-toastify";
 
 const NewFormPage = () => {
   interface FormValues {
-    [key: string]: string | Date | null | Date | number;
+    [key: string]: string | Date | null | Date | number | undefined;
   }
   interface Customer {
     customer_id: number;
     customer_name: string;
   }
-  const fieldName = "orderMaster";
-  const fields = [
-    {
-      label: "Voucher 1",
-      name: " voucher_part1",
-      type: "text",
-      table: "order_master",
-    },
-    { label: "Voucher 2", name: " voucher_part2", type: "text" },
-    { label: "Voucher 3 ", name: " voucher_part3", type: "text" },
-    {
-      label: "Voucher 4",
-      name: "order_id",
-      type: "autoComplete",
-    },
-    {
-      label: "Date",
-      name: "order_date",
-      type: "calendar",
-      table: "order_master_item",
-    },
-    { label: "Currency", name: "currency", type: "text" },
-    {
-      label: "Customer ID",
-      name: "customer_id",
-      type: "autoComplete",
-    },
-    {
-      label: "Customer Name",
-      name: "customer_name",
-      type: "text",
-      table: "rate_charts",
-    },
-    { label: "Conversion Factor", name: "conv_fact", type: "text" },
-    { label: "Conversion Date", name: "conv_d", type: "calendar" },
-    { label: "LMG Sales", name: "lmg_sales", type: "number" },
-    { label: "LMP Sales", name: "lmp_sales", type: "number" },
-    { label: "LMS Sales", name: "lms_sales", type: "number" },
-    { label: "LML Sales", name: "lml_sales", type: "number" },
-    { label: "CHI X KT", name: "chi_x_kt", type: "text" },
-    { label: "PO Number", name: "po_no", type: "text" },
-    { label: "PO Date", name: "po_date", type: "calendar" },
-    { label: "Priority", name: "priority", type: "text" },
-    { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar" },
-    { label: "Product Delivery Date", name: "prod_del_date", type: "calendar" },
-    { label: "Order Lock", name: "ord_lock", type: "text" },
-    { label: "Password", name: "pwd", type: "text" },
-    { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
-    { label: "Refresh Date", name: "refresh_date", type: "calendar" },
-  ];
 
-  const initialState: FormValues = fields.reduce((acc, field) => {
-    acc[field.name] = field.type === "calendar" ? null : "";
+  type Row = {
+    sr_no: number;
+    order_id: number;
+    design_code: string;
+    suffix: string;
+    size: number;
+    qty: number;
+    calc_price: number;
+    sales_price: number;
+    prod_dely_date: string;
+    exp_dely_date: string;
+    prod_setting: string;
+    fixed_price: number;
+  };
+
+  const handleAddTable = (
+    row: any,
+    index: number,
+    setActiveIndex: any,
+    setOrderMaster: any,
+    initailDataRateChart: any,
+    initialDataLabourChart: any
+  ) => {
+    setActiveIndex(index);
+    setOrderMaster((prev: any) => {
+      const updatedOrderDesign = [...prev.order_design];
+      const designIndex = index;
+
+      if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
+        const currentDesign = { ...updatedOrderDesign[designIndex] };
+        if (!currentDesign.rate_chart) {
+          currentDesign.rate_chart = [{ ...initailDataRateChart }];
+        }
+        if (!currentDesign.labour_chart) {
+          currentDesign.labour_chart = [{ ...initialDataLabourChart }];
+        }
+
+        //     currentDesign.rate_chart = [
+        //       ...currentDesign.rate_chart,
+        //       initailDataRateChart,
+        //     ];
+        //     currentDesign.labour_chart = [
+        //       ...currentDesign.labour_chart,
+        //       initialDataLabourChart,
+        //     ];
+        updatedOrderDesign[designIndex] = currentDesign;
+      }
+
+      return {
+        ...prev,
+        order_design: updatedOrderDesign,
+      };
+    });
+  };
+
+  const formObj = {
+    fieldName: "orderMaster",
+    fields: [
+      {
+        label: "Voucher 1",
+        name: "voucher_part1",
+        type: "text",
+        table: "order_master",
+        show: true,
+        disabled: false,
+      },
+      {
+        label: "Voucher 2",
+        name: "voucher_part2",
+        type: "text",
+        show: true,
+        disabled: false,
+      },
+      {
+        label: "Voucher 3 ",
+        name: "voucher_part3",
+        type: "text",
+        show: true,
+        disabled: false,
+      },
+      {
+        label: "Voucher 4",
+        name: "order_id",
+        type: "autoComplete",
+      },
+      {
+        label: "Date",
+        name: "order_date",
+        type: "calendar",
+        table: "order_master_item",
+      },
+      { label: "Currency", name: "currency", type: "text" },
+      {
+        label: "Customer ID",
+        name: "customer_id",
+        type: "autoComplete",
+      },
+      {
+        label: "Customer Name",
+        name: "customer_name",
+        type: "text",
+        table: "rate_charts",
+      },
+      { label: "Conversion Factor", name: "conv_fact", type: "text" },
+      { label: "Conversion Date", name: "conv_d", type: "calendar" },
+      { label: "LMG Sales", name: "lmg_sales", type: "number" },
+      { label: "LMP Sales", name: "lmp_sales", type: "number" },
+      { label: "LMS Sales", name: "lms_sales", type: "number" },
+      { label: "LML Sales", name: "lml_sales", type: "number" },
+      { label: "CHI X KT", name: "chi_x_kt", type: "text" },
+      { label: "PO Number", name: "po_no", type: "text" },
+      { label: "PO Date", name: "po_date", type: "calendar" },
+      { label: "Priority", name: "priority", type: "text" },
+      { label: "EXP Delivery Date", name: "exp_del_date", type: "calendar" },
+      {
+        label: "Product Delivery Date",
+        name: "prod_del_date",
+        type: "calendar",
+      },
+      { label: "Order Lock", name: "ord_lock", type: "text" },
+      { label: "Password", name: "pwd", type: "text" },
+      { label: "LK Sales Price", name: "lk_sales_price", type: "number" },
+      { label: "Refresh Date", name: "refresh_date", type: "calendar" },
+    ],
+    tableOne: {
+      title: "Order Design",
+      name: "order_design",
+      tableFields: {
+        parent_id: {
+          label: "Order ID",
+          name: "parent_id",
+          type: "text",
+          show: true,
+          disabled: true,
+        },
+        design_code: {
+          label: "Design Code",
+          value: "design_code",
+          type: "autoComplete",
+          show: true,
+        },
+        suffix: { label: "Suffix", name: "suffix", type: "text", show: true },
+        size: { label: "Size", name: "size", type: "text", show: true },
+        qty: { label: "Quantity", name: "qty", type: "number", show: true },
+        calc_price: {
+          label: "Calculated Price",
+          value: "calc_price",
+          type: "number",
+          show: true,
+        },
+        sales_price: {
+          label: "Sales Price",
+          value: "sales_price",
+          type: "number",
+          show: true,
+        },
+        prod_dely_date: {
+          label: "Prod Delivery Date",
+          name: "prod_dely_date",
+          type: "date",
+          show: true,
+        },
+        exp_dely_date: {
+          label: "Expected Delivery Date",
+          name: "exp_dely_date",
+          type: "date",
+          show: true,
+        },
+        prod_setting: {
+          label: "Prod Setting",
+          name: "prod_setting",
+          type: "text",
+          show: true,
+        },
+        fixed_price: {
+          label: "Fixed Price",
+          name: "fixed_price",
+          type: "number",
+          show: true,
+        },
+        actions: {
+          label: "fetch",
+          type: "button",
+          show: false,
+          // functionName: handleAddTable,
+          // functionParams: [
+          //   row,
+          //   index,
+          //   setActiveIndex,
+          //   setOrderMaster,
+          //   initailDataRateChart,
+          //   initialDataLabourChart,
+          // ],
+        },
+        formName: {
+          label: "fieldName",
+          name: "orderDesign",
+          type: "text",
+          show: false,
+        },
+        is_deleted: {
+          label: "Deleted",
+          name: "is_deleted",
+          value: 0,
+          type: "icon",
+          iconType: <MdDelete className="text-danger" />,
+          secondaryIconType: <MdDelete />,
+          show: true,
+          function: function handleRowAction(
+            row: Row,
+            index: number,
+            state: any,
+            setState: any
+          ) {
+            setState((prevState: any) => {
+              const updatedOrderDesign = [...prevState.order_design];
+
+              if (!updatedOrderDesign[index]) {
+                console.error(`No order design found at index ${index}`);
+                return prevState;
+              }
+              const currentDesign = { ...updatedOrderDesign[index] };
+              if (currentDesign.is_delete === 1) {
+                currentDesign.is_delete = 0;
+              } else if (
+                currentDesign.is_delete === 0 ||
+                !currentDesign.is_delete
+              ) {
+                currentDesign.is_delete = 1;
+              }
+              if (currentDesign.is_delete === 1 && currentDesign.is_new) {
+                updatedOrderDesign.splice(index, 1);
+              } else {
+                updatedOrderDesign[index] = currentDesign;
+              }
+              return {
+                ...prevState,
+                order_design: updatedOrderDesign,
+              };
+            });
+          },
+        },
+      },
+      childTables: [
+        { childTableOne: {} },
+        {
+          childTableTwo: {},
+        },
+      ],
+    },
+  };
+
+  const initializeFieldValue = (field: (typeof formObj.fields)[number]) => {
+    if (field.type === "calendar") return null;
+    if (field.type === "number") return 0;
+    return null;
+  };
+
+  const initialState: FormValues = formObj.fields.reduce((acc, field) => {
+    acc[field.name] = initializeFieldValue(field);
     return acc;
   }, {} as FormValues);
-  const [formValues, setFormValues] = useState<FormValues>(initialState);
-  const [showModal, setShowModal] = useState(false);
-  const [designData, setDesignData] = useState<any>([]);
 
-  const handleSubmit = (data: Record<string, any>) => {
-    window.electron.insertFormData([
-      { formData: data, formName: "orderDetails" },
-    ]);
-    console.log("Form submitted with data:", data);
-    setShowModal(false); // Close the modal after submission
-  };
+  const [orderMaster, setOrderMaster] = useState<any>({
+    ...initialState,
+    is_new: 1,
+    order_design: [],
+  });
+  const [showModal, setShowModal] = useState(false);
+
+  // const handleSubmit = (data: Record<string, any>) => {
+  //   window.electron.insertFormData([
+  //     { formData: data, formName: "orderDetails" },
+  //   ]);
+  //   console.log("Form submitted with data:", data);
+  //   setShowModal(false);
+  // };
 
   const handleClose = () => {
     setShowModal(false);
   };
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    setFormValues({
-      ...formValues,
-      [name]: e.target.value,
-    });
-  };
 
-  const handleChangeNumber = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    setFormValues({
-      ...formValues,
-      [name]: Number(e.target.value),
-    });
-  };
-
-  const handleCalendarChange = (e: any, name: string) => {
-    setFormValues({
-      ...formValues,
-      [name]: e.target.value,
-    });
-  };
-
-  const handdleSubmit = () => {
-    window.electron.insertFormData([
-      {
-        formData: formValues,
-        formName: fieldName,
-      },
-    ]);
-  };
-
-  const updateStateFunction = (value: any, field: any) => {
-    let values = { ...formValues };
-    if (field.type === "autoComplete") {
-      values = { ...values, ...value[0] };
-    } else {
-      values = { ...values, [field.name]: value };
-    }
-    setFormValues({ ...values });
-  };
-
-  const handleOnSelect = async (data: any, value: any) => {
-    console.log(data, value, "handleOnSelect");
-    if (data?.onSelect?.fetchFullForm) {
-      const res = await window.electron.triggerFunction({
-        path: data.onSelect.fetchFullForm,
-        inputs: {},
-      });
-      console.log(res?.data?.orderDesign, "handleOnSelect new");
-      let orderDesignData = res?.data?.orderDesign || [];
-      orderDesignData =
-        orderDesignData?.length > 0
-          ? orderDesignData.filter(
-              (item: any) => item.order_id === value[0]?.order_id
-            )
-          : [];
-      console.log(orderDesignData, "orderDesignData handleOnSelect");
-      setDesignData(orderDesignData);
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    console.log(orderMaster, "orderMaster");
+    try {
+      const res = await window.electron.saveForm([
+        {
+          ...orderMaster,
+          formName: formObj.fieldName,
+        },
+      ]);
+      console.log(res, "handdleSubmit");
+      if (res?.data) {
+        toast.success(res.message);
+        setOrderMaster({ ...res?.data, _is_new: 0 });
+      } else {
+        toast.error(res.error.message);
+      }
+    } catch (error) {
+      console.error("Error saving data:", error);
     }
   };
 
   return (
     <div className="container-fluid">
+      <ToastContainer />
       <div className="card shadow my-4">
-        {/* <div className="card-header bg-primary text-white">
-          <p className="mb-0 ">Sales Order Master Form</p>
-        </div> */}
-        <form className="row p-4 g-2">
-          {fields.map((field, index) => (
-            <div className="col-md-2" key={index}>
-              {/* Text Input */}
-              {field.type === "text" && (
-                <div className="">
-                  <label htmlFor={field.name} className="form-label fs-10">
-                    {field.label}
-                  </label>
-                  <input
-                    type="text"
-                    id={field.name}
-                    className="form-control  fs-10"
-                    value={formValues[field.name] as string}
-                    onChange={(e) => handleChange(e, field.name)}
-                    placeholder={`Enter ${field.label}`}
-                  />
-                </div>
-              )}
-              {field.type === "number" && (
-                <div className="">
-                  <label htmlFor={field.name} className="form-label fs-10">
-                    {field.label}
-                  </label>
-                  <input
-                    type="number"
-                    id={field.name}
-                    className="form-control fs-10"
-                    value={formValues[field.name] as number}
-                    onChange={(e) => handleChangeNumber(e, field.name)}
-                    placeholder={`Enter ${field.label}`}
-                  />
-                </div>
-              )}
-              {/* Calendar Input */}
-              {field.type === "calendar" && (
-                <div className="">
-                  <label htmlFor="dateInput" className="form-label fs-10">
-                    {field.label || "Select Date"}
-                  </label>
-                  <input
-                    type="date"
-                    id="dateInput fs-10"
-                    className="form-control fs-10"
-                    placeholder="Choose a date"
-                    value={formValues[field.name] as string}
-                    onChange={(e) => handleCalendarChange(e, field.name)}
-                  />
-                </div>
-              )}
-
-              {/* Autocomplete Input */}
-              {field.type === "autoComplete" && (
-                <div className="">
-                  <label htmlFor={field.name} className="form-label fs-10">
-                    {field.label}
-                  </label>
-                  <AutoCompleteDropDown
-                    field={field}
-                    formValues={formValues}
-                    setFormValues={setFormValues}
-                    defaultValue={formValues[field.name]}
-                    fieldName={fieldName}
-                    updateStateFunction={updateStateFunction}
-                    size={"small"}
-                    handleOnSelect={handleOnSelect}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </form>
-        <div>
-          <div className="d-flex justify-content-end my-2 ">
-            <div className="me-2">
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn btn-success fs-10"
-              >
-                Open Modal
-              </button>
-            </div>
-            <div className="mx-4">
-              <button
-                type="submit"
-                className="btn btn-success px-4 fs-10"
-                onClick={handdleSubmit}
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
+        <CommonFormComponent
+          formMainObj={formObj}
+          orderMaster={orderMaster}
+          setOrderMaster={setOrderMaster}
+        />
       </div>
       <div className="card shadow">
         <div className="">
-          {
+          {!orderMaster._is_new ? (
             <TableComponent
-              orderId={formValues.order_id as number}
-              designData={designData}
+              orderId={orderMaster?.order_id as number}
+              orderMaster={orderMaster}
+              setOrderMaster={setOrderMaster}
+              formObj={formObj}
             />
-          }
+          ) : (
+            ""
+          )}
         </div>
       </div>
-      <div>
-        {showModal && (
-          <ModalForm
-            orderMasterId={formValues?.order_id as number}
-            onSubmit={handleSubmit}
-            onClose={handleClose}
-          />
-        )}
+
+      <div className="p-4 text-end">
+        <button className="btn btn-success px-4 fs-10" onClick={handleSubmit}>
+          Submit
+        </button>
       </div>
     </div>
   );
