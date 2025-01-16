@@ -2,8 +2,7 @@ import "./App.css";
 import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
 import NewFormPage from "./componenets/NewFormPage";
 import CustomerForm from "./componenets/CustomerForm";
-import Layout from "./componenets/Layout";
-import FormPage from "./componenets/FormPage";
+import SalesOrderList from "./componenets/SalesOrderList";
 
 function App() {
   const router = createBrowserRouter([
@@ -13,6 +12,10 @@ function App() {
       children: [
         {
           path: "/",
+          Component: SalesOrderList,
+        },
+        {
+          path: "order-design-new/:id",
           Component: NewFormPage,
         },
         {
