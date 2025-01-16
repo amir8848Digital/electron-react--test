@@ -59,7 +59,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
   ) => {
     let updatedRowData = [...orderMaster.order_design];
     updatedRowData = updatedRowData.map((row, i) =>
-      i === index ? { ...row, [field]: value, is_updated: 1 } : row
+      i === index ? { ...row, [field]: value, _is_updated: 1 } : row
     );
     setOrderMaster({
       ...orderMaster,
@@ -94,7 +94,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
       exp_dely_date: null,
       prod_setting: null,
       fixed_price: 0,
-      is_new: 1,
+      _is_new: 1,
       formName: "orderDesign",
     };
 

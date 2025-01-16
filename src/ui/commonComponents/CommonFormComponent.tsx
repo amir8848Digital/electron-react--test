@@ -15,13 +15,13 @@ const CommonFormComponent = ({
   }
 
   const operationType = (typeOfOperation: any, value: any) => {
-    if (typeOfOperation === "is_new" || "is_updated" || "is_deleted") {
+    if (typeOfOperation === "_is_new" || "_is_updated" || "_is_deleted") {
       return { [typeOfOperation]: value };
     }
   };
 
   const stateUpdater = (name: any, value: any) => {
-    const operationSet = operationType("is_updated", 1);
+    const operationSet = operationType("_is_updated", 1);
     console.log({ operationSet });
     setOrderMaster((prev: any) => ({
       ...prev,

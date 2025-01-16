@@ -214,9 +214,9 @@ const NewFormPage = () => {
           type: "text",
           show: false,
         },
-        is_deleted: {
+        _is_deleted: {
           label: "Deleted",
-          name: "is_deleted",
+          name: "_is_deleted",
           value: 0,
           type: "icon",
           iconType: <MdDelete className="text-danger" />,
@@ -244,7 +244,7 @@ const NewFormPage = () => {
               ) {
                 currentDesign.is_delete = 1;
               }
-              if (currentDesign.is_delete === 1 && currentDesign.is_new) {
+              if (currentDesign.is_delete === 1 && currentDesign._is_new) {
                 updatedOrderDesign.splice(index, 1);
               } else {
                 updatedOrderDesign[index] = currentDesign;
@@ -279,7 +279,7 @@ const NewFormPage = () => {
 
   const [orderMaster, setOrderMaster] = useState<any>({
     ...initialState,
-    is_new: 1,
+    _is_new: 1,
     order_design: [],
   });
   const [showModal, setShowModal] = useState(false);
@@ -309,7 +309,7 @@ const NewFormPage = () => {
       console.log(res, "handdleSubmit");
       if (res?.data) {
         toast.success(res.message);
-        setOrderMaster({ ...res?.data, _is_new: 0 });
+        setOrderMaster({ ...res?.data, __is_new: 0 });
       } else {
         toast.error(res.error.message);
       }
@@ -330,7 +330,7 @@ const NewFormPage = () => {
       </div>
       <div className="card shadow">
         <div className="">
-          {!orderMaster._is_new ? (
+          {!orderMaster.__is_new ? (
             <TableComponent
               orderId={orderMaster?.order_id as number}
               orderMaster={orderMaster}
