@@ -4,9 +4,8 @@ import { pathToFileURL } from 'url';
 
 
 export async function triggerFunction(client:any,kwargs: any): Promise<any> {
-  try {
-    const { path: funcPath, inputs } = kwargs;
 
+    const { path: funcPath, inputs } = kwargs;
     if (!funcPath || typeof funcPath !== "string") {
       throw new Error("Invalid function path provided.");
     }
@@ -22,17 +21,9 @@ export async function triggerFunction(client:any,kwargs: any): Promise<any> {
       success: true,
       data: result,
     };
-  } catch (error: any) {
-    console.error("Error in triggerFunction:", error);
-    return {
-      success: false,
-      error: error.message,
-    };
-  }
 }
 
 async function resolveFunction(funcPath: string): Promise<any> {
-    try {
       const pathSegments = funcPath.split(".");
   
       if (pathSegments.length === 0) {
@@ -47,8 +38,4 @@ async function resolveFunction(funcPath: string): Promise<any> {
         throw new Error(`No function found at path: ${funcPath}`);
       }
       return module[functionName];
-    } catch (error) {
-      console.error("Error resolving function for path:", funcPath, error);
-      throw new Error(`Failed to resolve function at path: ${funcPath}`);
-    }
   }
