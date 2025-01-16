@@ -1,0 +1,18 @@
+{
+    "table": "order_master",
+    "filters":["order_id"],
+    "onSelect":{
+        "fetchFullForm": "forms.orderMaster.autoCompleteFields.fetchFullForm"
+    },
+    "columns":[
+        "order_id",
+        "TO_CHAR(order_date, 'YYYY-MM-DD') AS order_date",
+        "customer_id",
+        "customer_name",
+        "currency",
+        "TO_CHAR(po_date, 'YYYY-MM-DD') AS po_date",
+        "po_no",
+        "priority"
+    ]
+
+}

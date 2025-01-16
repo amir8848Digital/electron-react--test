@@ -1,14 +1,6 @@
 {
   "tableName": "order_labour_chart",
   "formName": "orderLabourChart",
-  "parent_id": "order_design_id",
-  "dependent": 1,
-  "dependentTables": [
-    {
-      "dependentTable": "OrderDesign",
-      "foreign_column": "order_design_id",
-      "foreign_row_id": "sr_no"
-    }
-  ]
+  "parent_id": "order_design_id"
 }
 

@@ -1,10 +1,8 @@
 {
-  "tableName": "OrderDesign",
-  "formName": "orderDesign",
-  "dependent_on": 1,
+  "tableName": "oder_design",
+  "formName": "OrderDesign",
   "primary_key": "order_design_id",
   "parent_id": "order_id",
-  "row_id": "sr_no",
   "autoCompleteFields": {
     "design_code": {
       "table": "Design",
