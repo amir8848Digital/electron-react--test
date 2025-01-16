@@ -236,15 +236,15 @@ const NewFormPage = () => {
                 return prevState;
               }
               const currentDesign = { ...updatedOrderDesign[index] };
-              if (currentDesign.is_delete === 1) {
-                currentDesign.is_delete = 0;
+              if (currentDesign._is_deleted === 1) {
+                currentDesign._is_deleted = 0;
               } else if (
-                currentDesign.is_delete === 0 ||
-                !currentDesign.is_delete
+                currentDesign._is_deleted === 0 ||
+                !currentDesign._is_deleted
               ) {
-                currentDesign.is_delete = 1;
+                currentDesign._is_deleted = 1;
               }
-              if (currentDesign.is_delete === 1 && currentDesign._is_new) {
+              if (currentDesign._is_deleted === 1 && currentDesign._is_new) {
                 updatedOrderDesign.splice(index, 1);
               } else {
                 updatedOrderDesign[index] = currentDesign;
