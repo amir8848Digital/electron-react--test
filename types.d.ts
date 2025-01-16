@@ -16,5 +16,6 @@ interface Window {
     getOrderDesignDetails:any;
     triggerFunction:any;
     saveForm:any;
+    listview:any;
   };
 }

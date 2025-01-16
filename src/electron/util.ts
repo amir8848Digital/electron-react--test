@@ -1,7 +1,4 @@
-import * as path from "path";
-import { promises as fs } from "fs";
-import { app } from "electron";
-import { getFormConfigPath } from "./pathResolver.js";
+import { getFormConfigPath ,getListViewPath} from "./pathResolver.js";
 import { triggerFunction } from "./triggerHandler.js";
 
 export function isDev(): boolean {
@@ -10,8 +7,6 @@ export function isDev(): boolean {
 export async function getAutoCompleteData(client: any, query: any) {
   const formName = query.formName;
   const config = await getFormConfig(formName);
-  console.log(config.autoCompleteFields);
-  console.log(config.autoCompleteFields[query.fieldname]);
   return getData(client, config.autoCompleteFields[query.fieldname], query);
 }
 
@@ -26,7 +21,6 @@ async function getData(
   queryConfig: any,
   query: any
 ): Promise<any[]> {
-  console.log("Query Config:", queryConfig, query);
 
   let queryConditions = "";
   const params: any[] = [];
@@ -49,10 +43,8 @@ async function getData(
       LIMIT 20;
     `;
 
-  console.log("Generated SQL Query:", sqlQuery);
 
   const result: any = await client.query(sqlQuery, params);
-  console.log("Result:", result.rows);
   return result.rows;
 }
 
@@ -73,7 +65,6 @@ export async function saveForm(client: any, formDataArray: any) {
 
   for (let formData of formDataArray) {
     const path = `forms.${formData.formName}.main.saveForm`;
-    console.log("func path:", path);
     const result = await triggerFunction(client, {
       path,
       inputs: { configs, formData },
@@ -97,7 +88,6 @@ export async function saveFormData(
   parent_id: any = null
 ) {
   let savedFormData = { ...formData };
-  console.log("Saved Form Data:", savedFormData);
 
   if (formData._delete === 1) {
     await deleteData(client, formData, configs);
@@ -204,7 +194,6 @@ async function insertData(
     VALUES (${placeholders})
     RETURNING ${primaryKey};
   `;
-  console.log(query);
   const r = await client.query(query, values);
   return r.rows[0]?.[primaryKey];
 }
@@ -288,3 +277,29 @@ async function checkIfRecordExists(
   // If count > 0, record exists
   return result.rows[0].count > 0;
 }
+
+export async function getListView(client: any, kwargs: any) {
+  let formName = kwargs.formName;
+  let filters = kwargs.filters || {};
+  
+  // Example filter object
+  // filters = { "order_id": 1, "customer_id": 2 };
+
+  const configpath = await getListViewPath(formName);
+  const configModule = await import(configpath, { with: { type: "json" } });
+  let listViewConfig = configModule.default;
+
+  let query = `SELECT ${listViewConfig.columns} FROM ${listViewConfig.table}`;
+
+  // If filters exist, format them for SQL query using LIKE
+  if (Object.keys(filters).length > 0) {
+    const filterConditions = Object.entries(filters)
+      .map(([key, value]) => `${key}::text LIKE '%${value}%'`) // Using LIKE operator for partial match
+      .join(' AND ');
+
+    query += ` WHERE ${filterConditions}`;
+  }
+  const result = await client.query(query);
+  return result.rows;
+}
+

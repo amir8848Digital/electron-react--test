@@ -1,5 +1,5 @@
 {
-  "tableName": "OrderMaster",
+  "tableName": "order_master",
   "formName": "orderMaster",
   "primary_key": "order_id",
   "autoCompleteFields": {
@@ -17,7 +17,7 @@
       "primaryField": "customer_id"
     },
     "order_id": {
-      "table": "OrderMaster",
+      "table": "order_master",
       "columns": [
         "order_id",
         "TO_CHAR(order_date, 'YYYY-MM-DD') AS order_date",

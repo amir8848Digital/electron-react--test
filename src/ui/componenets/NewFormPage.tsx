@@ -6,6 +6,16 @@ import CommonFormComponent from "../commonComponents/CommonFormComponent";
 import { toast, ToastContainer } from "react-toastify";
 
 const NewFormPage = () => {
+  useEffect(() => {
+    const fetch = async()=>{
+    const res = await  window.electron.listview({formName:"orderMaster", filters:{ }}).then((res: any) => {
+        console.log(res, "order_master");
+      
+      });
+
+    }
+    fetch()
+  },[]  );
   interface FormValues {
     [key: string]: string | Date | null | Date | number | undefined;
   }

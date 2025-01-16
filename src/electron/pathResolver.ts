@@ -27,3 +27,14 @@ export function getFormConfigPath(formName: string): string {
       );
   return pathToFileURL(filePath).href;
 }
+
+export function  getListViewPath(formName: string): string {
+  const filePath = path.join(app.getAppPath(),  
+        isDev() ? '.' : '..', 
+        "src/electron/forms",
+        formName,
+        `list_view.json`
+      );
+  return pathToFileURL(filePath).href;
+}
+  

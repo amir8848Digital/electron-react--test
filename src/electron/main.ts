@@ -1,13 +1,13 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow } from "electron";
 import {
   getAutoCompleteData,
   isDev,
   getFormConfig,
   getOrderDesignDetails,
   saveForm,
+  getListView
 } from "./util.js";
 import { triggerFunction } from "./triggerHandler.js";
-// import {  insertData,getSalesOrderData,} from './resourceManager.js';
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { ipcMain } from "electron";
 import { performTransaction } from "./db.js";
@@ -35,19 +35,22 @@ app.on("ready", () => {
     });
   });
 
+  ipcMain.handle("listview", async (_,filters:any) => {
+    return await performTransaction("readOnly", async (client) => {
+      return await getListView(client,filters);
+    });
+  });
+
   ipcMain.handle("getFormConfig", (_, formName: any) => {
     return getFormConfig(formName);
   });
-  ipcMain.handle("insertFormData", async (_, formData: any) => {
-    return await performTransaction("write", async (client) => {
-     // return await insertFormData(client, formData);
-    });
-  });
+
   ipcMain.handle("getOrderDesignDetails",async (_, designCode: string) => {
     return await performTransaction("readOnly", async (client) => {
       return await getOrderDesignDetails(client, designCode);
     });
   });
+
   ipcMain.handle("triggerFunction",async (_, kwargs: any) => {
     return await performTransaction("readOnly", async (client) => {
       return await triggerFunction(client,kwargs);

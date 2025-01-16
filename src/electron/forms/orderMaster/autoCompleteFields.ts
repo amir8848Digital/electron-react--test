@@ -37,9 +37,9 @@ export async function fetchFullForm(client: any, kwargs: any) {
                 '[]'::JSON
             ) AS order_design
         FROM 
-            orderMaster om
+            order_master om
         LEFT JOIN 
-            orderDesign od ON CAST(od.parent_id AS INTEGER) = om.order_id
+            order_design od ON CAST(od.parent_id AS INTEGER) = om.order_id
         WHERE 
             om.order_id = $1
         GROUP BY 
