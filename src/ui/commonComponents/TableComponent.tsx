@@ -46,6 +46,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
     rate: 0,
     value: 0,
     formName: "orderLabourChart",
+    _is_new: 1,
   };
 
   const [dataRateChart, setDataRateChart] = useState<any[]>([]);
@@ -132,6 +133,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
     rate_chart: [],
     labour_chart: [],
     formName: "orderRateChart",
+    _is_new: 1,
   };
 
   const handleAddTable = (
@@ -336,12 +338,11 @@ const TableComponent: React.FC<TableComponentProps> = ({
         <div className="row">
           <div className="col-6 my-2">
             {typeof activeIndex === "number" &&
-            orderMaster.order_design[activeIndex] ? (
+            orderMaster?.order_design[activeIndex] ? (
               <RateChartTable
                 data={orderMaster}
                 setData={setOrderMaster}
                 index={activeIndex}
-                setOrderMaster={setOrderMaster}
               />
             ) : (
               ""
@@ -349,7 +350,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
           </div>
           <div className="col-6 my-2">
             {typeof activeIndex === "number" &&
-            orderMaster.order_design[activeIndex] ? (
+            orderMaster?.order_design[activeIndex] ? (
               <LabourChartTable
                 data={orderMaster}
                 setData={setOrderMaster}

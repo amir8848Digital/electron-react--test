@@ -1,17 +1,16 @@
 import React from "react";
+import { MdDelete } from "react-icons/md";
 
 interface RateChartTableProps {
   data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
   index: number;
-  setOrderMaster: any;
 }
 
 const RateChartTable: React.FC<RateChartTableProps> = ({
   data,
   setData,
   index,
-  setOrderMaster,
 }) => {
   const fields = [
     "_order_design_id",
@@ -38,6 +37,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
     "h_set",
     "sshp",
     "m_material",
+    "Delete",
   ];
 
   const formatFieldLabel = (field: string) => {
@@ -60,6 +60,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
       updatedRateChart[rowIndex] = {
         ...updatedRateChart[rowIndex],
         [fieldName]: value,
+        _is_updated: 1,
       };
       design.rate_chart = updatedRateChart;
       updatedOrderDesign[index] = design;
@@ -96,10 +97,11 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
     sshp: 0,
     m_material: "",
     formName: "orderRateChart",
+    _is_new: 1,
   };
 
   const addRow = () => {
-    setOrderMaster((prev: any) => {
+    setData((prev: any) => {
       const updatedOrderDesign = [...prev.order_design];
       const designIndex = index;
 
@@ -130,6 +132,39 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
     });
   };
 
+  const handleDelete = (rowIndex: number) => {
+    // Create a shallow copy of the order design array
+    const updatedOrderDesign = [...data.order_design];
+    const designIndex = index;
+
+    // Ensure the design index is valid
+    if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
+      const currentDesign = updatedOrderDesign[designIndex];
+
+      if (
+        currentDesign.rate_chart &&
+        rowIndex >= 0 &&
+        rowIndex < currentDesign.rate_chart.length
+      ) {
+        const row = currentDesign.rate_chart[rowIndex];
+        if (row._is_deleted === 1) {
+          row._is_deleted = 0;
+        } else {
+          row._is_deleted = 1;
+        }
+        if (row._is_deleted === 1 && row._is_new === 1) {
+          currentDesign.rate_chart.splice(rowIndex, 1);
+        }
+        updatedOrderDesign[designIndex] = currentDesign;
+      }
+    }
+
+    setData((prev: any) => ({
+      ...prev,
+      order_design: updatedOrderDesign,
+    }));
+  };
+
   return (
     <div className="card shadow">
       <div className="d-flex justify-content-between">
@@ -149,6 +184,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                   {formatFieldLabel(field)}
                 </th>
               ))}
+              <th className="fs-10">Actions</th> {/* Add actions column */}
             </tr>
           </thead>
           <tbody>
@@ -160,11 +196,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                       {field === "_order_design_id" ? (
                         <input
                           type="number"
-                          name={`
-                            order_design[${index}].rate_chart[${rowIndex}][
-                              ${field}
-                            ]
-                          }`}
+                          name={`order_design[${index}].rate_chart[${rowIndex}][${field}]`}
                           value={row[field] || ""}
                           readOnly
                           className="form-control fs-10"
@@ -194,11 +226,7 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                               ? "number"
                               : "text"
                           }
-                          name={`
-                            order_design[${index}].rate_chart[${rowIndex}][
-                              ${field}
-                            ]
-                          }`}
+                          name={`order_design[${index}].rate_chart[${rowIndex}][${field}]`}
                           value={row[field] || ""}
                           onChange={(e) =>
                             handleCellChange(rowIndex, field, e.target.value)
@@ -208,6 +236,17 @@ const RateChartTable: React.FC<RateChartTableProps> = ({
                       )}
                     </td>
                   ))}
+                  <td>
+                    <span
+                      onClick={() => handleDelete(rowIndex)}
+                      style={{
+                        cursor: "pointer",
+                        color: row._is_delete === 1 ? "blue" : "red",
+                      }}
+                    >
+                      <MdDelete />
+                    </span>
+                  </td>
                 </tr>
               )
             )}

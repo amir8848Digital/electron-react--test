@@ -1,5 +1,5 @@
 import React from "react";
-
+import { MdDelete } from "react-icons/md";
 interface LabourChartTableProps {
   data: any;
   setData: React.Dispatch<React.SetStateAction<Array<Record<string, any>>>>;
@@ -42,6 +42,7 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
       updatedRateChart[rowIndex] = {
         ...updatedRateChart[rowIndex],
         [fieldName]: value,
+        _is_updated: 1,
       };
       design.labour_chart = updatedRateChart;
       updatedOrderDesign[index] = design;
@@ -51,6 +52,7 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
       };
     });
   };
+
   const initialDataLabourChart = {
     _order_design_id: null,
     maind_cd: "",
@@ -60,6 +62,7 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
     rate: 0,
     value: 0,
     formName: "orderLabourChart",
+    _is_new: 1,
   };
 
   const addRow = () => {
@@ -75,11 +78,6 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
         if (!currentDesign.labour_chart) {
           currentDesign.labour_chart = [];
         }
-
-        // currentDesign.rate_chart = [
-        //   ...currentDesign.rate_chart,
-        //   initailDataRateChart,
-        // ];
         currentDesign.labour_chart = [
           ...currentDesign.labour_chart,
           initialDataLabourChart,
@@ -92,6 +90,39 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
         order_design: updatedOrderDesign,
       };
     });
+  };
+
+  const handleDelete = (rowIndex: number) => {
+    // Create a shallow copy of the order design array
+    const updatedOrderDesign = [...data.order_design];
+    const designIndex = index;
+
+    // Ensure the design index is valid
+    if (designIndex >= 0 && designIndex < updatedOrderDesign.length) {
+      const currentDesign = updatedOrderDesign[designIndex];
+
+      if (
+        currentDesign.labour_chart &&
+        rowIndex >= 0 &&
+        rowIndex < currentDesign.labour_chart.length
+      ) {
+        const row = currentDesign.labour_chart[rowIndex];
+        if (row._is_deleted === 1) {
+          row._is_deleted = 0;
+        } else {
+          row._is_deleted = 1;
+        }
+        if (row._is_deleted === 1 && row._is_new === 1) {
+          currentDesign.labour_chart.splice(rowIndex, 1);
+        }
+        updatedOrderDesign[designIndex] = currentDesign;
+      }
+    }
+
+    setData((prev: any) => ({
+      ...prev,
+      order_design: updatedOrderDesign,
+    }));
   };
 
   return (
@@ -156,6 +187,17 @@ const LabourChartTable: React.FC<LabourChartTableProps> = ({
                         )}
                       </td>
                     ))}
+                    <td>
+                      <span
+                        onClick={() => handleDelete(rowIndex)}
+                        style={{
+                          cursor: "pointer",
+                          color: row._is_delete === 1 ? "blue" : "red",
+                        }}
+                      >
+                        <MdDelete />
+                      </span>
+                    </td>
                   </tr>
                 )
               )}

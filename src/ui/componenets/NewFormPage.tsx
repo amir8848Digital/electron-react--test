@@ -309,7 +309,7 @@ const NewFormPage = () => {
       console.log(res, "handdleSubmit");
       if (res?.data) {
         toast.success(res.message);
-        setOrderMaster({ ...res?.data, __is_new: 0 });
+        setOrderMaster({ ...res?.data, _is_new: 0 });
       } else {
         toast.error(res.error.message);
       }
@@ -330,16 +330,14 @@ const NewFormPage = () => {
       </div>
       <div className="card shadow">
         <div className="">
-          {!orderMaster.__is_new ? (
-            <TableComponent
-              orderId={orderMaster?.order_id as number}
-              orderMaster={orderMaster}
-              setOrderMaster={setOrderMaster}
-              formObj={formObj}
-            />
-          ) : (
-            ""
-          )}
+          (
+          <TableComponent
+            orderId={orderMaster?.order_id as number}
+            orderMaster={orderMaster}
+            setOrderMaster={setOrderMaster}
+            formObj={formObj}
+          />
+          )
         </div>
       </div>
 

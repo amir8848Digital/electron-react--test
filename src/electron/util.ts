@@ -83,7 +83,7 @@ export async function saveForm(client: any, formDataArray: any) {
   let x = {
     status: "success",
     message: "Data saved successfully",
-    data: savedData,
+    data: savedData[0].data,
   };
   return x;
 }
