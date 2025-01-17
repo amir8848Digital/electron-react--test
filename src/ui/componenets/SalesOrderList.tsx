@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import type { ColDef } from "ag-grid-community";
+
 import {
   AllCommunityModule,
   ModuleRegistry,
@@ -25,7 +27,6 @@ const SalesOrderList = () => {
     fetch();
   }, []);
 
-  
   const defaultColDef = {
     flex: 1,
   };
@@ -36,7 +37,7 @@ const SalesOrderList = () => {
         style={{
           color: "blue",
           cursor: "pointer",
-          textDecoration: "underline",
+          textDecoration: "none",
         }}
         onClick={() => navigate(`order-design-new/${params.value}`)}
       >
@@ -60,8 +61,20 @@ const SalesOrderList = () => {
     { headerName: "Currency", field: "currency" },
   ];
 
+  const handleAddNewOrder = () => {
+    navigate("order-design-new/");
+  };
+
   return (
     <div className="container-fluid p-2">
+      <div className="d-flex justify-content-end m-2">
+        <button
+          onClick={handleAddNewOrder}
+          className="btn brn-primary bg-success text-white"
+        >
+          Add new
+        </button>
+      </div>
       <div className={`ag-theme-alpine`} style={{ height: 400 }}>
         <AgGridReact
           theme={"legacy"}
